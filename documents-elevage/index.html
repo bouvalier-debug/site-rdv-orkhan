@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Documents, mémos et fiches pratiques de l’Élevage de la Dynastie d’Orkhan pour préparer l’arrivée de votre chiot.">
+  <title>Documents élevage — Dynastie d’Orkhan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --burgundy: #6f1226;
+      --burgundy-deep: #3d0b17;
+      --gold: #c6a45c;
+      --gold-soft: #ead9af;
+      --ivory: #fbf7ee;
+      --cream: #fffdf8;
+      --ink: #2d2222;
+      --muted: #6f6262;
+      --line: rgba(198, 164, 92, 0.42);
+      --shadow: 0 18px 45px rgba(61, 11, 23, 0.12);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Lato", Arial, sans-serif;
+      line-height: 1.65;
+      background:
+        linear-gradient(180deg, rgba(255, 253, 248, 0.96), rgba(251, 247, 238, 0.95)),
+        radial-gradient(circle at top left, rgba(198, 164, 92, 0.22), transparent 34rem),
+        var(--ivory);
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .site-header {
+      position: relative;
+      overflow: hidden;
+      min-height: 70vh;
+      padding: 28px clamp(18px, 4vw, 56px) 48px;
+      color: var(--cream);
+      background:
+        linear-gradient(135deg, rgba(61, 11, 23, 0.96), rgba(111, 18, 38, 0.88)),
+        linear-gradient(45deg, rgba(198, 164, 92, 0.26), transparent 50%);
+    }
+
+    .site-header::after {
+      content: "";
+      position: absolute;
+      inset: auto -18% -38% 42%;
+      height: 70%;
+      border: 1px solid rgba(234, 217, 175, 0.34);
+      border-radius: 50%;
+      transform: rotate(-8deg);
+      pointer-events: none;
+    }
+
+    .header-inner {
+      position: relative;
+      z-index: 1;
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: clamp(70px, 12vh, 120px);
+      color: var(--gold-soft);
+      font-size: 0.82rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .brand::before {
+      content: "";
+      width: 38px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .hero {
+      max-width: 780px;
+    }
+
+    .hero h1,
+    .section-title,
+    .card h3 {
+      font-family: "Playfair Display", Georgia, serif;
+    }
+
+    .hero h1 {
+      margin: 0 0 18px;
+      font-size: clamp(3rem, 8vw, 6rem);
+      line-height: 0.95;
+      font-weight: 700;
+    }
+
+    .hero .subtitle {
+      margin: 0 0 22px;
+      color: var(--gold-soft);
+      font-size: clamp(1.16rem, 2.2vw, 1.58rem);
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .hero .intro {
+      max-width: 690px;
+      margin: 0;
+      color: rgba(255, 253, 248, 0.88);
+      font-size: clamp(1rem, 1.4vw, 1.12rem);
+    }
+
+    main {
+      width: min(1120px, calc(100% - 36px));
+      margin: -34px auto 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .notice {
+      margin: 0 0 52px;
+      padding: clamp(20px, 3vw, 28px);
+      border: 1px solid var(--line);
+      border-left: 6px solid var(--gold);
+      border-radius: var(--radius);
+      background: rgba(255, 253, 248, 0.98);
+      box-shadow: var(--shadow);
+    }
+
+    .notice p {
+      margin: 0;
+      color: var(--burgundy-deep);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .section {
+      margin: 0 0 72px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 22px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-title {
+      margin: 0;
+      padding-bottom: 14px;
+      color: var(--burgundy-deep);
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.05;
+    }
+
+    .section-kicker {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .grid {
+      display: grid;
+      gap: 22px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid.memos {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 253, 248, 0.96);
+      box-shadow: 0 12px 32px rgba(61, 11, 23, 0.08);
+    }
+
+    .card-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      padding: clamp(20px, 3vw, 28px);
+    }
+
+    .card h3 {
+      margin: 0 0 12px;
+      color: var(--burgundy);
+      font-size: clamp(1.32rem, 2vw, 1.72rem);
+      line-height: 1.12;
+    }
+
+    .card p {
+      margin: 0 0 22px;
+      color: var(--muted);
+    }
+
+    .card .button {
+      margin-top: auto;
+    }
+
+    .memo-image {
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line);
+      background: #efe6d5;
+    }
+
+    .memo-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 12px 18px;
+      border: 1px solid var(--gold);
+      border-radius: 999px;
+      color: var(--cream);
+      background: var(--burgundy);
+      font-size: 0.94rem;
+      font-weight: 900;
+      line-height: 1.2;
+      text-align: center;
+      text-decoration: none;
+      transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
+    }
+
+    .button:hover,
+    .button:focus-visible {
+      transform: translateY(-2px);
+      background: var(--burgundy-deep);
+      box-shadow: 0 12px 24px rgba(61, 11, 23, 0.18);
+      outline: none;
+    }
+
+    .button.secondary {
+      color: var(--burgundy-deep);
+      background: linear-gradient(180deg, #fffaf0, #f3e5c4);
+    }
+
+    .button.secondary:hover,
+    .button.secondary:focus-visible {
+      background: #ead9af;
+    }
+
+    .official-card {
+      min-height: 100%;
+    }
+
+    .official-card .card-body::before,
+    .tool-card .card-body::before {
+      content: "";
+      width: 54px;
+      height: 3px;
+      margin-bottom: 20px;
+      background: var(--gold);
+    }
+
+    .memo-card h3 {
+      font-size: 1.25rem;
+    }
+
+    .memo-card p {
+      font-size: 0.95rem;
+    }
+
+    .footer {
+      margin-top: 32px;
+      padding: 42px clamp(18px, 4vw, 56px);
+      color: rgba(255, 253, 248, 0.9);
+      background: var(--burgundy-deep);
+      text-align: center;
+    }
+
+    .footer-inner {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+
+    .footer strong {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--gold-soft);
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: 1.55rem;
+      line-height: 1.2;
+    }
+
+    .footer p {
+      margin: 5px 0;
+    }
+
+    .footer a {
+      color: var(--gold-soft);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 4px;
+    }
+
+    @media (max-width: 980px) {
+      .grid.memos {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .site-header {
+        min-height: 78vh;
+        padding-top: 22px;
+      }
+
+      .brand {
+        margin-bottom: 72px;
+        font-size: 0.72rem;
+        letter-spacing: 0.1em;
+      }
+
+      main {
+        width: min(100% - 28px, 1120px);
+        margin-top: -28px;
+      }
+
+      .grid.two,
+      .grid.memos {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        margin-bottom: 56px;
+      }
+
+      .section-heading {
+        display: block;
+      }
+
+      .section-kicker {
+        margin-bottom: 14px;
+      }
+
+      .button {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .site-header {
+        min-height: 82vh;
+      }
+
+      .hero h1 {
+        font-size: 2.75rem;
+      }
+
+      .card-body,
+      .notice {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">Élevage de la Dynastie d’Orkhan</div>
+      <section class="hero" aria-labelledby="page-title">
+        <h1 id="page-title">Documents élevage</h1>
+        <p class="subtitle">Tous les documents utiles pour préparer l’arrivée de votre chiot</p>
+        <p class="intro">Cette page regroupe les principaux documents, mémos et fiches pratiques mis à disposition par l’Élevage de la Dynastie d’Orkhan afin d’accompagner les familles avant et après l’arrivée de leur chiot.</p>
+      </section>
+    </div>
+  </header>
+
+  <main>
+    <aside class="notice" aria-label="Avertissement vétérinaire">
+      <p>Ces documents sont fournis à titre informatif. Ils ne remplacent pas l’avis, le diagnostic ni les prescriptions de votre vétérinaire traitant. En cas de doute, de symptôme ou de problème de santé, consultez rapidement votre vétérinaire.</p>
+    </aside>
+
+    <section class="section" aria-labelledby="official-title">
+      <div class="section-heading">
+        <h2 class="section-title" id="official-title">Documents officiels</h2>
+        <p class="section-kicker">À lire et conserver</p>
+      </div>
+      <div class="grid two">
+        <article class="card official-card">
+          <div class="card-body">
+            <h3>Certificat d’engagement et de connaissance</h3>
+            <p>Document obligatoire à lire, compléter et signer avant l’acquisition d’un chien. Il rappelle les engagements légaux, les besoins fondamentaux du chien, les responsabilités du futur propriétaire et les conditions de cession.</p>
+            <a class="button" href="documents/CEC_Officiel_Orkhan_2026.pdf" target="_blank" rel="noopener noreferrer">Télécharger le CEC</a>
+          </div>
+        </article>
+
+        <article class="card official-card">
+          <div class="card-body">
+            <h3>Livret d’information &amp; carnet de soins</h3>
+            <p>Guide complet pour accompagner votre Cavalier King Charles : arrivée du chiot, alimentation, éducation, socialisation, toilettage, vaccination, vermifugation, antiparasitaires, suivi vétérinaire et sécurité.</p>
+            <a class="button" href="documents/livret_information_CKC_orkhan.pdf" target="_blank" rel="noopener noreferrer">Télécharger le livret</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="memos-title">
+      <div class="section-heading">
+        <h2 class="section-title" id="memos-title">Mémos rapides</h2>
+        <p class="section-kicker">Fiches visuelles</p>
+      </div>
+      <div class="grid memos">
+        <article class="card memo-card">
+          <a class="memo-image" href="images/memo-cec.png" target="_blank" rel="noopener noreferrer" aria-label="Voir l’image Mémo CEC">
+            <img src="images/memo-cec.png" alt="Aperçu du mémo CEC" loading="lazy">
+          </a>
+          <div class="card-body">
+            <h3>Mémo CEC</h3>
+            <p>Les points essentiels du Certificat d’Engagement et de Connaissance résumés en une fiche visuelle.</p>
+            <a class="button secondary" href="images/memo-cec.png" target="_blank" rel="noopener noreferrer">Voir l’image</a>
+          </div>
+        </article>
+
+        <article class="card memo-card">
+          <a class="memo-image" href="images/memo-livret-ckc.png" target="_blank" rel="noopener noreferrer" aria-label="Voir l’image Mémo livret CKC">
+            <img src="images/memo-livret-ckc.png" alt="Aperçu du mémo livret CKC" loading="lazy">
+          </a>
+          <div class="card-body">
+            <h3>Mémo livret CKC</h3>
+            <p>Les essentiels pour bien accueillir votre Cavalier King Charles.</p>
+            <a class="button secondary" href="images/memo-livret-ckc.png" target="_blank" rel="noopener noreferrer">Voir l’image</a>
+          </div>
+        </article>
+
+        <article class="card memo-card">
+          <a class="memo-image" href="images/plaquettes-ckc.png" target="_blank" rel="noopener noreferrer" aria-label="Voir l’image Les plaquettes chez le Cavalier King Charles">
+            <img src="images/plaquettes-ckc.png" alt="Aperçu du mémo sur les plaquettes chez le Cavalier King Charles" loading="lazy">
+          </a>
+          <div class="card-body">
+            <h3>Les plaquettes chez le Cavalier King Charles</h3>
+            <p>Une particularité de race à connaître pour éviter les inquiétudes et les interprétations erronées lors d'une prise de sang.</p>
+            <a class="button secondary" href="images/plaquettes-ckc.png" target="_blank" rel="noopener noreferrer">Voir l’image</a>
+          </div>
+        </article>
+
+        <article class="card memo-card">
+          <a class="memo-image" href="images/aliments-dangers-chiot.png" target="_blank" rel="noopener noreferrer" aria-label="Voir l’image Aliments et dangers à éviter">
+            <img src="images/aliments-dangers-chiot.png" alt="Aperçu du mémo aliments et dangers à éviter" loading="lazy">
+          </a>
+          <div class="card-body">
+            <h3>Aliments &amp; dangers à éviter</h3>
+            <p>Les aliments toxiques, dangers domestiques et conduites à tenir pour protéger son chiot.</p>
+            <a class="button secondary" href="images/aliments-dangers-chiot.png" target="_blank" rel="noopener noreferrer">Voir l’image</a>
+          </div>
+        </article>
+
+        <article class="card memo-card">
+          <a class="memo-image" href="images/standard-ckc.png" target="_blank" rel="noopener noreferrer" aria-label="Voir l’image Standard illustré du Cavalier King Charles">
+            <img src="images/standard-ckc.png" alt="Aperçu du standard illustré du Cavalier King Charles" loading="lazy">
+          </a>
+          <div class="card-body">
+            <h3>Standard illustré du Cavalier King Charles</h3>
+            <p>Repères morphologiques essentiels du Cavalier King Charles.</p>
+            <a class="button secondary" href="images/standard-ckc.png" target="_blank" rel="noopener noreferrer">Voir l’image</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="tools-title">
+      <div class="section-heading">
+        <h2 class="section-title" id="tools-title">Outils en ligne</h2>
+        <p class="section-kicker">Accès rapides</p>
+      </div>
+      <div class="grid two">
+        <article class="card tool-card">
+          <div class="card-body">
+            <h3>Suivi santé CKC</h3>
+            <p>Calculs de vaccins, vermifugation, antiparasitaires, poids et conseils santé.</p>
+            <a class="button" href="/suivi-sante-ckc/">Accéder au suivi santé</a>
+          </div>
+        </article>
+
+        <article class="card tool-card">
+          <div class="card-body">
+            <h3>Prendre rendez-vous à l’élevage</h3>
+            <p>Demande de rendez-vous en ligne pour une visite, une réservation ou le départ du chiot.</p>
+            <a class="button" href="/">Prendre rendez-vous</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <strong>Élevage de la Dynastie d’Orkhan</strong>
+      <p>52 rue de Masny — 59234 Monchecourt</p>
+      <p>SIRET : 421 173 824 00028</p>
+      <p>03 27 99 03 64</p>
+      <p><a href="mailto:contact@dynastiedorkhan.com">contact@dynastiedorkhan.com</a></p>
+    </div>
+  </footer>
+</body>
+</html>

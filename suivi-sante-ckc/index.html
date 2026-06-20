@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suivi Santé — Cavalier King Charles · Dynastie d'Orkhan</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bx: #7B1D2E;
+  --bx2: #5c1522;
+  --or: #C5A028;
+  --or2: #a8881f;
+  --bg: #ffffff;
+  --bg2: #faf9f7;
+  --border: #ece8e1;
+  --text: #1e1e1e;
+  --muted: #6b6560;
+  --green: #1e6e42;
+  --green-bg: #eaf5ee;
+  --amber: #8a5200;
+  --amber-bg: #fff4e0;
+  --red: #8b1a1a;
+  --red-bg: #fdeaea;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Lato',sans-serif;background:var(--bg2);color:var(--text);min-height:100vh;font-size:15px;}
+
+/* ── HEADER ── */
+header{background:var(--bx);color:#fff;padding:22px 20px 18px;text-align:center;}
+header h1{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;letter-spacing:.3px;}
+header p{font-size:.78rem;opacity:.75;margin-top:5px;letter-spacing:1.5px;text-transform:uppercase;font-weight:300;}
+.gold-bar{height:3px;background:var(--or);}
+
+/* ── NAV ── */
+nav{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;
+    box-shadow:0 2px 10px rgba(0,0,0,.06);overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.nav-inner{display:flex;min-width:max-content;padding:0 12px;}
+.tab{padding:13px 15px;cursor:pointer;font-size:.78rem;font-weight:900;letter-spacing:.8px;
+     text-transform:uppercase;color:var(--muted);border-bottom:3px solid transparent;
+     transition:all .2s;white-space:nowrap;user-select:none;}
+.tab:hover{color:var(--bx);}
+.tab.on{color:var(--bx);border-bottom-color:var(--or);}
+
+/* ── LAYOUT ── */
+main{max-width:780px;margin:0 auto;padding:24px 14px 40px;}
+.sec{display:none;}
+.sec.on{display:block;}
+
+/* ── CARDS ── */
+.card{background:#fff;border-radius:10px;padding:22px 20px;margin-bottom:18px;
+      border:1px solid var(--border);box-shadow:0 1px 6px rgba(0,0,0,.04);}
+.card-title{font-family:'Playfair Display',serif;font-size:1.08rem;color:var(--bx);
+            margin-bottom:16px;display:flex;align-items:center;gap:9px;}
+.card-title::before{content:'';display:block;width:3px;height:18px;background:var(--or);border-radius:2px;flex-shrink:0;}
+.sec-heading{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--bx);margin-bottom:4px;}
+.sec-sub{font-size:.84rem;color:var(--muted);margin-bottom:20px;}
+
+/* ── FORMS ── */
+.fg{margin-bottom:14px;}
+label.lbl{display:block;font-size:.74rem;font-weight:900;letter-spacing:.7px;
+          text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+input[type=date],input[type=number],select{
+  width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:7px;
+  font-family:'Lato',sans-serif;font-size:.93rem;color:var(--text);
+  background:var(--bg2);transition:border-color .2s;-webkit-appearance:none;}
+input:focus,select:focus{outline:none;border-color:var(--bx);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:440px){.row2{grid-template-columns:1fr;}}
+
+/* ── TOGGLE ── */
+.toggle{display:flex;gap:6px;margin-bottom:14px;}
+.tgl-btn{flex:1;padding:9px 6px;border:1px solid var(--border);border-radius:7px;
+         background:#fff;cursor:pointer;font-family:'Lato',sans-serif;
+         font-size:.78rem;font-weight:900;letter-spacing:.4px;color:var(--muted);
+         text-transform:uppercase;transition:all .2s;}
+.tgl-btn.on{background:var(--bx);color:#fff;border-color:var(--bx);}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:.86rem;margin-top:4px;}
+.tbl thead tr th{background:var(--bx);color:#fff;padding:9px 12px;text-align:left;
+                  font-size:.74rem;letter-spacing:.6px;text-transform:uppercase;font-weight:700;}
+.tbl thead tr th:first-child{border-radius:7px 0 0 0;}
+.tbl thead tr th:last-child{border-radius:0 7px 0 0;}
+.tbl tbody tr:nth-child(even) td{background:var(--bg2);}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.tbl tbody tr:last-child td{border-bottom:none;}
+.tbl tbody tr.past td{opacity:.45;}
+
+/* ── BADGES ── */
+.bdg{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.72rem;font-weight:700;white-space:nowrap;}
+.bdg-eleveur{background:#fef3c7;color:#92400e;}
+.bdg-client{background:#dbeafe;color:#1e40af;}
+.bdg-warn{background:#fee2e2;color:#991b1b;}
+.bdg-ok{background:#d1fae5;color:#065f46;}
+.bdg-info{background:#e0f2fe;color:#075985;}
+
+/* ── NOTE BOX ── */
+.notebox{background:#fffbeb;border-left:3px solid var(--or);padding:11px 14px;
+         border-radius:0 7px 7px 0;font-size:.84rem;color:var(--text);margin-top:14px;line-height:1.6;}
+
+/* ── STATUS BOXES ── */
+.status{text-align:center;padding:14px 16px;border-radius:8px;margin-top:10px;line-height:1.5;}
+.status small{display:block;font-size:.82rem;opacity:.85;margin-top:3px;}
+.s-ok{background:var(--green-bg);color:var(--green);}
+.s-warn{background:var(--amber-bg);color:var(--amber);}
+.s-bad{background:var(--red-bg);color:var(--red);}
+
+/* ── CHART ── */
+.chart-wrap{position:relative;height:290px;margin:14px 0 4px;}
+
+/* ── RECO CARDS ── */
+.reco{display:flex;align-items:flex-start;gap:14px;padding:15px;
+      border:1px solid var(--border);border-radius:9px;margin-bottom:12px;}
+.reco-ico{font-size:1.7rem;line-height:1;flex-shrink:0;margin-top:2px;}
+.reco-title{font-weight:900;color:var(--bx);margin-bottom:4px;font-size:.95rem;}
+.reco-desc{font-size:.84rem;color:var(--muted);line-height:1.55;}
+
+/* ── HEALTH LIST ── */
+.health-list{list-style:none;line-height:2;}
+.health-list li{font-size:.88rem;padding:8px 0;border-bottom:1px solid var(--border);}
+.health-list li:last-child{border-bottom:none;}
+
+/* ── HIDDEN ── */
+.hide{display:none!important;}
+
+/* ── PRINT BTN ── */
+.print-btn{display:inline-flex;align-items:center;gap:6px;background:var(--bg2);
+           border:1px solid var(--border);color:var(--muted);padding:7px 14px;
+           border-radius:7px;font-family:'Lato',sans-serif;font-size:.78rem;
+           font-weight:700;cursor:pointer;letter-spacing:.4px;text-transform:uppercase;
+           margin-bottom:16px;transition:all .2s;}
+.print-btn:hover{border-color:var(--bx);color:var(--bx);}
+
+/* ── FOOTER ── */
+footer{text-align:center;padding:18px 16px;color:var(--muted);font-size:.78rem;
+       border-top:1px solid var(--border);margin-top:10px;line-height:1.8;}
+footer strong{color:var(--bx);}
+footer a{color:var(--or2);text-decoration:none;}
+
+/* ── PRINT ── */
+@media print{
+  nav,.print-btn,footer{display:none!important;}
+  .sec{display:block!important;}
+  .card{box-shadow:none!important;break-inside:avoid;margin-bottom:12px;}
+  body{background:#fff;}
+  .hide{display:none!important;}
+}
+@media(max-width:500px){
+  .tbl{font-size:.8rem;}
+  .tbl td,.tbl th{padding:7px 8px;}
+  header h1{font-size:1.25rem;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🐾 Suivi Santé — Cavalier King Charles</h1>
+  <p>Élevage de la Dynastie d'Orkhan</p>
+</header>
+<div class="gold-bar"></div>
+
+<nav>
+  <div class="nav-inner">
+    <div class="tab on" onclick="showSec('vaccins',this)">💉 Vaccins</div>
+    <div class="tab" onclick="showSec('vermi',this)">🔬 Vermifugations</div>
+    <div class="tab" onclick="showSec('anti',this)">🛡️ Antiparasitaires</div>
+    <div class="tab" onclick="showSec('poids',this)">⚖️ Poids</div>
+    <div class="tab" onclick="showSec('reco',this)">📋 Conseils</div>
+  </div>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════ VACCINS ═══════════════════════════════ -->
+<div id="sec-vaccins" class="sec on">
+  <p class="sec-heading">Planning vaccinal</p>
+  <p class="sec-sub">Calcul automatique de toutes les dates de rappels</p>
+
+  <div class="card">
+    <div class="card-title">Date de référence</div>
+    <div class="fg">
+      <label class="lbl">Date de la 1ère injection</label>
+      <input type="date" id="inp-primo" oninput="calcV()">
+    </div>
+    <div class="fg" style="margin-top:6px;">
+      <label class="lbl">Options</label>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text);">
+          <input type="checkbox" id="opt-rage" onchange="calcV()">
+          Inclure vaccin Rage (voyage / sortie du territoire)
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text);">
+          <input type="checkbox" id="opt-lepto6" onchange="calcV()">
+          Leptospirose tous les 6 mois (risque élevé : eau stagnante, chasse, campagne)
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div id="v-result" class="hide">
+    <button class="print-btn" onclick="window.print()">🖨️ Imprimer / PDF</button>
+    <div class="card">
+      <div class="card-title">Calendrier vaccinal complet</div>
+      <div style="overflow-x:auto;">
+        <table class="tbl" id="v-table"></table>
+      </div>
+      <div class="notebox">
+        <strong>CHPPi</strong> — Carré, Hépatite, Parvovirose, Parainfluenza : rappel à 2 ans, puis tous les <strong>3 ans</strong>.<br>
+        <strong>Leptospirose</strong> — rappel annuel minimum, ou tous les 6 mois si exposition élevée.<br>
+        <strong>Rage</strong> — obligatoire notamment pour les sorties du territoire. Dès 12 semaines. Validité selon le vaccin utilisé et les indications portées par votre vétérinaire dans le passeport.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ VERMIFUGATIONS ═══════════════════════════════ -->
+<div id="sec-vermi" class="sec">
+  <p class="sec-heading">Calendrier de vermifugation</p>
+  <p class="sec-sub">Protocole chiot toutes les 2 semaines, puis mensuel, puis trimestriel adulte</p>
+
+  <div class="card">
+    <div class="card-title">Date de naissance du chiot</div>
+    <div class="fg">
+      <label class="lbl">Date de naissance</label>
+      <input type="date" id="inp-birth-vr" oninput="calcVr()">
+    </div>
+  </div>
+
+  <div id="vr-result" class="hide">
+    <button class="print-btn" onclick="window.print()">🖨️ Imprimer / PDF</button>
+    <div class="card">
+      <div class="card-title">Planning de vermifugation</div>
+      <div style="overflow-x:auto;">
+        <table class="tbl" id="vr-table"></table>
+      </div>
+      <div class="notebox">
+        🔬 À partir de <strong>6 mois</strong>, une <strong>coproscopie</strong> est recommandée pour identifier les parasites présents et adapter le traitement, plutôt qu'une vermifugation systématique aveugle.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ ANTIPARASITAIRES ═══════════════════════════════ -->
+<div id="sec-anti" class="sec">
+  <p class="sec-heading">Antiparasitaires externes</p>
+  <p class="sec-sub">Puces, tiques et parasites cutanés</p>
+
+  <div class="card">
+    <div class="card-title">Paramètres du traitement</div>
+    <div class="row2">
+      <div class="fg">
+        <label class="lbl">Date du 1er traitement</label>
+        <input type="date" id="inp-anti-date" oninput="calcAnti()">
+      </div>
+      <div class="fg">
+        <label class="lbl">Fréquence</label>
+        <select id="inp-anti-freq" onchange="onFreqChange()">
+          <option value="30">Mensuel — 1 mois</option>
+          <option value="90">Trimestriel — 3 mois</option>
+          <option value="180">Semestriel — 6 mois</option>
+          <option value="0">Personnalisé…</option>
+        </select>
+      </div>
+    </div>
+    <div id="anti-custom" class="fg hide">
+      <label class="lbl">Intervalle en jours</label>
+      <input type="number" id="inp-anti-days" min="7" max="365" placeholder="Ex : 45 jours" oninput="calcAnti()">
+    </div>
+    <div class="notebox">
+      ⚠️ Respecter impérativement <strong>l'AMM du produit utilisé</strong> ou la recommandation de votre vétérinaire.
+      Les intervalles varient selon le produit (Frontline® mensuel, Bravecto® 12 semaines, Simparica® mensuel, Seresto® 7–8 mois…).
+    </div>
+  </div>
+
+  <div id="anti-result" class="hide">
+    <button class="print-btn" onclick="window.print()">🖨️ Imprimer / PDF</button>
+    <div class="card">
+      <div class="card-title">Prochains traitements — 24 mois</div>
+      <div style="overflow-x:auto;">
+        <table class="tbl" id="anti-table"></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ POIDS ═══════════════════════════════ -->
+<div id="sec-poids" class="sec">
+  <p class="sec-heading">Courbe de poids CKC</p>
+  <p class="sec-sub">Cavalier King Charles Spaniel — courbe de référence 0 à 18 mois</p>
+
+  <div class="card">
+    <div class="card-title">Situation de votre chiot</div>
+    <div class="row2">
+      <div class="fg">
+        <label class="lbl">Âge (mois)</label>
+        <input type="number" id="inp-age" min="0" max="18" step="0.5" placeholder="Ex : 4" oninput="checkPoids()">
+      </div>
+      <div class="fg">
+        <label class="lbl">Poids actuel (kg)</label>
+        <input type="number" id="inp-poids" min="0.1" max="15" step="0.05" placeholder="Ex : 4.2" oninput="checkPoids()">
+      </div>
+    </div>
+    <div id="poids-status"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Courbe de référence — 0 à 18 mois</div>
+    <div class="chart-wrap">
+      <canvas id="poids-chart"></canvas>
+    </div>
+    <div class="notebox">
+      📊 <strong>Zone dorée</strong> = poids idéal. Le CKC gagne environ <strong>1 kg/mois</strong> jusqu'à 8–10 mois, puis se stabilise entre <strong>7 et 9 kg</strong> adulte. La ligne centrale représente la moyenne.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ RECOMMANDATIONS ═══════════════════════════════ -->
+<div id="sec-reco" class="sec">
+  <p class="sec-heading">Conseils & recommandations santé</p>
+  <p class="sec-sub">Soins préventifs spécifiques au Cavalier King Charles</p>
+
+  <div class="card">
+    <div class="card-title">Suivi préventif recommandé</div>
+
+    <div class="reco">
+      <div class="reco-ico">🦴</div>
+      <div style="flex:1;">
+        <div class="reco-title">Ostéopathie canine — 1 séance par an</div>
+        <div class="reco-desc">
+          Une séance annuelle permet de détecter et de corriger précocement les tensions musculo-squelettiques.
+          Particulièrement important chez le CKC, prédisposé aux tensions cervicales et dorsales.
+          À planifier de préférence après le premier anniversaire.
+        </div>
+        <div style="margin-top:12px;">
+          <div class="fg">
+            <label class="lbl">Date de la dernière séance</label>
+            <input type="date" id="inp-osteo" oninput="calcOsteo()" style="max-width:220px;">
+          </div>
+          <div id="osteo-result"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Hygiène & entretien</div>
+    <ul class="health-list">
+      <li>👂 <strong>Nettoyage des oreilles et des yeux</strong> — <strong>toutes les semaines</strong> avec un produit adapté et de qualité. Les oreilles tombantes du CKC favorisent l'accumulation de cire et les otites ; les yeux sont sujets aux sécrétions.</li>
+      <li>🦷 <strong>Nettoyage des dents</strong> — <strong>toutes les semaines</strong> avec une brosse et un dentifrice adaptés au chien. Prévient le tartre et les maladies parodontales.</li>
+      <li>🔧 <strong>Détartrage vétérinaire</strong> — selon état dentaire, généralement tous les 1 à 2 ans.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Toilettage</div>
+    <ul class="health-list">
+      <li>🛁 <strong>Bain mensuel</strong> — shampooing dilué selon les recommandations du fabricant + après-shampooing de qualité, adaptés au pelage du CKC. Rinçage soigneux et <strong>séchage obligatoire au sèche-cheveux</strong> pour obtenir un poil lisse et lustré.</li>
+      <li>🪮 <strong>Brossage hebdomadaire</strong> — minimum une fois par semaine. Tous les jours en période de mue. Utiliser une brosse en soie ou en sanglier, jamais de carde métallique qui arrache les poils.</li>
+      <li>🪮 <strong>Peigne — 2 fois par semaine</strong> — zones à risque : oreilles, plastron et jupe au niveau des pattes arrière. Les nœuds peuvent devenir douloureux si négligés.</li>
+      <li>✂️ <strong>Les poils ne se coupent pas</strong> — sauf sous les pattes et entre les coussinets (évite l'accumulation de terre), légèrement autour des pieds pour un aspect arrondi mais emplumé, et le bas des oreilles si effiloché.</li>
+      <li>🧤 <strong>Entre les bains (mâles)</strong> — passer un gant humide sur le ventre pour éliminer les traces d'urine qui collent le poil et le jaunissent.</li>
+      <li>💅 <strong>Ongles</strong> — couper selon la pousse avec une pince à ongles adaptée. Commencer dès le plus jeune âge pour habituer le chiot. Couper très peu à la fois : attention à la <strong>partie vivante de l'ongle</strong> qui, si coupée, provoque un saignement.</li>
+      <li>🔴 <strong>Glandes anales</strong> — à vider régulièrement pour éviter engorgement et abcès. Demander la technique à votre vétérinaire.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Alimentation</div>
+    <ul class="health-list">
+      <li>🍽️ <strong>Jusqu'à 4 mois</strong> — 3 à 4 repas par jour.</li>
+      <li>🍽️ <strong>De 4 à 6 mois</strong> — 3 repas par jour.</li>
+      <li>🍽️ <strong>À partir de 6 mois</strong> — 2 repas par jour (matin et soir).</li>
+      <li>💧 <strong>Eau fraîche à volonté</strong> — renouveler quotidiennement.</li>
+      <li>⏱️ <strong>Temps de repas</strong> — laisser la gamelle disponible <strong>15 minutes maximum</strong>, puis la retirer même si elle n'est pas terminée. Cela régule la prise alimentaire et évite le grignotage.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Activité physique</div>
+    <ul class="health-list">
+      <li>🚶 <strong>Pas d'exercice intensif avant la fin de croissance</strong> — éviter les sauts, les escaliers répétés, les courses trop longues et les activités violentes jusqu'à environ 10–12 mois. Les cartilages de croissance sont fragiles.</li>
+      <li>🌿 <strong>Privilégier les promenades courtes et régulières</strong> — plusieurs fois par jour, à rythme libre, en laissant le chiot s'arrêter quand il le souhaite.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Diarrhée de stress après l'arrivée du chiot</div>
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.75;margin-bottom:10px;">Le changement d'environnement, le voyage, la séparation de la fratrie et l'émotion liée à l'arrivée dans une nouvelle famille peuvent parfois provoquer un épisode de diarrhée passager chez le chiot.</p>
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.75;margin-bottom:10px;">Dans la majorité des cas, le chiot reste en forme, joue normalement et conserve un bon appétit.</p>
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.75;margin-bottom:10px;">En cas de diarrhée légère après l'arrivée, et uniquement si le chiot reste vif, mange et boit normalement, suivez les conseils remis au départ de l'élevage.</p>
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.75;margin-bottom:10px;">En complément, l'utilisation d'un probiotique vétérinaire peut aider à soutenir la flore intestinale. Exemples : Pro-Kolin+, Fortiflora Chien, Canikur Pro, ou probiotique équivalent conseillé par votre vétérinaire.</p>
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.75;margin-bottom:10px;">Maintenir l'alimentation habituelle du chiot, éviter tout changement brutal d'alimentation, ne pas distribuer de restes de table et laisser de l'eau fraîche à disposition.</p>
+    <div class="notebox" style="background:#fff8f1;">
+      Consultez rapidement un vétérinaire si la diarrhée persiste plus de 48 heures, si des vomissements apparaissent, si le chiot refuse de manger, semble fatigué ou abattu, si du sang est présent dans les selles ou si son état général vous inquiète.
+    </div>
+  </div>
+
+  <div class="card" style="border-left:3px solid #c0392b;">
+    <div class="card-title" style="color:#c0392b;">⚠️ Aliments & dangers à éviter</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:.85rem;">
+      <div>
+        <p style="font-weight:900;color:#c0392b;text-transform:uppercase;font-size:.75rem;letter-spacing:.5px;margin-bottom:8px;">☠️ Aliments toxiques — jamais</p>
+        <ul style="list-style:none;line-height:1.9;">
+          <li>🍫 Chocolat et cacao</li>
+          <li>🍇 Raisins et raisins secs</li>
+          <li>🧅 Oignons, ail, poireaux, ciboulette</li>
+          <li>🍬 Xylitol (chewing-gums, bonbons)</li>
+          <li>🥜 Noix de macadamia</li>
+          <li>🥖 Pâte à pain crue levée</li>
+          <li>🍺 Alcool, caféine, médicaments humains</li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-weight:900;color:#8a5200;text-transform:uppercase;font-size:.75rem;letter-spacing:.5px;margin-bottom:8px;">⚠️ À éviter / mal tolérés</p>
+        <ul style="list-style:none;line-height:1.9;">
+          <li>🦴 Os cuits, noyaux, épis de maïs</li>
+          <li>🥛 Lait de vache et produits laitiers</li>
+          <li>🥑 Avocat et gros noyaux</li>
+          <li>🧂 Restes de table gras, salés, sucrés</li>
+          <li>🌿 Laurier-rose, muguet, azalée, if</li>
+          <li>🧹 Produits ménagers, huiles essentielles</li>
+        </ul>
+      </div>
+    </div>
+    <div class="notebox" style="margin-top:14px;background:#fff0f0;border-left-color:#c0392b;">
+      🚨 En cas d'ingestion : <strong>NE PAS faire vomir sans avis vétérinaire</strong>. Notez le produit ingéré, la quantité et l'heure.<br>
+      📞 <strong>Centre antipoison vétérinaire (CNITV) : 04 78 87 10 40</strong>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🏠 La règle des 3 / 3 / 3</div>
+    <p style="font-size:.85rem;color:var(--muted);margin-bottom:14px;">Période d'adaptation normale pour un chiot qui arrive dans un nouvel environnement. Soyez patients et bienveillants !</p>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:#fffbeb;border-radius:8px;border-left:3px solid var(--or);">
+        <div style="font-size:1.4rem;flex-shrink:0;">3️⃣</div>
+        <div><strong style="color:var(--bx);">3 jours — Décompresser</strong><br><span style="font-size:.84rem;color:var(--muted);">Se sent dépassé, peut avoir peur, ne pas manger ni boire, se ferme sur lui-même. Normal !</span></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:#fffbeb;border-radius:8px;border-left:3px solid var(--or);">
+        <div style="font-size:1.4rem;flex-shrink:0;">3️⃣</div>
+        <div><strong style="color:var(--bx);">3 semaines — Apprendre la routine</strong><br><span style="font-size:.84rem;color:var(--muted);">Commence à s'habituer, montre sa personnalité. Des problèmes de comportement peuvent apparaître.</span></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:#fffbeb;border-radius:8px;border-left:3px solid var(--or);">
+        <div style="font-size:1.4rem;flex-shrink:0;">3️⃣</div>
+        <div><strong style="color:var(--bx);">3 mois — Se sentir à la maison</strong><br><span style="font-size:.84rem;color:var(--muted);">Confortable, fait confiance à sa famille, s'habitue à sa routine de façon durable.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎓 Éducation & propreté</div>
+    <ul class="health-list">
+      <li>🚽 <strong>Propreté</strong> — sortir le chiot après chaque repas, réveil et jeu. Récompenser immédiatement quand il fait ses besoins dehors (caresses, friandise). Ne jamais gronder après coup : le chiot ne comprend pas.</li>
+      <li>🌍 <strong>Socialisation — avant 12 semaines</strong> — exposer le chiot à des environnements variés : ville, campagne, personnes de tous âges, autres animaux, véhicules, bruits. C'est la période clé pour construire un chien équilibré.</li>
+      <li>✋ <strong>Mordillement</strong> — si le chiot mordille trop fort, dire fermement "NON" et interrompre le jeu. Ne jamais jouer à des jeux de tiraillement ou de poursuite qui encouragent la morsure.</li>
+      <li>🏆 <strong>Éducation positive</strong> — récompenser les bons comportements immédiatement. La punition ne sert que si elle intervient au moment exact du comportement indésirable. Patience et cohérence avant tout.</li>
+    </ul>
+  </div>
+
+  <div class="card" style="border-left:3px solid var(--or);">
+    <div class="card-title">Prendre rendez-vous à l'élevage</div>
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.7;margin-bottom:14px;">Accédez au site de prise de rendez-vous de l'élevage pour organiser votre venue.</p>
+    <a href="/" style="display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:7px;background:var(--bx);color:#fff;text-decoration:none;font-weight:900;font-size:.82rem;letter-spacing:.5px;text-transform:uppercase;">Prendre rendez-vous à l'élevage</a>
+  </div>
+
+  <div class="card" style="background:#fffbeb;border-left:3px solid var(--or);">
+    <div class="card-title">Avertissement vétérinaire</div>
+    <p style="font-size:.88rem;color:var(--text);line-height:1.75;">Cet outil est fourni à titre indicatif pour aider les familles à organiser le suivi de leur Cavalier King Charles. Il ne remplace pas l'avis, le diagnostic ni les prescriptions de votre vétérinaire traitant. En cas de doute, de symptôme ou de problème de santé, consultez rapidement votre vétérinaire.</p>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <strong>Élevage de la Dynastie d'Orkhan</strong> — 52 rue de Masny, 59234 Monchecourt<br>
+  SIRET : 421 173 824 00028<br>
+  <a href="tel:0327990364">03 27 99 03 64</a> · <a href="mailto:contact@dynastiedorkhan.com">contact@dynastiedorkhan.com</a> · <a href="/">Prendre rendez-vous à l'élevage</a>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────
+//  NAVIGATION
+// ─────────────────────────────────────────────
+function showSec(id, el) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('sec-' + id).classList.add('on');
+  el.classList.add('on');
+}
+
+// ─────────────────────────────────────────────
+//  DATE HELPERS
+// ─────────────────────────────────────────────
+const addD = (d, n) => { const r = new Date(d); r.setDate(r.getDate() + n); return r; };
+const addW = (d, n) => addD(d, n * 7);
+const addM = (d, n) => { const r = new Date(d); r.setMonth(r.getMonth() + n); return r; };
+const addY = (d, n) => { const r = new Date(d); r.setFullYear(r.getFullYear() + n); return r; };
+const fmt  = d => d.toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
+const past = d => d < new Date();
+
+// ─────────────────────────────────────────────
+//  VACCINS
+// ─────────────────────────────────────────────
+function calcV() {
+  const v = document.getElementById('inp-primo').value;
+  if (!v) return;
+  const primo = new Date(v);
+
+  const rage   = document.getElementById('opt-rage').checked;
+  const lepto6 = document.getElementById('opt-lepto6').checked;
+  const rows   = [];
+
+  // Protocole core
+  rows.push({ lbl:'Primovaccination 1', date:primo,             vac:'CHPPi',                             who:'eleveur', note:'' });
+  const r1 = addW(primo, 4);
+  rows.push({ lbl:'Rappel 1',           date:r1,               vac:'CHPPi + Leptospirose' + (rage ? ' + Rage' : ''), who:'client', note:'' });
+  const r2 = addW(r1, 4);
+  rows.push({ lbl:'Rappel 2',           date:r2,               vac:'CHPPi + Leptospirose',              who:'client', note:'' });
+
+  // 12 mois depuis primo
+  const rm12 = addM(primo, 12);
+  rows.push({ lbl:'Rappel 12 mois',     date:rm12,             vac:'CHPPi + Leptospirose',              who:'client', note:'' });
+
+  // Lepto 6 mois
+  if (lepto6) {
+    rows.push({ lbl:'Lepto 6 mois',     date:addM(r2, 6),      vac:'Leptospirose',                      who:'client', note:'Risque élevé' });
+    rows.push({ lbl:'Lepto 18 mois',    date:addM(r2, 18),     vac:'Leptospirose',                      who:'client', note:'Risque élevé' });
+  }
+
+  // 2 ans
+  const rm24 = addM(primo, 24);
+  rows.push({ lbl:'Rappel 2 ans',       date:rm24,             vac:'CHPPi + Leptospirose',              who:'client', note:'' });
+
+  // Triennaux DHPPi + Lepto annuel jusqu'à 14 ans
+  for (let i = 1; i <= 4; i++) {
+    const y = addY(rm24, i * 3);
+    rows.push({ lbl:`Rappel ${2 + i*3} ans`, date:y,           vac:'CHPPi + Leptospirose',              who:'client', note:'' });
+    if (lepto6) {
+      rows.push({ lbl:`Lepto ${2+i*3-2}–${2+i*3} ans`, date:addM(y, -18), vac:'Leptospirose', who:'client', note:'Risque élevé' });
+    }
+  }
+
+  // Rage triennale si activée
+  if (rage) {
+    const rageDate = addW(primo, 4); // donnée au rappel 1
+    for (let i = 1; i <= 4; i++) {
+      rows.push({ lbl:`Rappel Rage ${i*3} ans`, date:addY(rageDate, i*3), vac:'Rage', who:'client', note:'Voyage requis' });
+    }
+  }
+
+  rows.sort((a, b) => a.date - b.date);
+
+  let html = `<thead><tr><th>Acte vaccinal</th><th>Date</th><th>Vaccins</th><th>Remarque</th></tr></thead><tbody>`;
+  rows.forEach(r => {
+    const p = past(r.date);
+    const who = r.who === 'eleveur'
+      ? `<span class="bdg bdg-eleveur">Éleveur</span>`
+      : `<span class="bdg bdg-client">Propriétaire</span>`;
+    const note = r.note ? `<span class="bdg bdg-warn">${r.note}</span>` : '—';
+    html += `<tr class="${p ? 'past' : ''}">
+      <td><strong>${p ? '✓ ' : ''}${r.lbl}</strong><br>${who}</td>
+      <td style="white-space:nowrap;">${fmt(r.date)}</td>
+      <td>${r.vac}</td>
+      <td>${note}</td>
+    </tr>`;
+  });
+  html += '</tbody>';
+
+  document.getElementById('v-table').innerHTML = html;
+  document.getElementById('v-result').classList.remove('hide');
+}
+
+// ─────────────────────────────────────────────
+//  VERMIFUGATIONS
+// ─────────────────────────────────────────────
+function calcVr() {
+  const v = document.getElementById('inp-birth-vr').value;
+  if (!v) return;
+  const b = new Date(v);
+  const rows = [];
+
+  // Toutes les 2 sem jusqu'à 12 sem
+  for (let w = 2; w <= 12; w += 2) {
+    rows.push({
+      lbl: `${w} semaines`,
+      date: addW(b, w),
+      who: w <= 10 ? 'eleveur' : 'client',
+      special: w === 12 ? 'depart' : ''
+    });
+  }
+
+  // Mensuel de 3 à 5 mois
+  for (let m = 3; m <= 5; m++) {
+    rows.push({ lbl: `${m} mois`, date: addM(b, m), who: 'client', special: '' });
+  }
+
+  // 6 mois : coproscopie
+  rows.push({ lbl: '6 mois', date: addM(b, 6), who: 'client', special: 'copro' });
+
+  // Trimestriel adulte
+  for (let m = 9; m <= 24; m += 3) {
+    rows.push({ lbl: `${m} mois`, date: addM(b, m), who: 'client', special: m % 6 === 0 ? 'copro-option' : '' });
+  }
+
+  let html = `<thead><tr><th>Âge</th><th>Date</th><th>Responsable</th><th>Note</th></tr></thead><tbody>`;
+  rows.forEach(r => {
+    const p = past(r.date);
+    const who = r.who === 'eleveur'
+      ? `<span class="bdg bdg-eleveur">Éleveur</span>`
+      : `<span class="bdg bdg-client">Propriétaire</span>`;
+    let note = '—';
+    if (r.special === 'depart') note = `<span class="bdg bdg-info">Poursuite du protocole chiot</span>`;
+    if (r.special === 'copro')  note = `<span class="bdg bdg-warn">Coproscopie recommandée</span>`;
+    if (r.special === 'copro-option') note = `<span class="bdg bdg-info">Coproscopie si doute</span>`;
+    html += `<tr class="${p ? 'past' : ''}">
+      <td><strong>${p ? '✓ ' : ''}${r.lbl}</strong></td>
+      <td style="white-space:nowrap;">${fmt(r.date)}</td>
+      <td>${who}</td>
+      <td>${note}</td>
+    </tr>`;
+  });
+  html += '</tbody>';
+
+  document.getElementById('vr-table').innerHTML = html;
+  document.getElementById('vr-result').classList.remove('hide');
+}
+
+// ─────────────────────────────────────────────
+//  ANTIPARASITAIRES
+// ─────────────────────────────────────────────
+function onFreqChange() {
+  const v = document.getElementById('inp-anti-freq').value;
+  document.getElementById('anti-custom').classList.toggle('hide', v !== '0');
+  calcAnti();
+}
+
+function calcAnti() {
+  const dateV = document.getElementById('inp-anti-date').value;
+  if (!dateV) return;
+  const freqV = document.getElementById('inp-anti-freq').value;
+  let days;
+  if (freqV === '0') {
+    days = parseInt(document.getElementById('inp-anti-days').value);
+    if (!days || days < 7) return;
+  } else {
+    days = parseInt(freqV);
+  }
+
+  const start = new Date(dateV);
+  const end = addM(start, 24);
+  const rows = [];
+  let cur = new Date(start);
+  while (cur <= end) {
+    rows.push(new Date(cur));
+    cur = addD(cur, days);
+  }
+
+  let html = `<thead><tr><th>#</th><th>Date</th><th>Statut</th></tr></thead><tbody>`;
+  rows.forEach((d, i) => {
+    const p = past(d);
+    const st = p
+      ? `<span class="bdg bdg-ok">✓ Effectué</span>`
+      : `<span class="bdg bdg-client">À planifier</span>`;
+    html += `<tr class="${p ? 'past' : ''}">
+      <td>${i + 1}</td>
+      <td style="white-space:nowrap;">${fmt(d)}</td>
+      <td>${st}</td>
+    </tr>`;
+  });
+  html += '</tbody>';
+
+  document.getElementById('anti-table').innerHTML = html;
+  document.getElementById('anti-result').classList.remove('hide');
+}
+
+// ─────────────────────────────────────────────
+//  POIDS — COURBE CKC
+// ─────────────────────────────────────────────
+const AGE_PTS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18];
+const W_LOW   = [0.25, 0.85, 1.75, 2.65, 3.50, 4.30, 5.15, 5.95, 6.45, 6.70, 6.90, 7.00, 7.00, 7.00];
+const W_HIGH  = [0.40, 1.30, 2.50, 3.55, 4.65, 5.80, 6.85, 7.85, 8.50, 8.80, 8.95, 9.00, 9.00, 9.00];
+const W_MID   = AGE_PTS.map((_, i) => +((W_LOW[i] + W_HIGH[i]) / 2).toFixed(2));
+
+const poidsCtx = document.getElementById('poids-chart').getContext('2d');
+const poidsChart = new Chart(poidsCtx, {
+  type: 'line',
+  data: {
+    labels: AGE_PTS,
+    datasets: [
+      {
+        label: 'Minimum',
+        data: W_LOW,
+        borderColor: 'rgba(197,160,40,.35)',
+        backgroundColor: 'rgba(197,160,40,.12)',
+        fill: '+1',
+        pointRadius: 0,
+        tension: 0.4,
+        borderWidth: 1.5,
+        borderDash: [4, 4],
+      },
+      {
+        label: 'Courbe idéale',
+        data: W_MID,
+        borderColor: '#C5A028',
+        backgroundColor: 'transparent',
+        fill: false,
+        pointRadius: 3,
+        pointBackgroundColor: '#C5A028',
+        tension: 0.4,
+        borderWidth: 2.5,
+      },
+      {
+        label: 'Maximum',
+        data: W_HIGH,
+        borderColor: 'rgba(197,160,40,.35)',
+        backgroundColor: 'rgba(197,160,40,.12)',
+        fill: '-1',
+        pointRadius: 0,
+        tension: 0.4,
+        borderWidth: 1.5,
+        borderDash: [4, 4],
+      },
+      {
+        label: 'Votre chiot',
+        data: new Array(AGE_PTS.length).fill(null),
+        borderColor: '#7B1D2E',
+        backgroundColor: '#7B1D2E',
+        pointRadius: 10,
+        pointHoverRadius: 12,
+        pointStyle: 'circle',
+        showLine: false,
+        fill: false,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        display: true,
+        labels: {
+          filter: item => item.text !== 'Maximum' && item.text !== 'Minimum',
+          color: '#6b6560',
+          font: { family: 'Lato', size: 12 }
+        }
+      },
+      tooltip: {
+        callbacks: {
+          title: ctx => 'Âge : ' + ctx[0].label + ' mois',
+          label: ctx => {
+            if (ctx.parsed.y === null) return null;
+            return ctx.dataset.label + ' : ' + ctx.parsed.y.toFixed(2) + ' kg';
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        title: { display: true, text: 'Âge (mois)', color: '#6b6560', font: { size: 11 } },
+        grid: { color: '#f0ece5' },
+        ticks: { color: '#6b6560' }
+      },
+      y: {
+        title: { display: true, text: 'Poids (kg)', color: '#6b6560', font: { size: 11 } },
+        min: 0, max: 11,
+        grid: { color: '#f0ece5' },
+        ticks: { color: '#6b6560', callback: v => v + ' kg' }
+      }
+    }
+  }
+});
+
+function lerp(arr, age) {
+  for (let i = 0; i < AGE_PTS.length - 1; i++) {
+    if (age >= AGE_PTS[i] && age <= AGE_PTS[i + 1]) {
+      const t = (age - AGE_PTS[i]) / (AGE_PTS[i + 1] - AGE_PTS[i]);
+      return arr[i] + t * (arr[i + 1] - arr[i]);
+    }
+  }
+  return arr[arr.length - 1];
+}
+
+function checkPoids() {
+  const age   = parseFloat(document.getElementById('inp-age').value);
+  const poids = parseFloat(document.getElementById('inp-poids').value);
+  const el    = document.getElementById('poids-status');
+
+  // Clear
+  poidsChart.data.datasets[3].data = new Array(AGE_PTS.length).fill(null);
+
+  if (isNaN(age) || isNaN(poids) || age < 0 || poids <= 0) {
+    el.innerHTML = '';
+    poidsChart.update();
+    return;
+  }
+
+  const lo = lerp(W_LOW, age);
+  const hi = lerp(W_HIGH, age);
+  const mi = lerp(W_MID, age);
+
+  // Plot point at nearest x label
+  const nearestIdx = AGE_PTS.reduce((best, m, i) =>
+    Math.abs(m - age) < Math.abs(AGE_PTS[best] - age) ? i : best, 0);
+  poidsChart.data.datasets[3].data[nearestIdx] = poids;
+  poidsChart.update();
+
+  let cls, icon, msg;
+  if (poids < lo - 0.2) {
+    cls = 's-warn'; icon = '⚠️';
+    msg = `Poids insuffisant — ${poids} kg à ${age} mois<br><small>Plage attendue : ${lo.toFixed(1)} – ${hi.toFixed(1)} kg · Consultez votre vétérinaire.</small>`;
+  } else if (poids > hi + 0.4) {
+    cls = 's-bad'; icon = '⚠️';
+    msg = `Poids excessif — ${poids} kg à ${age} mois<br><small>Plage attendue : ${lo.toFixed(1)} – ${hi.toFixed(1)} kg · Adaptez la ration alimentaire.</small>`;
+  } else {
+    cls = 's-ok'; icon = '✅';
+    msg = `Poids dans la norme — ${poids} kg à ${age} mois<br><small>Plage idéale : ${lo.toFixed(1)} – ${hi.toFixed(1)} kg · Courbe médiane : ${mi.toFixed(2)} kg</small>`;
+  }
+
+  el.innerHTML = `<div class="status ${cls}">${icon} <strong>${msg}</strong></div>`;
+}
+
+// ─────────────────────────────────────────────
+//  OSTÉOPATHE
+// ─────────────────────────────────────────────
+function calcOsteo() {
+  const v = document.getElementById('inp-osteo').value;
+  if (!v) return;
+  const last = new Date(v);
+  const next = addY(last, 1);
+  const diff = Math.round((next - new Date()) / 86400000);
+  let html;
+  if (diff < 0) {
+    html = `<div class="status s-warn">⚠️ Séance en retard de <strong>${Math.abs(diff)} jours</strong><br><small>Prochaine séance recommandée : ${fmt(next)}</small></div>`;
+  } else if (diff <= 45) {
+    html = `<div class="status s-warn">📅 Séance à planifier bientôt — <strong>dans ${diff} jours</strong><br><small>Date : ${fmt(next)}</small></div>`;
+  } else {
+    html = `<div class="status s-ok">✅ Prochain rendez-vous ostéopathe : <strong>${fmt(next)}</strong><br><small>Dans ${diff} jours</small></div>`;
+  }
+  document.getElementById('osteo-result').innerHTML = html;
+}
+</script>
+</body>
+</html>

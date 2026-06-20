@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide de suivi vétérinaire — Élevage de la Dynastie d'Orkhan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bordeaux:#7B1D2E;
+    --bordeaux-dark:#5A1320;
+    --or:#C5A028;
+    --or-light:#E3CE86;
+    --cream:#FBF7EF;
+    --ink:#2B2420;
+    --muted:#6B5D52;
+    --line:#E4D9C6;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Lato',sans-serif;
+    color:var(--ink);
+    background:#cfc6b8;
+    line-height:1.6;
+    font-size:14px;
+  }
+  .page{
+    width:210mm;
+    min-height:297mm;
+    margin:14px auto;
+    background:var(--cream);
+    padding:22mm 20mm 18mm;
+    position:relative;
+    box-shadow:0 10px 40px rgba(0,0,0,.25);
+    overflow:hidden;
+  }
+  .page::before{
+    content:"";
+    position:absolute;top:0;left:0;right:0;height:8px;
+    background:linear-gradient(90deg,var(--bordeaux) 0%,var(--bordeaux) 60%,var(--or) 60%,var(--or) 100%);
+  }
+  /* ---------- COVER ---------- */
+  .cover{
+    background:radial-gradient(circle at 30% 20%, #8C2436 0%, var(--bordeaux) 45%, var(--bordeaux-dark) 100%);
+    color:#fff;
+    display:flex;flex-direction:column;justify-content:center;
+    text-align:center;
+  }
+  .cover::before{background:linear-gradient(90deg,var(--or),var(--or-light),var(--or));height:10px;}
+  .crest{
+    width:84px;height:84px;border:2px solid var(--or);border-radius:50%;
+    margin:0 auto 26px;display:flex;align-items:center;justify-content:center;
+    font-family:'Playfair Display',serif;font-size:34px;color:var(--or);font-weight:700;
+    background:rgba(0,0,0,.12);
+  }
+  .cover .kicker{font-family:'Lato';letter-spacing:.42em;text-transform:uppercase;font-size:11px;color:var(--or-light);margin-bottom:30px;}
+  .cover h1{font-family:'Playfair Display',serif;font-size:46px;line-height:1.12;font-weight:800;margin-bottom:18px;}
+  .cover h1 em{color:var(--or-light);font-style:italic;font-weight:600;}
+  .cover .sub{font-size:16px;font-weight:300;max-width:62%;margin:0 auto 40px;color:#F3E7DA;}
+  .cover .rule{width:70px;height:2px;background:var(--or);margin:0 auto 40px;}
+  .cover .brand{font-family:'Playfair Display',serif;font-size:21px;font-weight:600;letter-spacing:.02em;}
+  .cover .brand span{color:var(--or-light);}
+  .cover .meta{margin-top:8px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--or-light);}
+  .cover-note{
+    position:absolute;bottom:18mm;left:20mm;right:20mm;
+    border-top:1px solid rgba(197,160,40,.4);padding-top:14px;
+    font-size:11.5px;font-weight:300;color:#E9D9CC;font-style:italic;line-height:1.5;
+  }
+
+  /* ---------- HEADERS ---------- */
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin:0 0 18px;}
+  .sec-num{font-family:'Playfair Display',serif;font-size:40px;font-weight:800;color:var(--or);line-height:.8;}
+  .sec-title{font-family:'Playfair Display',serif;font-size:25px;font-weight:700;color:var(--bordeaux);}
+  .sec-title small{display:block;font-family:'Lato';font-size:11.5px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+  .page-kicker{font-size:10.5px;letter-spacing:.32em;text-transform:uppercase;color:var(--or);font-weight:700;margin-bottom:6px;}
+
+  h3{font-family:'Playfair Display',serif;color:var(--bordeaux-dark);font-size:16px;font-weight:700;margin:20px 0 8px;}
+  p{margin-bottom:9px;}
+  .lead{font-size:14.5px;color:var(--muted);margin-bottom:18px;border-left:3px solid var(--or);padding-left:14px;font-style:italic;}
+
+  /* ---------- TABLES ---------- */
+  table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12.5px;}
+  th{background:var(--bordeaux);color:#fff;text-align:left;padding:8px 10px;font-weight:700;font-size:11px;letter-spacing:.04em;text-transform:uppercase;}
+  td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;}
+  tr:nth-child(even) td{background:rgba(197,160,40,.07);}
+  td strong{color:var(--bordeaux-dark);}
+  .age-col{font-weight:700;color:var(--bordeaux);white-space:nowrap;width:24%;}
+
+  /* ---------- CALLOUT ---------- */
+  .callout{
+    background:#fff;border:1px solid var(--line);border-left:4px solid var(--or);
+    border-radius:4px;padding:13px 16px;margin:14px 0;font-size:12.8px;
+  }
+  .callout.warn{border-left-color:var(--bordeaux);background:#FCF3F2;}
+  .callout .ct{font-family:'Playfair Display',serif;font-weight:700;color:var(--bordeaux);font-size:13.5px;margin-bottom:4px;display:flex;align-items:center;gap:7px;}
+  .callout.breed{border-left-color:#7a5b1e;background:#FAF4E2;}
+
+  ul.clean{list-style:none;margin:6px 0 12px;}
+  ul.clean li{position:relative;padding-left:20px;margin-bottom:6px;font-size:13px;}
+  ul.clean li::before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;background:var(--or);transform:rotate(45deg);}
+
+  /* ---------- CHECKLIST ---------- */
+  .check-grid{margin-top:6px;}
+  .check-item{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px dashed var(--line);}
+  .box{flex:0 0 16px;width:16px;height:16px;border:2px solid var(--bordeaux);border-radius:3px;margin-top:2px;}
+  .check-item .txt{font-size:13px;}
+  .check-item .txt b{color:var(--bordeaux-dark);}
+  .check-cat{font-family:'Playfair Display',serif;color:var(--or);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:18px 0 4px;}
+
+  /* ---------- SOURCES ---------- */
+  .sources{font-size:11px;color:var(--muted);line-height:1.5;}
+  .sources li{margin-bottom:7px;padding-left:4px;}
+  .sources b{color:var(--bordeaux-dark);}
+
+  .footer{position:absolute;bottom:12mm;left:20mm;right:20mm;display:flex;justify-content:space-between;
+    font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);padding-top:7px;}
+  .footer span:last-child{color:var(--bordeaux);font-weight:700;}
+  .ref{vertical-align:super;font-size:8.5px;color:var(--or);font-weight:700;}
+
+  @media print{
+    body{background:#fff;}
+    .page{margin:0;box-shadow:none;width:auto;min-height:auto;page-break-after:always;}
+    .page:last-child{page-break-after:auto;}
+    @page{size:A4;margin:0;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<section class="page cover">
+  <div class="crest">O</div>
+  <div class="kicker">Élevage de la Dynastie d'Orkhan</div>
+  <h1>Le suivi vétérinaire<br>de votre <em>chiot</em></h1>
+  <div class="sub">Check-list complète après le départ à 10 semaines — vaccination, vermifuge, antiparasitaire, ostéopathie, visites d'entretien et alimentation.</div>
+  <div class="rule"></div>
+  <div class="brand">Cavalier King Charles <span>&amp;</span> Bullmastiff</div>
+  <div class="meta">Recommandations sourcées · Édition 2026</div>
+  <div class="cover-note">Ce guide rassemble les bonnes pratiques actuelles (WSAVA 2024, ESCCAP 2025) sous forme de calendrier pratique. Il complète, sans jamais le remplacer, l'avis de votre vétérinaire traitant, qui adapte chaque protocole au mode de vie, à la région et à l'état de santé de votre chien.</div>
+</section>
+
+<!-- ============ PAGE 1 — VACCINATION ============ -->
+<section class="page">
+  <div class="page-kicker">Suivi vétérinaire · 01</div>
+  <div class="sec-head">
+    <div class="sec-num">1</div>
+    <div class="sec-title">Vaccination<small>Protocole chiot &amp; rappels adulte</small></div>
+  </div>
+  <p class="lead">Les anticorps transmis par la mère neutralisent une partie des premiers vaccins. C'est pourquoi le chiot reçoit plusieurs injections espacées, la dernière à 16 semaines ou plus.<span class="ref">1</span></p>
+
+  <h3>Calendrier du chiot</h3>
+  <table>
+    <tr><th>Âge</th><th>Acte recommandé</th></tr>
+    <tr><td class="age-col">6–8 sem.</td><td><strong>1<sup>re</sup> injection</strong> CHP (Carré, Hépatite de Rubarth, Parvovirose) ± Parainfluenza. <em>Réalisée à l'élevage avant le départ.</em></td></tr>
+    <tr><td class="age-col">10–12 sem.</td><td><strong>2<sup>e</sup> injection</strong> CHPPi + 1<sup>re</sup> valence <strong>Leptospirose</strong> (forte pression en France).<span class="ref">1,2</span></td></tr>
+    <tr><td class="age-col">16 sem. ou +</td><td><strong>3<sup>e</sup> injection</strong> (dose finale) CHPPiL — indispensable pour couvrir les chiots encore protégés par leur mère.<span class="ref">1</span></td></tr>
+    <tr><td class="age-col">≥ 12 sem.</td><td><strong>Rage</strong> : non obligatoire en France au quotidien, mais requise pour tout voyage UE (passeport) ou pension. Conseillée si déplacements.<span class="ref">1</span></td></tr>
+    <tr><td class="age-col">6 mois</td><td><strong>Rappel précoce</strong> (26<sup>e</sup> semaine) plutôt que d'attendre 12–16 mois : sécurise les rares chiots non immunisés.<span class="ref">1</span></td></tr>
+  </table>
+
+  <h3>Rappels chez l'adulte</h3>
+  <table>
+    <tr><th>Valence</th><th>Fréquence du rappel</th></tr>
+    <tr><td><strong>Carré, Hépatite, Parvovirose</strong> (cœur)</td><td>Tous les <strong>3 ans</strong> — l'immunité des vaccins vivants dure plusieurs années ; inutile de vacciner plus souvent.<span class="ref">1</span></td></tr>
+    <tr><td><strong>Leptospirose</strong></td><td><strong>Annuel</strong> (immunité courte ; risque élevé en zone humide / Nord).<span class="ref">1,2</span></td></tr>
+    <tr><td><strong>Parainfluenza / toux de chenil</strong></td><td><strong>Annuel</strong>, surtout si pension, exposition, regroupements.<span class="ref">1</span></td></tr>
+    <tr><td><strong>Rage</strong></td><td>Selon l'AMM du vaccin (1 à 3 ans), si déplacements à l'étranger.</td></tr>
+  </table>
+
+  <div class="callout"><div class="ct">◆ Titrage sérologique</div>Pour les valences cœur, un test d'anticorps (CDV/CAV/CPV) peut remplacer le rappel systématique et confirmer la protection — option de plus en plus retenue.<span class="ref">1</span></div>
+
+  <div class="callout warn"><div class="ct">◆ Socialisation</div>Le chiot peut commencer sa socialisation pendant la primovaccination : le risque en classe de chiots est faible et le bénéfice comportemental majeur.<span class="ref">1</span></div>
+
+  <div class="footer"><span>Élevage de la Dynastie d'Orkhan</span><span>Vaccination · p. 1</span></div>
+</section>
+
+<!-- ============ PAGE 2 — VERMIFUGE ============ -->
+<section class="page">
+  <div class="page-kicker">Suivi vétérinaire · 02</div>
+  <div class="sec-head">
+    <div class="sec-num">2</div>
+    <div class="sec-title">Vermifugation<small>Parasites internes · ESCCAP GL1</small></div>
+  </div>
+  <p class="lead">Le vermifuge cible les vers digestifs (Toxocara, ankylostomes, ténias). Plusieurs ont un potentiel zoonotique : un rythme régulier protège le chien <em>et</em> la famille.<span class="ref">3</span></p>
+
+  <h3>Chez le chiot</h3>
+  <table>
+    <tr><th>Période</th><th>Protocole</th></tr>
+    <tr><td class="age-col">2 sem. → sevrage</td><td>Traitement dès le 14<sup>e</sup> jour, puis <strong>toutes les 2 semaines</strong> jusqu'à 2 semaines après le sevrage. <em>Réalisé à l'élevage.</em><span class="ref">3</span></td></tr>
+    <tr><td class="age-col">Sevrage → 6 mois</td><td><strong>Une fois par mois</strong> (risque accru : croissance, sol, classes de chiots).<span class="ref">3</span></td></tr>
+  </table>
+
+  <h3>Chez l'adulte</h3>
+  <p>La fréquence se module selon le mode de vie (catégories de risque ESCCAP A→D) :</p>
+  <table>
+    <tr><th>Profil</th><th>Fréquence</th></tr>
+    <tr><td><strong>Standard</strong> (chien de compagnie)</td><td>Au minimum <strong>4 fois par an</strong> (≈ tous les 3 mois).<span class="ref">3</span></td></tr>
+    <tr><td><strong>Risque élevé</strong> : enfants au foyer, accès jardin/extérieur, alimentation crue (BARF), chasse</td><td><strong>Mensuel</strong> — un rythme mensuel prévient en pratique l'excrétion d'œufs.<span class="ref">3,4</span></td></tr>
+    <tr><td><strong>Femelle reproductrice</strong></td><td>Macrocyclique aux ≈ <strong>40<sup>e</sup> et 55<sup>e</sup> jours</strong> de gestation, puis après la mise bas, pour limiter la transmission aux chiots.<span class="ref">3</span></td></tr>
+  </table>
+
+  <div class="callout breed"><div class="ct">◆ Spécial élevage / portée</div>En collectivité, l'ESCCAP conseille une vermifugation <strong>mensuelle planifiée</strong> ou un examen coprologique toutes les 4 semaines avec traitement selon résultat.<span class="ref">3</span></div>
+
+  <div class="callout"><div class="ct">◆ Bon réflexe</div>Adapter la dose au <strong>poids réel</strong> (un Bullmastiff change vite de gabarit !) et alterner les molécules. En cas de doute, une coprologie cible le traitement.<span class="ref">3,5</span></div>
+
+  <div class="footer"><span>Élevage de la Dynastie d'Orkhan</span><span>Vermifuge · p. 2</span></div>
+</section>
+
+<!-- ============ PAGE 3 — ANTIPARASITAIRE EXTERNE ============ -->
+<section class="page">
+  <div class="page-kicker">Suivi vétérinaire · 03</div>
+  <div class="sec-head">
+    <div class="sec-num">3</div>
+    <div class="sec-title">Antiparasitaire externe<small>Puces &amp; tiques · ESCCAP GL3</small></div>
+  </div>
+  <p class="lead">Puces et tiques transmettent maladies et allergies. La plupart des produits modernes ont un effet rémanent : la régularité prime sur le rattrapage.<span class="ref">6</span></p>
+
+  <h3>Rythme recommandé</h3>
+  <table>
+    <tr><th>Âge / profil</th><th>Protocole</th></tr>
+    <tr><td class="age-col">Chiot</td><td>Dès l'âge / le poids minimal de l'AMM du produit (souvent ≈ 8 sem.). Vérifier la mention « chiot » sur la notice.</td></tr>
+    <tr><td class="age-col">Adulte — base</td><td><strong>Application mensuelle</strong> d'un produit homologué (pipette, comprimé, collier).<span class="ref">6,7</span></td></tr>
+    <tr><td class="age-col">Longue durée</td><td>Comprimé fluralaner ≈ <strong>12 sem.</strong> ; colliers imidaclopride/fluméthrine ≈ <strong>8 mois</strong>, deltaméthrine ≈ <strong>6 mois</strong>.<span class="ref">8</span></td></tr>
+  </table>
+
+  <h3>Saisonnalité (Nord de la France)</h3>
+  <ul class="clean">
+    <li><strong>Puces : toute l'année.</strong> Le chauffage des habitations leur permet de survivre en hiver — couverture continue conseillée.<span class="ref">9</span></li>
+    <li><strong>Tiques : surtout printemps → automne</strong>, mais activité de plus en plus étalée selon les températures ; couvrir en saison à risque.<span class="ref">9</span></li>
+  </ul>
+
+  <div class="callout warn"><div class="ct">◆ Traiter tout le foyer</div>L'animal visible ne porte qu'une fraction de l'infestation : traiter <strong>tous les animaux</strong> du domicile et l'<strong>environnement</strong> (aspirateur, couchages lavés) contre les stades immatures.<span class="ref">6</span></div>
+
+  <div class="callout breed"><div class="ct">◆ Repère pli des deux races</div>CKC (oreilles tombantes, franges) et Bullmastiff (plis facial/cou) : inspecter ces zones après chaque sortie ; retirer toute tique rapidement avec un crochet.</div>
+
+  <div class="footer"><span>Élevage de la Dynastie d'Orkhan</span><span>Antiparasitaire · p. 3</span></div>
+</section>
+
+<!-- ============ PAGE 4 — OSTÉO + VISITE + ALIM ============ -->
+<section class="page">
+  <div class="page-kicker">Suivi vétérinaire · 04</div>
+  <div class="sec-head">
+    <div class="sec-num">4</div>
+    <div class="sec-title">Ostéopathie, visites &amp; repas<small>Croissance et entretien</small></div>
+  </div>
+
+  <h3>Ostéopathie</h3>
+  <table>
+    <tr><th>Étape</th><th>Fréquence conseillée</th></tr>
+    <tr><td class="age-col">Chiot</td><td><strong>1 séance</strong> dans la 1<sup>re</sup> année pour vérifier l'équilibre et les aplombs et bien démarrer.<span class="ref">10,11</span></td></tr>
+    <tr><td class="age-col">Grande race (Bullmastiff)</td><td>Suivi de croissance renforcé : séances vers <strong>10 mois</strong> puis en fin de croissance <strong>15–18 mois</strong> (aplombs, lignes de force).<span class="ref">12</span></td></tr>
+    <tr><td class="age-col">Adulte — préventif</td><td><strong>1 à 2 fois par an</strong> ; 2× pour un chien sportif/expo.<span class="ref">10,11</span></td></tr>
+    <tr><td class="age-col">Senior</td><td>Entretien régulier pour la mobilité et l'arthrose.<span class="ref">10</span></td></tr>
+  </table>
+  <p style="font-size:12px;color:var(--muted);font-style:italic;">Soin complémentaire : il ne remplace jamais la consultation vétérinaire. Laisser le chien au repos 2–3 jours après une séance.<span class="ref">11</span></p>
+
+  <h3>Visite vétérinaire d'entretien</h3>
+  <ul class="clean">
+    <li><strong>Bilan annuel</strong> de santé (couplé au rappel vaccinal) : poids, dents, cœur, palpation.</li>
+    <li><strong>CKC :</strong> auscultation cardiaque annuelle dès l'âge adulte, puis renforcée (dépistage de la maladie valvulaire mitrale).</li>
+    <li><strong>Senior</strong> (CKC ≈ 7 ans+, Bullmastiff ≈ 5–6 ans+) : <strong>2 visites par an</strong>, bilan sanguin recommandé.</li>
+  </ul>
+
+  <h3>Fréquence des repas</h3>
+  <table>
+    <tr><th>Âge</th><th>Repas / jour</th></tr>
+    <tr><td class="age-col">2 – 3 mois</td><td><strong>4 repas</strong> (petit estomac, croissance rapide).<span class="ref">13,14</span></td></tr>
+    <tr><td class="age-col">3 – 6 mois</td><td><strong>3 repas</strong>.<span class="ref">13,14</span></td></tr>
+    <tr><td class="age-col">6 – 12 mois</td><td><strong>2 repas</strong>.<span class="ref">13,14</span></td></tr>
+    <tr><td class="age-col">Adulte</td><td><strong>2 repas</strong> (à heures fixes ; éviter le repas unique).<span class="ref">15</span></td></tr>
+  </table>
+  <div class="callout breed"><div class="ct">◆ Aliment « croissance » jusqu'à la taille adulte</div>CKC ≈ <strong>10–12 mois</strong> ; Bullmastiff ≈ <strong>15–24 mois</strong> avec une formule « grande race » (protection articulaire).<span class="ref">14</span> <strong>Bullmastiff :</strong> maintenir au moins 2 repas, repas calme, pas d'effort autour des repas (risque de torsion d'estomac).</div>
+
+  <div class="footer"><span>Élevage de la Dynastie d'Orkhan</span><span>Ostéo · Visites · Repas · p. 4</span></div>
+</section>
+
+<!-- ============ PAGE 5 — CHECKLIST ============ -->
+<section class="page">
+  <div class="page-kicker">Suivi vétérinaire · 05</div>
+  <div class="sec-head">
+    <div class="sec-num">5</div>
+    <div class="sec-title">Check-list à cocher<small>Mémo pratique du nouveau propriétaire</small></div>
+  </div>
+
+  <div class="check-cat">À l'arrivée (semaines suivant le départ)</div>
+  <div class="check-grid">
+    <div class="check-item"><div class="box"></div><div class="txt"><b>2<sup>e</sup> vaccin</b> CHPPi + Leptospirose vers 10–12 semaines</div></div>
+    <div class="check-item"><div class="box"></div><div class="txt"><b>Vermifuge mensuel</b> jusqu'à 6 mois</div></div>
+    <div class="check-item"><div class="box"></div><div class="txt"><b>Antiparasitaire externe</b> adapté à l'âge / au poids</div></div>
+    <div class="check-item"><div class="box"></div><div class="txt">Mise à jour <b>carnet de santé / passeport</b> et identification (puce)</div></div>
+    <div class="check-item"><div class="box"></div><div class="txt">4 repas/jour d'aliment <b>croissance</b></div></div>
+  </div>
+
+  <div class="check-cat">Avant 6 mois</div>
+  <div class="check-grid">
+    <div class="check-item"><div class="box"></div><div class="txt"><b>3<sup>e</sup> vaccin</b> à 16 semaines ou plus</div></div>
+    <div class="check-item"><div class="box"></div><div class="txt"><b>1<sup>re</sup> séance d'ostéopathie</b> (vérification croissance)</div></div>
+    <div class="check-item"><div class="box"></div><div class="txt">Passage à <b>3 puis 2 repas/jour</b></div></div>
+    <div class="check-item"><div class="box"></div><div class="txt"><b>Rappel précoce</b> à 6 mois (26 sem.)</div></div>
+  </div>
+
+  <div class="check-cat">Chaque année (adulte)</div>
+  <div class="check-grid">
+    <div class="check-item"><div class="box"></div><div class="txt"><b>Bilan vétérinaire annuel</b> + rappels Lepto/Parainfluenza</div></div>
+    <div class="check-item"><div class="box"></div><div class="txt"><b>Cœur (CKC)</b> : auscultation cardiaque annuelle</div></div>
+    <div class="check-item"><div class="box"></div><div class="txt"><b>Vermifuge</b> ≥ 4×/an (mensuel si risque)</div></div>
+    <div class="check-item"><div class="box"></div><div class="txt"><b>Antiparasitaire</b> : couverture mensuelle / longue durée</div></div>
+    <div class="check-item"><div class="box"></div><div class="txt"><b>Ostéopathie préventive</b> 1–2×/an</div></div>
+  </div>
+
+  <div class="check-cat">Tous les 3 ans</div>
+  <div class="check-grid">
+    <div class="check-item"><div class="box"></div><div class="txt"><b>Rappel des valences cœur</b> (Carré / Hépatite / Parvovirose) — ou titrage</div></div>
+  </div>
+
+  <div class="footer"><span>Élevage de la Dynastie d'Orkhan</span><span>Check-list · p. 5</span></div>
+</section>
+
+<!-- ============ PAGE 6 — SOURCES ============ -->
+<section class="page">
+  <div class="page-kicker">Références</div>
+  <div class="sec-head">
+    <div class="sec-num">＊</div>
+    <div class="sec-title">Sources &amp; bibliographie<small>Recommandations professionnelles citées</small></div>
+  </div>
+  <ol class="sources" style="padding-left:18px;">
+    <li><b>WSAVA Vaccination Guidelines Group</b> — Squires R.A. et al. <i>2024 Guidelines for the Vaccination of Dogs and Cats.</i> J Small Anim Pract 2024;65:277–316. (Primovaccination, dose finale à 16 sem., rappel précoce à 26 sem., intervalle 3 ans des valences cœur, titrage.)</li>
+    <li><b>WSAVA</b> — <i>Dogs Vaccination Table</i> (valences cœur / non-cœur, leptospirose et parainfluenza annuelles).</li>
+    <li><b>ESCCAP — Guideline 01 (7<sup>e</sup> éd., juin 2025)</b> <i>Worm Control in Dogs and Cats</i> (vermifugation chiot dès J14 puis bimensuelle, mensuelle jusqu'à 6 mois, ≥ 4×/an adulte, gestation J40/J55, collectivités).</li>
+    <li><b>ESCCAP</b> — <i>Scheme for individual worm management in dogs</i> (catégories de risque A–D, rythme mensuel en risque élevé).</li>
+    <li><b>ESCCAP</b> — <i>Modular Guide MG1</i> (coprologie et adaptation au poids).</li>
+    <li><b>ESCCAP — Guideline 03</b> <i>Control of Ectoparasites in Dogs and Cats</i> (application mensuelle, traitement de tout le foyer et de l'environnement).</li>
+    <li>Vétérinaire-conseil ESCCAP — usage des produits homologués selon AMM (âge / poids minimal chiot).</li>
+    <li>Données AMM produits longue durée : fluralaner (≈ 12 sem.), colliers imidaclopride/fluméthrine (8 mois), deltaméthrine (6 mois).</li>
+    <li><b>ESCCAP / The Vetiverse</b> — facteurs saisonniers (puces toute l'année avec chauffage, tiques dépendantes de la température).</li>
+    <li>Nature de Chien / Toutoupourlechien — ostéopathie préventive 1–2×/an, séance chiot, suivi senior.</li>
+    <li>Naturo.vet / Animalliance — déroulé et repos post-séance, ostéopathie complémentaire au vétérinaire.</li>
+    <li>OstéoVet 44 — suivi de croissance des grandes races (séances ≈ 10 mois et 15–18 mois).</li>
+    <li>Jardiland / Vetostore — fréquence des repas du chiot (4 → 3 → 2 selon l'âge).</li>
+    <li>Royal Canin / Pro Plan (Purina) — passage à 2 repas vers 6 mois, aliment croissance jusqu'à la taille adulte (15–24 mois pour les grandes races).</li>
+    <li>Virbac — adulte : fractionner en au moins 2 repas, à heures fixes.</li>
+  </ol>
+
+  <div class="callout warn" style="margin-top:22px;"><div class="ct">◆ Avertissement</div>Document d'information à visée pédagogique. Les protocoles exacts (molécules, doses, calendrier) relèvent de la prescription de votre vétérinaire traitant, qui tient compte du mode de vie, de la région, de l'état de santé et de la réglementation en vigueur.</div>
+
+  <div class="footer"><span>contact@dynastiedorkhan.com</span><span>Sources · p. 6</span></div>
+</section>
+
+</body>
+</html>
