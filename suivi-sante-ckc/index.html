@@ -127,6 +127,17 @@ input:focus,select:focus{outline:none;border-color:var(--bx);}
 .partner-benefit{margin-top:14px;padding:11px 14px;background:var(--green-bg);border-radius:7px;
                  color:var(--green);font-size:.86rem;line-height:1.55;}
 
+/* ── FAQ ── */
+.faq-item{border:1px solid var(--border);border-radius:8px;margin-bottom:10px;background:var(--bg2);}
+.faq-item summary{cursor:pointer;padding:13px 14px;font-weight:900;color:var(--bx);font-size:.9rem;}
+.faq-item p{padding:0 14px 14px;color:var(--muted);font-size:.86rem;line-height:1.65;}
+.checklist{list-style:none;line-height:1.65;}
+.checklist li{padding:8px 0;border-bottom:1px solid var(--border);font-size:.88rem;}
+.checklist li:last-child{border-bottom:none;}
+.back-top{position:fixed;right:16px;bottom:18px;z-index:150;width:44px;height:44px;border:0;border-radius:50%;
+          background:var(--bx);color:#fff;font-size:1.2rem;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.2);}
+.back-top:hover{background:var(--bx2);}
+
 /* ── HEALTH LIST ── */
 .health-list{list-style:none;line-height:2;}
 .health-list li{font-size:.88rem;padding:8px 0;border-bottom:1px solid var(--border);}
@@ -155,7 +166,7 @@ footer a{color:var(--or2);text-decoration:none;}
 
 /* ── PRINT ── */
 @media print{
-  nav,.print-btn,footer{display:none!important;}
+  nav,.print-btn,.calendar-btn,.back-top,footer{display:none!important;}
   .sec{display:none!important;}
   .sec.on{display:block!important;}
   .card{box-shadow:none!important;break-inside:avoid;margin-bottom:12px;}
@@ -481,6 +492,34 @@ footer a{color:var(--or2);text-decoration:none;}
     </ul>
   </div>
 
+  <div class="card">
+    <div class="card-title">💬 Questions fréquentes</div>
+    <details class="faq-item">
+      <summary>🛁 Quand laver mon chiot ?</summary>
+      <p>Un bain n'est utile que si votre chiot est réellement sale ou sent mauvais. Utilisez un shampooing spécialement conçu pour les chiens, rincez soigneusement et séchez-le bien. En cas de démangeaisons, de rougeurs ou de problème cutané, demandez conseil à votre vétérinaire avant de le laver.</p>
+    </details>
+    <details class="faq-item">
+      <summary>🐾 Quand et comment le promener ?</summary>
+      <p>Privilégiez des sorties courtes, régulières et adaptées à son âge, à son énergie et à son état de santé. Évitez les efforts forcés, la chaleur et les sols brûlants. Votre vétérinaire pourra vous guider si votre chiot présente une fragilité ou une croissance particulière.</p>
+    </details>
+    <details class="faq-item">
+      <summary>🍫 Quels aliments éviter ?</summary>
+      <p>Ne donnez jamais de chocolat, raisin, oignon, ail, xylitol, alcool ou médicaments humains. Retrouvez la liste complète et les réflexes à adopter dans la rubrique « Aliments dangereux » de ce guide. En cas d'ingestion, contactez sans attendre un vétérinaire ou un centre antipoison vétérinaire.</p>
+    </details>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🩺 Première visite vétérinaire</div>
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.7;margin-bottom:10px;">Préparez ces éléments pour que la consultation soit la plus utile possible :</p>
+    <ul class="checklist">
+      <li>☐ Le carnet de santé et les documents remis par l'élevage.</li>
+      <li>☐ La liste des vaccins, vermifuges et antiparasitaires déjà administrés.</li>
+      <li>☐ Le nom de son alimentation, les quantités données et son rythme de repas.</li>
+      <li>☐ Vos observations : appétit, selles, sommeil, activité, peau, oreilles ou comportement.</li>
+      <li>☐ Vos questions sur la vaccination, la prévention parasitaire et l'activité adaptée à votre chiot.</li>
+    </ul>
+  </div>
+
   <div class="card" style="border-left:3px solid var(--or);">
     <div class="card-title">Prendre rendez-vous à l'élevage</div>
     <p style="font-size:.88rem;color:var(--muted);line-height:1.7;margin-bottom:14px;">Accédez au site de prise de rendez-vous de l'élevage pour organiser votre venue.</p>
@@ -561,6 +600,8 @@ footer a{color:var(--or2);text-decoration:none;}
   SIRET : 421 173 824 00028<br>
   <a href="tel:0327990364">03 27 99 03 64</a> · <a href="mailto:contact@dynastiedorkhan.com">contact@dynastiedorkhan.com</a> · <a href="/">Prendre rendez-vous à l'élevage</a>
 </footer>
+
+<button class="back-top" type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" aria-label="Retour en haut de page" title="Retour en haut">↑</button>
 
 <script>
 // ─────────────────────────────────────────────
