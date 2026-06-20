@@ -17,15 +17,29 @@ const elevenColourReferences = new Set([
   '01-BO', '01-BN', '01-BB', '01-DG', '01-DH', '01-ST', '01-FW', '01-PP', '01-PC', '01-DA', '01-MU',
   '01-FH', '01-HT', '01-SK', '01-XB', '01-TA', '01-AW', '01-TF', '01-TH', '01-ZF', '01-CR', '01-HS',
 ]);
+const catTagReferences = new Set(['01-KT', '01-MS', '01-FI', '01-FB']);
+const categoryOrder = [
+  'Émaillées - couleur imposée', 'Émaillées - 11 couleurs', 'Médailles chat - 11 couleurs',
+  'Paillettes - 7 couleurs', 'Alphabet', 'Acier inoxydable plat', 'Laiton plat',
+  'Plastique', 'Titanium coloré', 'Titanium', 'Diamante',
+];
 const findLocalImage = (reference) => {
   const prefix = `${reference}-`.toLowerCase();
   return localFiles.find((file) => file.toLowerCase().startsWith(prefix)) || null;
 };
 const categoryFor = (product) => {
+  const reference = product.productID;
   const price = Number(product?.offers?.price);
-  if (price === 16.95) return 'Émaillée';
-  if (price === 27.95 && /diamante/i.test(product.name)) return 'Diamante';
-  if (price === 27.95 && /titanium/i.test(product.name)) return 'Titanium';
+  if (price === 16.95 && reference.startsWith('0X-')) return 'Paillettes - 7 couleurs';
+  if (price === 16.95 && reference.startsWith('02-')) return 'Acier inoxydable plat';
+  if (price === 16.95 && reference.startsWith('03-')) return 'Laiton plat';
+  if (price === 16.95 && reference.startsWith('04-')) return 'Plastique';
+  if (price === 16.95 && reference.startsWith('09-')) return 'Titanium coloré';
+  if (price === 16.95 && elevenColourReferences.has(reference)) return 'Émaillées - 11 couleurs';
+  if (price === 16.95 && catTagReferences.has(reference)) return 'Médailles chat - 11 couleurs';
+  if (price === 16.95 && reference.startsWith('01-')) return 'Émaillées - couleur imposée';
+  if (price === 27.95 && reference.startsWith('08-')) return 'Diamante';
+  if (price === 27.95 && reference.startsWith('0T-')) return 'Titanium';
   return null;
 };
 
@@ -42,11 +56,19 @@ const products = catalogue.itemListElement
       price: Number(product.offers.price),
       color: product.color || '',
       image: `models/${image}`,
-      elevenColours: elevenColourReferences.has(reference),
+      elevenColours: elevenColourReferences.has(reference) || catTagReferences.has(reference),
+      smallOnly: catTagReferences.has(reference),
+      glitterColours: reference.startsWith('0X-'),
     };
   })
   .filter(Boolean)
-  .sort((a, b) => a.category.localeCompare(b.category, 'fr') || a.name.localeCompare(b.name, 'fr'));
+  .sort((a, b) => categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category) || a.name.localeCompare(b.name, 'fr'));
+
+const alphabetImage = 'menu-alphabet-tags.jpg';
+if (localFiles.includes(alphabetImage)) products.splice(categoryOrder.indexOf('Alphabet'), 0, {
+  reference: '1J + lettre', name: 'Alphabet (A-Z)', category: 'Alphabet', price: 16.95,
+  color: 'Rouge', image: `models/${alphabetImage}`, alphabet: true,
+});
 
 fs.writeFileSync(outputFile, `${JSON.stringify(products, null, 2)}\n`);
 console.log(`${products.length} modèles fiables générés.`);

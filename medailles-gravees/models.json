@@ -1,1110 +1,1299 @@
 [
   {
-    "reference": "08-BI",
-    "name": "Bird",
-    "category": "Diamante",
-    "price": 27.95,
-    "color": "Stainless Steel",
-    "image": "models/08-BI-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "08-BN",
-    "name": "Bone",
-    "category": "Diamante",
-    "price": 27.95,
-    "color": "Stainless Steel",
-    "image": "models/08-BN-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "08-CL",
-    "name": "Circle",
-    "category": "Diamante",
-    "price": 27.95,
-    "color": "Stainless Steel",
-    "image": "models/08-CL-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "08-FI",
-    "name": "Fish",
-    "category": "Diamante",
-    "price": 27.95,
-    "color": "Stainless Steel",
-    "image": "models/08-FI-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "08-HT",
-    "name": "Heart",
-    "category": "Diamante",
-    "price": 27.95,
-    "color": "Stainless Steel",
-    "image": "models/08-HT-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "08-RT",
-    "name": "Rectangle",
-    "category": "Diamante",
-    "price": 27.95,
-    "color": "Stainless Steel",
-    "image": "models/08-RT-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
     "reference": "01-AN",
     "name": "Anchor",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Dark Blue",
     "image": "models/01-AN-DB-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-AW",
-    "name": "Angel Wings",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-AW-GR-grey.jpg",
-    "elevenColours": true
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-AT",
     "name": "Atom",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Black",
     "image": "models/01-AT-BB-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-AU",
     "name": "Australian Flag",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Dark Blue",
     "image": "models/01-AU-DB-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-FF",
     "name": "BFF",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "",
     "image": "models/01-ff-pk-me-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
-    "reference": "01-BN",
-    "name": "Bone",
-    "category": "Émaillée",
+    "reference": "1J + lettre",
+    "name": "Alphabet (A-Z)",
+    "category": "Alphabet",
     "price": 16.95,
-    "color": "",
-    "image": "models/01-bn-bb.jpg",
-    "elevenColours": true
-  },
-  {
-    "reference": "02-BN",
-    "name": "Bone",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Stainless Steel",
-    "image": "models/02-BN-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "0X-BN",
-    "name": "Bone Glitter",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/0x-bn-hp-me-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-BB",
-    "name": "Bone in Bowl",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-BB-GR-grey.jpg",
-    "elevenColours": true
+    "color": "Rouge",
+    "image": "models/menu-alphabet-tags.jpg",
+    "alphabet": true
   },
   {
     "reference": "01-OS",
     "name": "Boss",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "",
     "image": "models/01-os-bb-me-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "03-BN",
-    "name": "Brass Bone",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Brass",
-    "image": "models/03-BN-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "03-CF",
-    "name": "Brass Cat Face",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Brass",
-    "image": "models/03-CF-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "03-CH",
-    "name": "Brass Cat Head",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Brass",
-    "image": "models/03-CH-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "03-CL",
-    "name": "Brass Circle",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Brass",
-    "image": "models/03-CL-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "03-DF",
-    "name": "Brass Dog Face",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Brass",
-    "image": "models/03-DF-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "03-DH",
-    "name": "Brass Dog House",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Brass",
-    "image": "models/03-DH-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "03-FH",
-    "name": "Brass Fire Hydrant",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Brass",
-    "image": "models/03-FH-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "03-FI",
-    "name": "Brass Fish",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Brass",
-    "image": "models/03-FI-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "03-HT",
-    "name": "Brass Heart",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Brass",
-    "image": "models/03-HT-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "03-RT",
-    "name": "Brass Rectangle",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Brass",
-    "image": "models/03-RT-ZZ-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-EY",
     "name": "Bumble Bee",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "",
     "image": "models/01-EY-YE-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-BU",
     "name": "Butterfly",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "",
     "image": "models/01-BU-PU-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-CG",
     "name": "Camouflage",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "",
     "image": "models/01-CG-GR-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-CA",
     "name": "Canadian Flag",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Red",
     "image": "models/01-CA-RE-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "02-CF",
-    "name": "Cat Face",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Stainless Steel",
-    "image": "models/02-CF-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "02-CH",
-    "name": "Cat Head",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Stainless Steel",
-    "image": "models/02-CH-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "02-CL",
-    "name": "Circle",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Stainless Steel",
-    "image": "models/02-CL-ZZ-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-CV",
     "name": "Clover",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Green",
     "image": "models/01-CV-GR-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-HK",
     "name": "Coloured Heart",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "",
     "image": "models/01-HK-PK-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-BO",
-    "name": "Comic Bone",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-BO-YE-grey.jpg",
-    "elevenColours": true
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-CM",
     "name": "Compass",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Black",
     "image": "models/01-CM-BB-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-XB",
-    "name": "Cross Bone",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-XB-BB-grey.jpg",
-    "elevenColours": true
-  },
-  {
-    "reference": "01-CR",
-    "name": "Crown",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-CR-RE-grey.jpg",
-    "elevenColours": true
-  },
-  {
-    "reference": "0X-CC",
-    "name": "Cupcake Glitter",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Aqua Glitter",
-    "image": "models/0x-cc-aq-me-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-DA",
-    "name": "Daisy Flower",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-da-hp.jpg",
-    "elevenColours": true
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-DV",
     "name": "Devil",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "White",
     "image": "models/01-DV-WT-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-DG",
-    "name": "Dog",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-DG-YE-grey.jpg",
-    "elevenColours": true
-  },
-  {
-    "reference": "02-DF",
-    "name": "Dog Face",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Stainless Steel",
-    "image": "models/02-DF-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-DH",
-    "name": "Dog House",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-DH-LB-grey.jpg",
-    "elevenColours": true
-  },
-  {
-    "reference": "02-DH",
-    "name": "Dog House",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Stainless Steel",
-    "image": "models/02-DH-ZZ-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-DL",
     "name": "Dolphin",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Dark Blue",
     "image": "models/01-DL-DB-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-DR",
     "name": "Dragon",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "",
     "image": "models/01-DR-RE-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "0X-FY",
-    "name": "Dragonfly Glitter",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Hot Pink Glitter",
-    "image": "models/0x-fy-hp-me-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-EE",
     "name": "Evil Eye",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Dark Blue",
     "image": "models/01-EE-DB-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-FH",
-    "name": "Fire Hydrant",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-FH-PU-grey.jpg",
-    "elevenColours": true
-  },
-  {
-    "reference": "02-FH",
-    "name": "Fire Hydrant",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Stainless Steel",
-    "image": "models/02-FH-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-FI",
-    "name": "Fish",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-FI-HP-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "02-FI",
-    "name": "Fish",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Stainless Steel",
-    "image": "models/02-FI-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-FB",
-    "name": "Fish Bowl",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-fb-or.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-SK",
-    "name": "Fish Skeleton",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-SK-LB-grey.jpg",
-    "elevenColours": true
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-FM",
     "name": "Flamingo",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "White",
     "image": "models/01-FM-WT-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-ZF",
-    "name": "Flash",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-ZF-DB-grey.jpg",
-    "elevenColours": true
-  },
-  {
-    "reference": "01-FW",
-    "name": "Flower",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-FW-GR-grey.jpg",
-    "elevenColours": true
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-FR",
     "name": "French Flag",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "White",
     "image": "models/01-FR-WT-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-DE",
     "name": "German Flag",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Red",
     "image": "models/01-DE-RE-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-HT",
-    "name": "Heart",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-HT-BB-grey.jpg",
-    "elevenColours": true
-  },
-  {
-    "reference": "02-HT",
-    "name": "Heart",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Stainless Steel",
-    "image": "models/02-HT-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "0X-HT",
-    "name": "Heart Glitter",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/0x-ht-pu-me-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-HS",
-    "name": "Horse Shoe",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-HS-LB-grey.jpg",
-    "elevenColours": true
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-LD",
     "name": "I Love Dad",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "White",
     "image": "models/01-ld-wt-me-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-LF",
     "name": "I Love Food",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "White",
     "image": "models/01-lf-wt-me-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-LM",
     "name": "I Love Mom",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "White",
     "image": "models/01-lm-wt-me-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-IT",
     "name": "Italian Flag",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "White",
     "image": "models/01-IT-WT-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-KC",
     "name": "King's Crown",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Dark Blue",
     "image": "models/01-KC-DB-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-KT",
-    "name": "Kitten",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-KT-HP-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-LB",
     "name": "Lady Bug",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "White",
     "image": "models/01-LB-WT-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-LI",
     "name": "Lion",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "White",
     "image": "models/01-LI-WT-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-MD",
     "name": "Medical",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "White",
     "image": "models/01-MD-WT-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-MK",
     "name": "Monkey",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Yellow",
     "image": "models/01-MK-YE-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-MN",
     "name": "Moon and Stars",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Dark Blue",
     "image": "models/01-MN-DB-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-MT",
     "name": "Mountains",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Light Blue",
     "image": "models/01-MT-LB-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-MS",
-    "name": "Mouse",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-MS-OR-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-MU",
-    "name": "Music",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-MU-LB-grey.jpg",
-    "elevenColours": true
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-NZ",
     "name": "New Zealand Kiwi",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Black",
     "image": "models/01-NZ-BB-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-NC",
     "name": "Nickelodeon Paw Patrol Chase",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Dark Blue",
     "image": "models/01-NC-DB-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-NE",
     "name": "Nickelodeon Paw Patrol Everest",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Aqua",
     "image": "models/01-NE-AQ-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-NM",
     "name": "Nickelodeon Paw Patrol Marshall",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Orange",
     "image": "models/01-NM-OR-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-NS",
     "name": "Nickelodeon Paw Patrol Skye",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Pink",
     "image": "models/01-NS-PK-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-PA",
     "name": "Panda",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Green",
     "image": "models/01-PA-GR-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-PP",
-    "name": "Paw Print",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-pp-bb-grey.jpg",
-    "elevenColours": true
-  },
-  {
-    "reference": "0X-PP",
-    "name": "Paw Print Glitter",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/0x-pp-re-me-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-PC",
-    "name": "Peace",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-PC-YE-grey.jpg",
-    "elevenColours": true
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-PE",
     "name": "Penguin",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "White",
     "image": "models/01-pe-wt-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "04-BN",
-    "name": "Plastic Bone",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/04-BN-PK-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "04-CH",
-    "name": "Plastic Cat Head",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/04-CH-RE-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "04-CL",
-    "name": "Plastic Circle",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/04-CL-DB-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "04-FI",
-    "name": "Plastic Fish",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/04-FI-BB-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "04-HT",
-    "name": "Plastic Heart",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/04-HT-RE-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "04-RT",
-    "name": "Plastic Rectangle",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/04-RT-BB-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-QC",
     "name": "Queen's Crown",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Hot Pink",
     "image": "models/01-QC-HP-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-RA",
     "name": "Rainbow",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "White",
     "image": "models/01-RA-WT-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "02-RT",
-    "name": "Rectangle",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Stainless Steel",
-    "image": "models/02-RT-ZZ-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "0X-RS",
-    "name": "Red Shoe Glitter",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Black Glitter",
-    "image": "models/0x-rs-bb-me-grey_1.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-RU",
     "name": "Rubber Duck",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Light Blue",
     "image": "models/01-RU-LB-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "0X-RY",
-    "name": "Ruby",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Black",
-    "image": "models/0x-ry-bb-me-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-KN",
     "name": "Sheriff",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Dark Blue",
     "image": "models/01-KN-DB-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-SM",
     "name": "Smiley Face",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Yellow",
     "image": "models/01-SM-YE-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-SF",
     "name": "Snowflake",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "White",
     "image": "models/01-SF-WT-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-SB",
     "name": "Soccerball",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "White",
     "image": "models/01-SB-WT-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-ES",
     "name": "Spanish Flag",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Yellow",
     "image": "models/01-ES-YE-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-ST",
-    "name": "Star",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-st-pu_1.jpg",
-    "elevenColours": true
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-US",
     "name": "Stars & Stripes US Flag",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Dark Blue",
     "image": "models/01-US-DB-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-SC",
     "name": "Swiss Cross",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Red",
     "image": "models/01-SC-RE-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-TB",
     "name": "Teddy Bear",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "White",
     "image": "models/01-TB-WT-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "09-BN",
-    "name": "Ti-Coated Bone",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/09-BN-BB-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "09-CL",
-    "name": "Ti-Coated Circle",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/09-CL-GO-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "09-HT",
-    "name": "Ti-Coated Heart",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/09-HT-RG-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "09-RT",
-    "name": "Ti-Coated Rectangle",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/09-RT-DB-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "01-TA",
-    "name": "Tribal Arrows",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-TA-BB-grey.jpg",
-    "elevenColours": true
-  },
-  {
-    "reference": "01-TF",
-    "name": "Tribal Fish",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-tf-gr-grey.jpg",
-    "elevenColours": true
-  },
-  {
-    "reference": "01-TH",
-    "name": "Tribal Heart",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "",
-    "image": "models/01-TH-PK-grey.jpg",
-    "elevenColours": true
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-TS",
     "name": "Tribal Sun",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Dark Blue",
     "image": "models/01-TS-DB-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-UK",
     "name": "UK Flag",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Dark Blue",
     "image": "models/01-UK-DB-grey.jpg",
-    "elevenColours": false
-  },
-  {
-    "reference": "0X-UC",
-    "name": "Unicorn Glitter",
-    "category": "Émaillée",
-    "price": 16.95,
-    "color": "Aqua Glitter",
-    "image": "models/0x-uc-aq-me-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-WA",
     "name": "Wave",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Light Blue",
     "image": "models/01-WA-LB-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-WI",
     "name": "Winner",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Dark Blue",
     "image": "models/01-WI-DB-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "01-YY",
     "name": "Yin Yang",
-    "category": "Émaillée",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "Black",
     "image": "models/01-YY-BB-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-AW",
+    "name": "Angel Wings",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-AW-GR-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-BN",
+    "name": "Bone",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-bn-bb.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-BB",
+    "name": "Bone in Bowl",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-BB-GR-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-BO",
+    "name": "Comic Bone",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-BO-YE-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-XB",
+    "name": "Cross Bone",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-XB-BB-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-CR",
+    "name": "Crown",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-CR-RE-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-DA",
+    "name": "Daisy Flower",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-da-hp.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-DG",
+    "name": "Dog",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-DG-YE-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-DH",
+    "name": "Dog House",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-DH-LB-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-FH",
+    "name": "Fire Hydrant",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-FH-PU-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-SK",
+    "name": "Fish Skeleton",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-SK-LB-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-ZF",
+    "name": "Flash",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-ZF-DB-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-FW",
+    "name": "Flower",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-FW-GR-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-HT",
+    "name": "Heart",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-HT-BB-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-HS",
+    "name": "Horse Shoe",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-HS-LB-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-MU",
+    "name": "Music",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-MU-LB-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-PP",
+    "name": "Paw Print",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-pp-bb-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-PC",
+    "name": "Peace",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-PC-YE-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-ST",
+    "name": "Star",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-st-pu_1.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-TA",
+    "name": "Tribal Arrows",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-TA-BB-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-TF",
+    "name": "Tribal Fish",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-tf-gr-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-TH",
+    "name": "Tribal Heart",
+    "category": "Émaillées - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-TH-PK-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-FI",
+    "name": "Fish",
+    "category": "Médailles chat - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-FI-HP-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": true,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-FB",
+    "name": "Fish Bowl",
+    "category": "Médailles chat - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-fb-or.jpg",
+    "elevenColours": true,
+    "smallOnly": true,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-KT",
+    "name": "Kitten",
+    "category": "Médailles chat - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-KT-HP-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": true,
+    "glitterColours": false
+  },
+  {
+    "reference": "01-MS",
+    "name": "Mouse",
+    "category": "Médailles chat - 11 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/01-MS-OR-grey.jpg",
+    "elevenColours": true,
+    "smallOnly": true,
+    "glitterColours": false
+  },
+  {
+    "reference": "0X-BN",
+    "name": "Bone Glitter",
+    "category": "Paillettes - 7 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/0x-bn-hp-me-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": true
+  },
+  {
+    "reference": "0X-CC",
+    "name": "Cupcake Glitter",
+    "category": "Paillettes - 7 couleurs",
+    "price": 16.95,
+    "color": "Aqua Glitter",
+    "image": "models/0x-cc-aq-me-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": true
+  },
+  {
+    "reference": "0X-FY",
+    "name": "Dragonfly Glitter",
+    "category": "Paillettes - 7 couleurs",
+    "price": 16.95,
+    "color": "Hot Pink Glitter",
+    "image": "models/0x-fy-hp-me-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": true
+  },
+  {
+    "reference": "0X-HT",
+    "name": "Heart Glitter",
+    "category": "Paillettes - 7 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/0x-ht-pu-me-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": true
+  },
+  {
+    "reference": "0X-PP",
+    "name": "Paw Print Glitter",
+    "category": "Paillettes - 7 couleurs",
+    "price": 16.95,
+    "color": "",
+    "image": "models/0x-pp-re-me-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": true
+  },
+  {
+    "reference": "0X-RS",
+    "name": "Red Shoe Glitter",
+    "category": "Paillettes - 7 couleurs",
+    "price": 16.95,
+    "color": "Black Glitter",
+    "image": "models/0x-rs-bb-me-grey_1.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": true
+  },
+  {
+    "reference": "0X-RY",
+    "name": "Ruby",
+    "category": "Paillettes - 7 couleurs",
+    "price": 16.95,
+    "color": "Black",
+    "image": "models/0x-ry-bb-me-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": true
+  },
+  {
+    "reference": "0X-UC",
+    "name": "Unicorn Glitter",
+    "category": "Paillettes - 7 couleurs",
+    "price": 16.95,
+    "color": "Aqua Glitter",
+    "image": "models/0x-uc-aq-me-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": true
+  },
+  {
+    "reference": "02-BN",
+    "name": "Bone",
+    "category": "Acier inoxydable plat",
+    "price": 16.95,
+    "color": "Stainless Steel",
+    "image": "models/02-BN-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "02-CF",
+    "name": "Cat Face",
+    "category": "Acier inoxydable plat",
+    "price": 16.95,
+    "color": "Stainless Steel",
+    "image": "models/02-CF-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "02-CH",
+    "name": "Cat Head",
+    "category": "Acier inoxydable plat",
+    "price": 16.95,
+    "color": "Stainless Steel",
+    "image": "models/02-CH-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "02-CL",
+    "name": "Circle",
+    "category": "Acier inoxydable plat",
+    "price": 16.95,
+    "color": "Stainless Steel",
+    "image": "models/02-CL-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "02-DF",
+    "name": "Dog Face",
+    "category": "Acier inoxydable plat",
+    "price": 16.95,
+    "color": "Stainless Steel",
+    "image": "models/02-DF-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "02-DH",
+    "name": "Dog House",
+    "category": "Acier inoxydable plat",
+    "price": 16.95,
+    "color": "Stainless Steel",
+    "image": "models/02-DH-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "02-FH",
+    "name": "Fire Hydrant",
+    "category": "Acier inoxydable plat",
+    "price": 16.95,
+    "color": "Stainless Steel",
+    "image": "models/02-FH-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "02-FI",
+    "name": "Fish",
+    "category": "Acier inoxydable plat",
+    "price": 16.95,
+    "color": "Stainless Steel",
+    "image": "models/02-FI-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "02-HT",
+    "name": "Heart",
+    "category": "Acier inoxydable plat",
+    "price": 16.95,
+    "color": "Stainless Steel",
+    "image": "models/02-HT-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "02-RT",
+    "name": "Rectangle",
+    "category": "Acier inoxydable plat",
+    "price": 16.95,
+    "color": "Stainless Steel",
+    "image": "models/02-RT-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "03-BN",
+    "name": "Brass Bone",
+    "category": "Laiton plat",
+    "price": 16.95,
+    "color": "Brass",
+    "image": "models/03-BN-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "03-CF",
+    "name": "Brass Cat Face",
+    "category": "Laiton plat",
+    "price": 16.95,
+    "color": "Brass",
+    "image": "models/03-CF-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "03-CH",
+    "name": "Brass Cat Head",
+    "category": "Laiton plat",
+    "price": 16.95,
+    "color": "Brass",
+    "image": "models/03-CH-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "03-CL",
+    "name": "Brass Circle",
+    "category": "Laiton plat",
+    "price": 16.95,
+    "color": "Brass",
+    "image": "models/03-CL-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "03-DF",
+    "name": "Brass Dog Face",
+    "category": "Laiton plat",
+    "price": 16.95,
+    "color": "Brass",
+    "image": "models/03-DF-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "03-DH",
+    "name": "Brass Dog House",
+    "category": "Laiton plat",
+    "price": 16.95,
+    "color": "Brass",
+    "image": "models/03-DH-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "03-FH",
+    "name": "Brass Fire Hydrant",
+    "category": "Laiton plat",
+    "price": 16.95,
+    "color": "Brass",
+    "image": "models/03-FH-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "03-FI",
+    "name": "Brass Fish",
+    "category": "Laiton plat",
+    "price": 16.95,
+    "color": "Brass",
+    "image": "models/03-FI-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "03-HT",
+    "name": "Brass Heart",
+    "category": "Laiton plat",
+    "price": 16.95,
+    "color": "Brass",
+    "image": "models/03-HT-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "03-RT",
+    "name": "Brass Rectangle",
+    "category": "Laiton plat",
+    "price": 16.95,
+    "color": "Brass",
+    "image": "models/03-RT-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "04-BN",
+    "name": "Plastic Bone",
+    "category": "Plastique",
+    "price": 16.95,
+    "color": "",
+    "image": "models/04-BN-PK-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "04-CH",
+    "name": "Plastic Cat Head",
+    "category": "Plastique",
+    "price": 16.95,
+    "color": "",
+    "image": "models/04-CH-RE-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "04-CL",
+    "name": "Plastic Circle",
+    "category": "Plastique",
+    "price": 16.95,
+    "color": "",
+    "image": "models/04-CL-DB-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "04-FI",
+    "name": "Plastic Fish",
+    "category": "Plastique",
+    "price": 16.95,
+    "color": "",
+    "image": "models/04-FI-BB-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "04-HT",
+    "name": "Plastic Heart",
+    "category": "Plastique",
+    "price": 16.95,
+    "color": "",
+    "image": "models/04-HT-RE-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "04-RT",
+    "name": "Plastic Rectangle",
+    "category": "Plastique",
+    "price": 16.95,
+    "color": "",
+    "image": "models/04-RT-BB-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "09-BN",
+    "name": "Ti-Coated Bone",
+    "category": "Titanium coloré",
+    "price": 16.95,
+    "color": "",
+    "image": "models/09-BN-BB-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "09-CL",
+    "name": "Ti-Coated Circle",
+    "category": "Titanium coloré",
+    "price": 16.95,
+    "color": "",
+    "image": "models/09-CL-GO-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "09-HT",
+    "name": "Ti-Coated Heart",
+    "category": "Titanium coloré",
+    "price": 16.95,
+    "color": "",
+    "image": "models/09-HT-RG-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "09-RT",
+    "name": "Ti-Coated Rectangle",
+    "category": "Titanium coloré",
+    "price": 16.95,
+    "color": "",
+    "image": "models/09-RT-DB-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "0T-BN",
@@ -1113,7 +1302,9 @@
     "price": 27.95,
     "color": "Titanium",
     "image": "models/0T-BN-ZZ-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "0T-CL",
@@ -1122,7 +1313,9 @@
     "price": 27.95,
     "color": "Titanium",
     "image": "models/0T-CL-ZZ-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "0T-HT",
@@ -1131,7 +1324,9 @@
     "price": 27.95,
     "color": "Titanium",
     "image": "models/0T-HT-ZZ-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   },
   {
     "reference": "0T-RT",
@@ -1140,6 +1335,74 @@
     "price": 27.95,
     "color": "Titanium",
     "image": "models/0T-RT-ZZ-grey.jpg",
-    "elevenColours": false
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "08-BI",
+    "name": "Bird",
+    "category": "Diamante",
+    "price": 27.95,
+    "color": "Stainless Steel",
+    "image": "models/08-BI-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "08-BN",
+    "name": "Bone",
+    "category": "Diamante",
+    "price": 27.95,
+    "color": "Stainless Steel",
+    "image": "models/08-BN-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "08-CL",
+    "name": "Circle",
+    "category": "Diamante",
+    "price": 27.95,
+    "color": "Stainless Steel",
+    "image": "models/08-CL-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "08-FI",
+    "name": "Fish",
+    "category": "Diamante",
+    "price": 27.95,
+    "color": "Stainless Steel",
+    "image": "models/08-FI-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "08-HT",
+    "name": "Heart",
+    "category": "Diamante",
+    "price": 27.95,
+    "color": "Stainless Steel",
+    "image": "models/08-HT-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
+  },
+  {
+    "reference": "08-RT",
+    "name": "Rectangle",
+    "category": "Diamante",
+    "price": 27.95,
+    "color": "Stainless Steel",
+    "image": "models/08-RT-ZZ-grey.jpg",
+    "elevenColours": false,
+    "smallOnly": false,
+    "glitterColours": false
   }
 ]
