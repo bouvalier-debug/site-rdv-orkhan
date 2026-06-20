@@ -221,14 +221,18 @@ footer a{color:var(--or2);text-decoration:none;}
       <label class="lbl">Options</label>
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text);">
-          <input type="checkbox" id="opt-rage" onchange="calcV()">
-          Inclure vaccin Rage (voyage / sortie du territoire)
+          <input type="checkbox" id="opt-rage-export" onchange="calcV()">
+          Chiot export : vaccin Rage fait à l'élevage à 12 semaines
         </label>
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text);">
           <input type="checkbox" id="opt-lepto6" onchange="calcV()">
           Leptospirose tous les 6 mois (risque élevé : eau stagnante, chasse, campagne)
         </label>
       </div>
+    </div>
+    <div class="fg" style="margin-top:6px;">
+      <label class="lbl" for="inp-rage-date">Date de validité Rage (facultatif)</label>
+      <input type="date" id="inp-rage-date" onchange="calcV()">
     </div>
   </div>
 
@@ -241,7 +245,7 @@ footer a{color:var(--or2);text-decoration:none;}
         <table class="tbl" id="v-table"></table>
       </div>
       <div class="notebox">
-        <strong>CHPPi</strong> — Carré, Hépatite, Parvovirose, Parainfluenza : rappel à 2 ans, puis tous les <strong>3 ans</strong>.<br>
+        <strong>CHPPi</strong> — rappels à 1 an, 2 ans, puis tous les <strong>3 ans</strong>, selon le protocole vétérinaire et le vaccin utilisé.<br>
         <strong>Leptospirose</strong> — rappel annuel minimum, ou tous les 6 mois si exposition élevée.<br>
         <strong>Rage</strong> — obligatoire notamment pour les sorties du territoire. Dès 12 semaines. Validité selon le vaccin utilisé et les indications portées par votre vétérinaire dans le passeport.
       </div>
@@ -764,47 +768,35 @@ function calcV() {
   if (!v) return;
   const primo = new Date(v);
 
-  const rage   = document.getElementById('opt-rage').checked;
+  const rageExport = document.getElementById('opt-rage-export').checked;
+  const rageDateV  = document.getElementById('inp-rage-date').value;
   const lepto6 = document.getElementById('opt-lepto6').checked;
   const rows   = [];
 
   // Protocole core
   rows.push({ lbl:'Primovaccination 1', date:primo,             vac:'CHPPi',                             who:'eleveur', note:'' });
   const r1 = addW(primo, 4);
-  rows.push({ lbl:'Rappel 1',           date:r1,               vac:'CHPPi + Leptospirose' + (rage ? ' + Rage' : ''), who:'client', note:'' });
+  rows.push({ lbl:'Rappel 1',           date:r1,               vac:'CHPPi + Leptospirose' + (rageExport ? ' + Rage' : ''), who:rageExport ? 'eleveur' : 'client', note:rageExport ? 'Chiot export' : '' });
   const r2 = addW(r1, 4);
   rows.push({ lbl:'Rappel 2',           date:r2,               vac:'CHPPi + Leptospirose',              who:'client', note:'' });
 
-  // 12 mois depuis primo
-  const rm12 = addM(primo, 12);
-  rows.push({ lbl:'Rappel 12 mois',     date:rm12,             vac:'CHPPi + Leptospirose',              who:'client', note:'' });
-
-  // Lepto 6 mois
-  if (lepto6) {
-    rows.push({ lbl:'Lepto 6 mois',     date:addM(r2, 6),      vac:'Leptospirose',                      who:'client', note:'Risque élevé' });
-    rows.push({ lbl:'Lepto 18 mois',    date:addM(r2, 18),     vac:'Leptospirose',                      who:'client', note:'Risque élevé' });
+  // Rappels adultes : 1 an, 2 ans, puis CHPPi tous les 3 ans.
+  const rappel1an = addM(primo, 10);
+  const rappel2ans = addM(primo, 22);
+  rows.push({ lbl:'Rappel 1 an', date:rappel1an, vac:'CHPPi', who:'client', note:'' });
+  rows.push({ lbl:'Rappel 2 ans', date:rappel2ans, vac:'CHPPi', who:'client', note:'' });
+  for (let age = 5; age <= 14; age += 3) {
+    rows.push({ lbl:`Rappel ${age} ans`, date:addY(rappel2ans, age - 2), vac:'CHPPi', who:'client', note:'' });
   }
 
-  // 2 ans
-  const rm24 = addM(primo, 24);
-  rows.push({ lbl:'Rappel 2 ans',       date:rm24,             vac:'CHPPi + Leptospirose',              who:'client', note:'' });
-
-  // Triennaux DHPPi + Lepto annuel jusqu'à 14 ans
-  for (let i = 1; i <= 4; i++) {
-    const y = addY(rm24, i * 3);
-    rows.push({ lbl:`Rappel ${2 + i*3} ans`, date:y,           vac:'CHPPi + Leptospirose',              who:'client', note:'' });
-    if (lepto6) {
-      rows.push({ lbl:`Lepto ${2+i*3-2}–${2+i*3} ans`, date:addM(y, -18), vac:'Leptospirose', who:'client', note:'Risque élevé' });
-    }
+  // Leptospirose : annuelle, ou semestrielle si risque élevé.
+  const leptoStep = lepto6 ? 6 : 12;
+  for (let m = 0; m <= 156; m += leptoStep) {
+    rows.push({ lbl:'Rappel leptospirose', date:addM(rappel1an, m), vac:'Leptospirose', who:'client', note:lepto6 ? 'Risque élevé — 6 mois' : 'Annuel' });
   }
 
-  // Rage triennale si activée
-  if (rage) {
-    const rageDate = addW(primo, 4); // donnée au rappel 1
-    for (let i = 1; i <= 4; i++) {
-      rows.push({ lbl:`Rappel Rage ${i*3} ans`, date:addY(rageDate, i*3), vac:'Rage', who:'client', note:'Voyage requis' });
-    }
-  }
+  // Rage : date de validité renseignée manuellement, prioritaire.
+  if (rageDateV) rows.push({ lbl:'Rage — validité saisie', date:new Date(rageDateV), vac:'Rage', who:'client', note:'À vérifier dans le passeport' });
 
   rows.sort((a, b) => a.date - b.date);
   calendarEvents.vaccins = rows.map(r => ({ date: r.date, label: r.lbl, description: r.vac }));
@@ -848,13 +840,10 @@ function calcVr() {
     });
   }
 
-  // Mensuel de 3 à 5 mois
-  for (let m = 3; m <= 5; m++) {
-    rows.push({ lbl: `${m} mois`, date: addM(b, m), who: 'client', special: '' });
+  // Mensuel de 4 à 6 mois, avec coproscopie conseillée à 6 mois.
+  for (let m = 4; m <= 6; m++) {
+    rows.push({ lbl: `${m} mois`, date: addM(b, m), who: 'client', special: m === 6 ? 'copro' : '' });
   }
-
-  // 6 mois : coproscopie
-  rows.push({ lbl: '6 mois', date: addM(b, 6), who: 'client', special: 'copro' });
 
   // Trimestriel adulte
   for (let m = 9; m <= 24; m += 3) {
