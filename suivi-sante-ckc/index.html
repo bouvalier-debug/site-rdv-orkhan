@@ -778,7 +778,7 @@ function calcV() {
   const r1 = addW(primo, 4);
   rows.push({ lbl:'Rappel 1',           date:r1,               vac:'CHPPi + Leptospirose' + (rageExport ? ' + Rage' : ''), who:rageExport ? 'eleveur' : 'client', note:rageExport ? 'Chiot export' : '' });
   const r2 = addW(r1, 4);
-  rows.push({ lbl:'Rappel 2',           date:r2,               vac:'CHPPi + Leptospirose',              who:'client', note:'' });
+  rows.push({ lbl:'Rappel 2',           date:r2,               vac:'CHPPi + Leptospirose' + (rageExport ? '' : ' + Rage'), who:'client', note:rageExport ? '' : 'Rage recommandée France' });
 
   // Rappels adultes : 1 an, 2 ans, puis CHPPi tous les 3 ans.
   const rappel1an = addM(primo, 10);
