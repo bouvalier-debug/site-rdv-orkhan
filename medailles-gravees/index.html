@@ -35,11 +35,11 @@
       <label>Prénom<input name="prenom" autocomplete="given-name" required></label><label>Nom<input name="nom" autocomplete="family-name" required></label>
       <label>E-mail<input name="email" type="email" autocomplete="email" required></label><label>Téléphone<input name="telephone" type="tel" autocomplete="tel" required></label>
       <label class="full">Adresse de livraison<textarea name="adresse_livraison" autocomplete="street-address" required placeholder="Numéro et rue&#10;Code postal et ville&#10;Pays"></textarea></label>
-      <label class="full check"><input name="confirmation_exactitude" value="oui" type="checkbox" required><span>Je confirme que la gravure et mes coordonnées sont exactes. Je comprends qu'elles seront utilisées pour vérifier ma demande et organiser la livraison.</span></label>
+      <label class="full check"><input name="confirmation_exactitude" value="oui" type="checkbox" required><span>Je confirme que la gravure et mes coordonnées sont exactes. J'ai lu la <a href="confidentialite.html" target="_blank">politique de confidentialité</a>.</span></label>
     </div>
-    <button type="submit">Envoyer ma demande</button><p class="status" id="message" role="status"></p>
+    <p class="hint">L'envoi constitue une demande de vérification, et non une commande définitive ni un paiement. Nous vous confirmerons le modèle, la gravure, le prix et la livraison avant tout règlement.</p><button type="submit">Envoyer ma demande</button><p class="status" id="message" role="status"></p>
   </form>
-  <footer class="site-footer"><div><strong>Élevage de la Dynastie d'Orkhan</strong><p>52 rue de Masny, 59234 Monchecourt</p><p>SIRET : 421 173 824 00028</p><p><a href="tel:+33327990364">03 27 99 03 64</a> · <a href="mailto:contact@dynastiedorkhan.com">contact@dynastiedorkhan.com</a></p></div></footer>
+  <footer class="site-footer"><div><strong>Élevage de la Dynastie d'Orkhan</strong><p>52 rue de Masny, 59234 Monchecourt</p><p>SIRET : 421 173 824 00028</p><p><a href="tel:+33327990364">03 27 99 03 64</a> · <a href="mailto:contact@dynastiedorkhan.com">contact@dynastiedorkhan.com</a></p><p><a href="mentions-legales.html">Mentions légales</a> · <a href="confidentialite.html">Politique de confidentialité</a></p></div></footer>
 </main>
 <script>
   const catalogue=document.getElementById('catalogue'), search=document.getElementById('search'), category=document.getElementById('category'), count=document.getElementById('count'); let models=[];
