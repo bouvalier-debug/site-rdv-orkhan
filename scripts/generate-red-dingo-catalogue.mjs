@@ -28,8 +28,7 @@ const doubleSidedReferences = new Set([
 ]);
 const categoryOrder = [
   'Émaillées - couleur imposée', 'Émaillées - 11 couleurs', 'Médailles chat - 11 couleurs',
-  'Paillettes - 7 couleurs', 'Alphabet', 'Acier inoxydable plat', 'Laiton plat',
-  'Titanium', 'Diamante',
+  'Paillettes - 7 couleurs', 'Alphabet',
 ];
 const findLocalImage = (reference) => {
   const prefix = `${reference}-`.toLowerCase();
@@ -39,13 +38,9 @@ const categoryFor = (product) => {
   const reference = product.productID;
   const price = Number(product?.offers?.price);
   if (price === 16.95 && reference.startsWith('0X-')) return 'Paillettes - 7 couleurs';
-  if (price === 16.95 && reference.startsWith('02-')) return 'Acier inoxydable plat';
-  if (price === 16.95 && reference.startsWith('03-')) return 'Laiton plat';
   if (price === 16.95 && elevenColourReferences.has(reference)) return 'Émaillées - 11 couleurs';
   if (price === 16.95 && catTagReferences.has(reference)) return 'Médailles chat - 11 couleurs';
   if (price === 16.95 && reference.startsWith('01-')) return 'Émaillées - couleur imposée';
-  if (price === 27.95 && reference.startsWith('08-')) return 'Diamante';
-  if (price === 27.95 && reference.startsWith('0T-')) return 'Titanium';
   return null;
 };
 
