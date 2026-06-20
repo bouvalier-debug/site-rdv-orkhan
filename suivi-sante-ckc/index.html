@@ -245,7 +245,7 @@ footer a{color:var(--or2);text-decoration:none;}
         <table class="tbl" id="v-table"></table>
       </div>
       <div class="notebox">
-        <strong>CHPPi</strong> — rappels à 1 an, 2 ans, puis tous les <strong>3 ans</strong>, selon le protocole vétérinaire et le vaccin utilisé.<br>
+        <strong>CHPPi</strong> — rappels à 1 an, 2 ans, puis tous les <strong>3 ans</strong>, selon le protocole vétérinaire et le vaccin utilisé. L'intervalle des valences cœur ne préjuge pas du rythme des autres valences.<br>
         <strong>Leptospirose</strong> — rappel annuel minimum, ou tous les 6 mois si exposition élevée.<br>
         <strong>Rage</strong> — pour un chiot exporté hors de France, le vaccin est fait à 12 semaines à l'élevage, puis un délai de 21 jours est requis avant le départ. Pour un chiot restant en France, il peut être fait à partir de 12 semaines mais est recommandé à 16 semaines, par le propriétaire. Sa validité est de <strong>3 ans</strong> ; la date inscrite dans le passeport reste la référence.
       </div>
@@ -369,9 +369,9 @@ footer a{color:var(--or2);text-decoration:none;}
     <div class="reco">
       <div class="reco-ico">🦴</div>
       <div style="flex:1;">
-        <div class="reco-title">Ostéopathie canine — 1 séance par an</div>
+        <div class="reco-title">Ostéopathie canine — en complément si besoin</div>
         <div class="reco-desc">
-          Une séance annuelle permet de détecter et de corriger précocement les tensions musculo-squelettiques.
+          Elle peut être envisagée en complément du suivi vétérinaire, notamment en cas de raideur, de gêne locomotrice ou de tension observée. Elle ne remplace pas un examen vétérinaire.
           Particulièrement important chez le CKC, prédisposé aux tensions cervicales et dorsales.
           À planifier de préférence après le premier anniversaire.
         </div>
@@ -404,7 +404,7 @@ footer a{color:var(--or2);text-decoration:none;}
       <li>✂️ <strong>Les poils ne se coupent pas</strong> — sauf sous les pattes et entre les coussinets (évite l'accumulation de terre), légèrement autour des pieds pour un aspect arrondi mais emplumé, et le bas des oreilles si effiloché.</li>
       <li>🧤 <strong>Entre les bains (mâles)</strong> — passer un gant humide sur le ventre pour éliminer les traces d'urine qui collent le poil et le jaunissent.</li>
       <li>💅 <strong>Ongles</strong> — couper selon la pousse avec une pince à ongles adaptée. Commencer dès le plus jeune âge pour habituer le chiot. Couper très peu à la fois : attention à la <strong>partie vivante de l'ongle</strong> qui, si coupée, provoque un saignement.</li>
-      <li>🔴 <strong>Glandes anales</strong> — à vider régulièrement pour éviter engorgement et abcès. Demander la technique à votre vétérinaire.</li>
+      <li>🔴 <strong>Glandes anales</strong> — à surveiller. En cas de léchage excessif, de gêne, de frottement au sol, de douleur ou de mauvaise odeur, demandez conseil à votre vétérinaire ou à votre toiletteur. Ne pas vider systématiquement sans raison.</li>
     </ul>
   </div>
 
@@ -497,7 +497,7 @@ footer a{color:var(--or2);text-decoration:none;}
       <li>🚽 <strong>Propreté</strong> — sortir le chiot après chaque repas, réveil et jeu. Récompenser immédiatement quand il fait ses besoins dehors (caresses, friandise). Ne jamais gronder après coup : le chiot ne comprend pas.</li>
       <li>🌍 <strong>Socialisation — avant 12 semaines</strong> — exposer le chiot à des environnements variés : ville, campagne, personnes de tous âges, autres animaux, véhicules, bruits. C'est la période clé pour construire un chien équilibré.</li>
       <li>✋ <strong>Mordillement</strong> — si le chiot mordille trop fort, dire fermement "NON" et interrompre le jeu. Ne jamais jouer à des jeux de tiraillement ou de poursuite qui encouragent la morsure.</li>
-      <li>🏆 <strong>Éducation positive</strong> — récompenser les bons comportements immédiatement. La punition ne sert que si elle intervient au moment exact du comportement indésirable. Patience et cohérence avant tout.</li>
+      <li>🏆 <strong>Éducation positive</strong> — récompensez immédiatement les bons comportements, redirigez les comportements indésirables et restez cohérent. Les corrections brutales ou tardives sont inefficaces et peuvent nuire à la relation avec le chiot.</li>
     </ul>
   </div>
 
@@ -618,6 +618,7 @@ footer a{color:var(--or2);text-decoration:none;}
 <div id="sec-partenaires" class="sec">
   <p class="sec-heading">Nos partenaires</p>
   <p class="sec-sub">Des services et produits sélectionnés pour accompagner votre chien au quotidien.</p>
+  <div class="notebox">Certains liens peuvent être des liens de parrainage. Ils sont proposés comme bons plans pour les familles, sans obligation d'achat.</div>
 
   <div class="card" style="border-left:3px solid var(--or);">
     <div class="card-title">Chiens &amp; Chats Naturellement</div>
@@ -939,8 +940,8 @@ function calcAnti() {
 //  POIDS — COURBE CKC
 // ─────────────────────────────────────────────
 const AGE_PTS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18];
-const W_LOW   = [0.25, 0.85, 1.75, 2.65, 3.50, 4.30, 5.15, 5.95, 6.45, 6.70, 6.90, 7.00, 7.00, 7.00];
-const W_HIGH  = [0.40, 1.30, 2.50, 3.55, 4.65, 5.80, 6.85, 7.85, 8.50, 8.80, 8.95, 9.00, 9.00, 9.00];
+const W_LOW   = [0.25, 0.85, 1.75, 2.65, 3.40, 4.10, 4.70, 5.00, 5.20, 5.30, 5.40, 5.40, 5.40, 5.40];
+const W_HIGH  = [0.40, 1.30, 2.50, 3.55, 4.55, 5.60, 6.50, 7.10, 7.50, 7.70, 7.80, 8.00, 8.00, 8.00];
 const W_MID   = AGE_PTS.map((_, i) => +((W_LOW[i] + W_HIGH[i]) / 2).toFixed(2));
 
 const poidsCtx = document.getElementById('poids-chart').getContext('2d');
