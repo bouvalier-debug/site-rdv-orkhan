@@ -156,7 +156,8 @@ footer a{color:var(--or2);text-decoration:none;}
 /* ── PRINT ── */
 @media print{
   nav,.print-btn,footer{display:none!important;}
-  .sec{display:block!important;}
+  .sec{display:none!important;}
+  .sec.on{display:block!important;}
   .card{box-shadow:none!important;break-inside:avoid;margin-bottom:12px;}
   body{background:#fff;}
   .hide{display:none!important;}
