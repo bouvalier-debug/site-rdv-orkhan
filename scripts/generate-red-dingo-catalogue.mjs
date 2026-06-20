@@ -18,6 +18,12 @@ const elevenColourReferences = new Set([
   '01-FH', '01-HT', '01-SK', '01-XB', '01-TA', '01-AW', '01-TF', '01-TH', '01-ZF', '01-CR', '01-HS',
 ]);
 const catTagReferences = new Set(['01-KT', '01-MS', '01-FI', '01-FB']);
+const doubleSidedReferences = new Set([
+  '0T-BN', '0T-HT', '0T-CL', '0T-RT',
+  '08-BN', '08-HT', '08-BI', '08-RT', '08-CL', '08-FI',
+  '02-BN', '02-CL', '02-HT', '02-RT', '02-FI', '02-CH',
+  '03-BN', '03-CL', '03-HT',
+]);
 const categoryOrder = [
   'Émaillées - couleur imposée', 'Émaillées - 11 couleurs', 'Médailles chat - 11 couleurs',
   'Paillettes - 7 couleurs', 'Alphabet', 'Acier inoxydable plat', 'Laiton plat',
@@ -59,6 +65,7 @@ const products = catalogue.itemListElement
       elevenColours: elevenColourReferences.has(reference) || catTagReferences.has(reference),
       smallOnly: catTagReferences.has(reference),
       glitterColours: reference.startsWith('0X-'),
+      doubleSided: doubleSidedReferences.has(reference),
     };
   })
   .filter(Boolean)
