@@ -276,6 +276,15 @@
     "doubleSided": false
   },
   {
+    "id": "01-DO-PK",
+    "reference": "01-DO",
+    "name": "Donut",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Pink",
+    "image": "models/01-DO-PK.jpg"
+  },
+  {
     "reference": "01-DR",
     "name": "Dragon",
     "category": "Émaillées - couleur imposée",

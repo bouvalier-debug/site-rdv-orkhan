@@ -74,6 +74,7 @@ const manualProducts = [
   ['01-HN', 'Cœur', 'Dark Blue', '01-HN-DB.jpg'], ['01-HP', 'Cœur', 'Purple', '01-HP-PU.jpg'], ['01-HB', 'Cœur', 'Black', '01-HB-BB.jpg'],
   ['01-BL', 'Papillon', 'Light Blue', '01-BL-LB.jpg'], ['01-BP', 'Papillon', 'Pink', '01-BP-PK.jpg'],
   ['01-CB', 'Camouflage', 'Dark Blue', '01-CB-DB.jpg'], ['01-CP', 'Camouflage', 'Pink', '01-CP-PK.jpg'], ['01-DN', 'Dragon', 'Black', '01-DN-BB.jpg'],
+  ['01-DO', 'Donut', 'Pink', '01-DO-PK.jpg'],
   ['01-EL', 'Abeille', 'Light Blue', '01-EL-LB.jpg'], ['01-EP', 'Abeille', 'Pink', '01-EP-PK.jpg'],
   ['01-FD', 'BFF', 'Light Blue', '01-FD-LB.jpg'],
   ['01-ON', 'Boss', 'Dark Blue', '01-ON-DB.jpg'], ['01-OP', 'Boss', 'Pink', '01-OP-PK.jpg'],
