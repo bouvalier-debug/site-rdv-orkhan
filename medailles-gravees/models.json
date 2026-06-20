@@ -1,5 +1,23 @@
 [
   {
+    "id": "01-EL-LB",
+    "reference": "01-EL",
+    "name": "Abeille",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Light Blue",
+    "image": "models/01-EL-LB.jpg"
+  },
+  {
+    "id": "01-EP-PK",
+    "reference": "01-EP",
+    "name": "Abeille",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Pink",
+    "image": "models/01-EP-PK.jpg"
+  },
+  {
     "reference": "01-AN",
     "name": "Anchor",
     "category": "Émaillées - couleur imposée",
@@ -36,37 +54,55 @@
     "doubleSided": false
   },
   {
-    "reference": "01-FF",
+    "reference": "01-FP",
     "name": "BFF",
     "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "",
-    "image": "models/01-ff-pk-me-grey.jpg",
+    "image": "models/01-FP-PK.jpg",
     "elevenColours": false,
     "smallOnly": false,
     "glitterColours": false,
     "doubleSided": false
   },
   {
-    "reference": "1J + lettre",
-    "name": "Alphabet (A-Z)",
-    "category": "Alphabet",
+    "id": "01-FD-LB",
+    "reference": "01-FD",
+    "name": "BFF",
+    "category": "Émaillées - couleur imposée",
     "price": 16.95,
-    "color": "Rouge",
-    "image": "models/menu-alphabet-tags.jpg",
-    "alphabet": true
+    "color": "Light Blue",
+    "image": "models/01-FD-LB.jpg"
   },
   {
-    "reference": "01-OS",
+    "reference": "01-OB",
     "name": "Boss",
     "category": "Émaillées - couleur imposée",
     "price": 16.95,
     "color": "",
-    "image": "models/01-os-bb-me-grey.jpg",
+    "image": "models/01-OB-BB.jpg",
     "elevenColours": false,
     "smallOnly": false,
     "glitterColours": false,
     "doubleSided": false
+  },
+  {
+    "id": "01-ON-DB",
+    "reference": "01-ON",
+    "name": "Boss",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Dark Blue",
+    "image": "models/01-ON-DB.jpg"
+  },
+  {
+    "id": "01-OP-PK",
+    "reference": "01-OP",
+    "name": "Boss",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Pink",
+    "image": "models/01-OP-PK.jpg"
   },
   {
     "reference": "01-EY",
@@ -105,6 +141,24 @@
     "doubleSided": false
   },
   {
+    "id": "01-CB-DB",
+    "reference": "01-CB",
+    "name": "Camouflage",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Dark Blue",
+    "image": "models/01-CB-DB.jpg"
+  },
+  {
+    "id": "01-CP-PK",
+    "reference": "01-CP",
+    "name": "Camouflage",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Pink",
+    "image": "models/01-CP-PK.jpg"
+  },
+  {
     "reference": "01-CA",
     "name": "Canadian Flag",
     "category": "Émaillées - couleur imposée",
@@ -129,6 +183,33 @@
     "doubleSided": false
   },
   {
+    "id": "01-HB-BB",
+    "reference": "01-HB",
+    "name": "Cœur",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Black",
+    "image": "models/01-HB-BB.jpg"
+  },
+  {
+    "id": "01-HN-DB",
+    "reference": "01-HN",
+    "name": "Cœur",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Dark Blue",
+    "image": "models/01-HN-DB.jpg"
+  },
+  {
+    "id": "01-HP-PU",
+    "reference": "01-HP",
+    "name": "Cœur",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Purple",
+    "image": "models/01-HP-PU.jpg"
+  },
+  {
     "reference": "01-HK",
     "name": "Coloured Heart",
     "category": "Émaillées - couleur imposée",
@@ -151,6 +232,24 @@
     "smallOnly": false,
     "glitterColours": false,
     "doubleSided": false
+  },
+  {
+    "id": "01-CK-LB",
+    "reference": "01-CK",
+    "name": "Cookie",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Light Blue",
+    "image": "models/01-CK-LB.jpg"
+  },
+  {
+    "id": "01-CK-PK",
+    "reference": "01-CK",
+    "name": "Cookie",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Pink",
+    "image": "models/01-CK-PK.jpg"
   },
   {
     "reference": "01-DV",
@@ -187,6 +286,15 @@
     "smallOnly": false,
     "glitterColours": false,
     "doubleSided": false
+  },
+  {
+    "id": "01-DN-BB",
+    "reference": "01-DN",
+    "name": "Dragon",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Black",
+    "image": "models/01-DN-BB.jpg"
   },
   {
     "reference": "01-EE",
@@ -345,6 +453,33 @@
     "doubleSided": false
   },
   {
+    "id": "01-MO-DB",
+    "reference": "01-MO",
+    "name": "Monstre",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Dark Blue",
+    "image": "models/01-MO-DB.jpg"
+  },
+  {
+    "id": "01-MO-GR",
+    "reference": "01-MO",
+    "name": "Monstre",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Green",
+    "image": "models/01-MO-GR.jpg"
+  },
+  {
+    "id": "01-MO-PK",
+    "reference": "01-MO",
+    "name": "Monstre",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Pink",
+    "image": "models/01-MO-PK.jpg"
+  },
+  {
     "reference": "01-MN",
     "name": "Moon and Stars",
     "category": "Émaillées - couleur imposée",
@@ -439,6 +574,24 @@
     "smallOnly": false,
     "glitterColours": false,
     "doubleSided": false
+  },
+  {
+    "id": "01-BL-LB",
+    "reference": "01-BL",
+    "name": "Papillon",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Light Blue",
+    "image": "models/01-BL-LB.jpg"
+  },
+  {
+    "id": "01-BP-PK",
+    "reference": "01-BP",
+    "name": "Papillon",
+    "category": "Émaillées - couleur imposée",
+    "price": 16.95,
+    "color": "Pink",
+    "image": "models/01-BP-PK.jpg"
   },
   {
     "reference": "01-PE",
@@ -1051,6 +1204,15 @@
     "smallOnly": false,
     "glitterColours": true,
     "doubleSided": false
+  },
+  {
+    "reference": "1J + lettre",
+    "name": "Alphabet (A-Z)",
+    "category": "Alphabet",
+    "price": 16.95,
+    "color": "Rouge",
+    "image": "models/menu-alphabet-tags.jpg",
+    "alphabet": true
   },
   {
     "reference": "02-BN",
