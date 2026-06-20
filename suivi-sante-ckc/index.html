@@ -142,6 +142,10 @@ input:focus,select:focus{outline:none;border-color:var(--bx);}
            font-weight:700;cursor:pointer;letter-spacing:.4px;text-transform:uppercase;
            margin-bottom:16px;transition:all .2s;}
 .print-btn:hover{border-color:var(--bx);color:var(--bx);}
+.calendar-btn{display:inline-flex;align-items:center;gap:6px;background:var(--green);border:1px solid var(--green);
+              color:#fff;padding:7px 14px;border-radius:7px;font-family:'Lato',sans-serif;font-size:.78rem;
+              font-weight:700;cursor:pointer;letter-spacing:.4px;text-transform:uppercase;margin:0 0 16px 7px;}
+.calendar-btn:hover{background:#155332;border-color:#155332;}
 
 /* ── FOOTER ── */
 footer{text-align:center;padding:18px 16px;color:var(--muted);font-size:.78rem;
@@ -215,6 +219,7 @@ footer a{color:var(--or2);text-decoration:none;}
 
   <div id="v-result" class="hide">
     <button class="print-btn" onclick="window.print()">🖨️ Imprimer / PDF</button>
+    <button class="calendar-btn" type="button" onclick="downloadCalendar('vaccins')">🗓️ Ajouter au calendrier</button>
     <div class="card">
       <div class="card-title">Calendrier vaccinal complet</div>
       <div style="overflow-x:auto;">
@@ -244,6 +249,7 @@ footer a{color:var(--or2);text-decoration:none;}
 
   <div id="vr-result" class="hide">
     <button class="print-btn" onclick="window.print()">🖨️ Imprimer / PDF</button>
+    <button class="calendar-btn" type="button" onclick="downloadCalendar('vermifuges')">🗓️ Ajouter au calendrier</button>
     <div class="card">
       <div class="card-title">Planning de vermifugation</div>
       <div style="overflow-x:auto;">
@@ -290,6 +296,7 @@ footer a{color:var(--or2);text-decoration:none;}
 
   <div id="anti-result" class="hide">
     <button class="print-btn" onclick="window.print()">🖨️ Imprimer / PDF</button>
+    <button class="calendar-btn" type="button" onclick="downloadCalendar('antiparasitaires')">🗓️ Ajouter au calendrier</button>
     <div class="card">
       <div class="card-title">Prochains traitements — 24 mois</div>
       <div style="overflow-x:auto;">
@@ -574,6 +581,62 @@ const addM = (d, n) => { const r = new Date(d); r.setMonth(r.getMonth() + n); re
 const addY = (d, n) => { const r = new Date(d); r.setFullYear(r.getFullYear() + n); return r; };
 const fmt  = d => d.toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
 const past = d => d < new Date();
+const calendarEvents = { vaccins: [], vermifuges: [], antiparasitaires: [] };
+
+function icsDate(d) {
+  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function icsEscape(text) {
+  return String(text).replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/([,;])/g, '\\$1');
+}
+
+function downloadCalendar(kind) {
+  const labels = {
+    vaccins: 'Calendrier vaccinal',
+    vermifuges: 'Calendrier de vermifugation',
+    antiparasitaires: 'Calendrier antiparasitaire'
+  };
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const events = calendarEvents[kind].filter(event => event.date >= today);
+
+  if (!events.length) {
+    alert('Aucune échéance à venir à ajouter au calendrier.');
+    return;
+  }
+
+  const stamp = `${icsDate(new Date())}T120000Z`;
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'PRODID:-//Élevage de la Dynastie d\'Orkhan//Suivi santé//FR'];
+  events.forEach((event, index) => {
+    const title = `${labels[kind]} — ${event.label}`;
+    const description = event.description ? `${event.description}\\nCalendrier indicatif à valider avec votre vétérinaire.` : 'Calendrier indicatif à valider avec votre vétérinaire.';
+    lines.push(
+      'BEGIN:VEVENT',
+      `UID:${kind}-${icsDate(event.date)}-${index}@dynastiedorkhan.com`,
+      `DTSTAMP:${stamp}`,
+      `DTSTART;VALUE=DATE:${icsDate(event.date)}`,
+      `SUMMARY:${icsEscape(title)}`,
+      `DESCRIPTION:${icsEscape(description)}`,
+      'BEGIN:VALARM',
+      'TRIGGER:-P2D',
+      'ACTION:DISPLAY',
+      `DESCRIPTION:${icsEscape(title)}`,
+      'END:VALARM',
+      'END:VEVENT'
+    );
+  });
+  lines.push('END:VCALENDAR');
+
+  const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `${kind}-dynastie-orkhan.ics`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+}
 
 // ─────────────────────────────────────────────
 //  VACCINS
@@ -626,6 +689,7 @@ function calcV() {
   }
 
   rows.sort((a, b) => a.date - b.date);
+  calendarEvents.vaccins = rows.map(r => ({ date: r.date, label: r.lbl, description: r.vac }));
 
   let html = `<thead><tr><th>Acte vaccinal</th><th>Date</th><th>Vaccins</th><th>Remarque</th></tr></thead><tbody>`;
   rows.forEach(r => {
@@ -679,6 +743,12 @@ function calcVr() {
     rows.push({ lbl: `${m} mois`, date: addM(b, m), who: 'client', special: m % 6 === 0 ? 'copro-option' : '' });
   }
 
+  calendarEvents.vermifuges = rows.map(r => ({
+    date: r.date,
+    label: `Vermifugation — ${r.lbl}`,
+    description: r.special === 'copro' ? 'Coproscopie recommandée' : 'Suivi de vermifugation'
+  }));
+
   let html = `<thead><tr><th>Âge</th><th>Date</th><th>Responsable</th><th>Note</th></tr></thead><tbody>`;
   rows.forEach(r => {
     const p = past(r.date);
@@ -731,6 +801,12 @@ function calcAnti() {
     rows.push(new Date(cur));
     cur = addD(cur, days);
   }
+
+  calendarEvents.antiparasitaires = rows.map((date, index) => ({
+    date,
+    label: `Traitement ${index + 1}`,
+    description: 'Antiparasitaire externe — respectez l\'AMM du produit ou l\'avis de votre vétérinaire.'
+  }));
 
   let html = `<thead><tr><th>#</th><th>Date</th><th>Statut</th></tr></thead><tbody>`;
   rows.forEach((d, i) => {
