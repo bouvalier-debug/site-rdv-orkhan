@@ -117,6 +117,14 @@ input:focus,select:focus{outline:none;border-color:var(--bx);}
 .reco-title{font-weight:900;color:var(--bx);margin-bottom:4px;font-size:.95rem;}
 .reco-desc{font-size:.84rem;color:var(--muted);line-height:1.55;}
 
+/* ── PARTENAIRES ── */
+.partner-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;}
+.partner-btn{display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;border-radius:7px;
+             background:var(--bx);color:#fff;text-decoration:none;font-size:.82rem;font-weight:900;
+             letter-spacing:.4px;text-transform:uppercase;transition:background .2s;}
+.partner-btn:hover{background:var(--bx2);}
+.partner-link{display:inline-flex;align-items:center;padding:11px 4px;color:var(--bx);font-size:.85rem;font-weight:700;}
+
 /* ── HEALTH LIST ── */
 .health-list{list-style:none;line-height:2;}
 .health-list li{font-size:.88rem;padding:8px 0;border-bottom:1px solid var(--border);}
@@ -169,6 +177,7 @@ footer a{color:var(--or2);text-decoration:none;}
     <div class="tab" onclick="showSec('anti',this)">🛡️ Antiparasitaires</div>
     <div class="tab" onclick="showSec('poids',this)">⚖️ Poids</div>
     <div class="tab" onclick="showSec('reco',this)">📋 Conseils</div>
+    <div class="tab" onclick="showSec('partenaires',this)">🤝 Nos partenaires</div>
   </div>
 </nav>
 
@@ -469,6 +478,40 @@ footer a{color:var(--or2);text-decoration:none;}
   <div class="card" style="background:#fffbeb;border-left:3px solid var(--or);">
     <div class="card-title">Avertissement vétérinaire</div>
     <p style="font-size:.88rem;color:var(--text);line-height:1.75;">Cet outil est fourni à titre indicatif pour aider les familles à organiser le suivi de leur Cavalier King Charles. Il ne remplace pas l'avis, le diagnostic ni les prescriptions de votre vétérinaire traitant. En cas de doute, de symptôme ou de problème de santé, consultez rapidement votre vétérinaire.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ PARTENAIRES ═══════════════════════════════ -->
+<div id="sec-partenaires" class="sec">
+  <p class="sec-heading">Nos partenaires</p>
+  <p class="sec-sub">Des services et produits sélectionnés pour accompagner votre chien au quotidien.</p>
+
+  <div class="card" style="border-left:3px solid var(--or);">
+    <div class="card-title">Chiens &amp; Chats Naturellement</div>
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.7;">Découvrez leur boutique dédiée au bien-être des chiens et des chats. En passant par notre lien de parrainage, votre inscription est rattachée à l'élevage.</p>
+    <div class="partner-actions">
+      <a class="partner-btn" href="https://www.chiensetchatsnaturellement.com/?s=2059403" target="_blank" rel="noopener noreferrer">Accéder au lien de parrainage</a>
+      <a class="partner-link" href="https://www.chiensetchatsnaturellement.com/" target="_blank" rel="noopener noreferrer">Visiter le site</a>
+    </div>
+    <div class="notebox"><strong>Code parrain :</strong> 2059403<br>Si vous vous inscrivez directement sur le site, saisissez ce code lors de l'inscription.</div>
+  </div>
+
+  <div class="card" style="border-left:3px solid var(--or);">
+    <div class="card-title">Nourrir comme la Nature</div>
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.7;">Découvrez leur boutique spécialisée dans l'alimentation naturelle pour chiens et chats. Utilisez notre lien de parrainage lors de votre inscription.</p>
+    <div class="partner-actions">
+      <a class="partner-btn" href="https://www.nourrircommelanature.com/?country=fr#ref=16264209" target="_blank" rel="noopener noreferrer">Accéder au lien de parrainage</a>
+      <a class="partner-link" href="https://www.nourrircommelanature.com/?country=fr" target="_blank" rel="noopener noreferrer">Visiter le site</a>
+    </div>
+  </div>
+
+  <div class="card" style="border-left:3px solid var(--or);">
+    <div class="card-title">Terra Canis</div>
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.7;">Découvrez leur alimentation et leurs produits dédiés aux chiens. Utilisez notre lien de parrainage lors de votre inscription.</p>
+    <div class="partner-actions">
+      <a class="partner-btn" href="https://www.terracanis.com/fr-fr/referral/GE2FXB6" target="_blank" rel="noopener noreferrer">Accéder au lien de parrainage</a>
+      <a class="partner-link" href="https://www.terracanis.com/fr-fr/" target="_blank" rel="noopener noreferrer">Visiter le site</a>
+    </div>
   </div>
 </div>
 
