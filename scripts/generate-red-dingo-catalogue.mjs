@@ -13,6 +13,10 @@ const catalogue = scripts.find((entry) => entry?.mainEntity?.['@type'] === 'Offe
 if (!catalogue?.itemListElement) throw new Error('Catalogue JSON-LD introuvable.');
 
 const localFiles = fs.readdirSync(modelsDirectory);
+const elevenColourReferences = new Set([
+  '01-BO', '01-BN', '01-BB', '01-DG', '01-DH', '01-ST', '01-FW', '01-PP', '01-PC', '01-DA', '01-MU',
+  '01-FH', '01-HT', '01-SK', '01-XB', '01-TA', '01-AW', '01-TF', '01-TH', '01-ZF', '01-CR', '01-HS',
+]);
 const findLocalImage = (reference) => {
   const prefix = `${reference}-`.toLowerCase();
   return localFiles.find((file) => file.toLowerCase().startsWith(prefix)) || null;
@@ -38,6 +42,7 @@ const products = catalogue.itemListElement
       price: Number(product.offers.price),
       color: product.color || '',
       image: `models/${image}`,
+      elevenColours: elevenColourReferences.has(reference),
     };
   })
   .filter(Boolean)
