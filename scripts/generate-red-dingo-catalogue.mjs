@@ -39,8 +39,6 @@ const categoryFor = (product) => {
   if (price === 16.95 && reference.startsWith('0X-')) return 'Paillettes - 7 couleurs';
   if (price === 16.95 && reference.startsWith('02-')) return 'Acier inoxydable plat';
   if (price === 16.95 && reference.startsWith('03-')) return 'Laiton plat';
-  if (price === 16.95 && reference.startsWith('04-')) return 'Plastique';
-  if (price === 16.95 && reference.startsWith('09-')) return 'Titanium coloré';
   if (price === 16.95 && elevenColourReferences.has(reference)) return 'Émaillées - 11 couleurs';
   if (price === 16.95 && catTagReferences.has(reference)) return 'Médailles chat - 11 couleurs';
   if (price === 16.95 && reference.startsWith('01-')) return 'Émaillées - couleur imposée';
