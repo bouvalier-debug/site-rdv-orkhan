@@ -28,8 +28,8 @@
 body{font-family:'Lato',sans-serif;background:var(--bg2);color:var(--text);min-height:100vh;font-size:15px;}
 
 /* ── HEADER ── */
-header{background:var(--bx);color:#fff;padding:22px 20px 18px;text-align:center;}
-.site-logo{display:block;width:82px;height:82px;margin:0 auto 10px;object-fit:contain;}
+header{background:var(--bx);color:#fff;padding:24px max(24px,calc(50% - 576px)) 18px;text-align:center;}
+.site-logo{display:block;width:92px;height:92px;margin:0 0 10px;object-fit:contain;}
 header h1{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;letter-spacing:.3px;}
 header p{font-size:.78rem;opacity:.75;margin-top:5px;letter-spacing:1.5px;text-transform:uppercase;font-weight:300;}
 .gold-bar{height:3px;background:var(--or);}
@@ -187,7 +187,8 @@ footer a{color:var(--or2);text-decoration:none;}
   .hide{display:none!important;}
 }
 @media(max-width:500px){
-  .site-logo{width:68px;height:68px;}
+  header{padding:14px 14px 18px;}
+  .site-logo{width:70px;height:70px;}
   .cross-site-grid{grid-template-columns:1fr;}
   .tbl{font-size:.8rem;}
   .tbl td,.tbl th{padding:7px 8px;}

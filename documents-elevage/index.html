@@ -55,7 +55,7 @@
       position: relative;
       overflow: hidden;
       min-height: 70vh;
-      padding: 28px clamp(18px, 4vw, 56px) 48px;
+      padding: 24px max(24px, calc(50% - 576px)) 48px;
       color: var(--cream);
       background: linear-gradient(135deg, var(--burgundy) 0%, var(--burgundy-deep) 100%);
     }
@@ -74,7 +74,7 @@
     .header-inner {
       position: relative;
       z-index: 1;
-      width: min(1120px, 100%);
+      width: min(1200px, 100%);
       margin: 0 auto;
     }
 
@@ -97,10 +97,11 @@
       background: var(--gold);
     }
 
-    .brand-logo {
-      width: 54px;
-      height: 54px;
-      flex: 0 0 auto;
+    .site-logo {
+      display: block;
+      width: 92px;
+      height: 92px;
+      margin: 0 0 16px;
       object-fit: contain;
     }
 
@@ -355,7 +356,7 @@
     @media (max-width: 760px) {
       .site-header {
         min-height: 78vh;
-        padding-top: 22px;
+        padding: 14px 14px 48px;
       }
 
       .brand {
@@ -364,9 +365,9 @@
         letter-spacing: 0.1em;
       }
 
-      .brand-logo {
-        width: 46px;
-        height: 46px;
+      .site-logo {
+        width: 70px;
+        height: 70px;
       }
 
       main {
@@ -416,7 +417,8 @@
 <body>
   <header class="site-header">
     <div class="header-inner">
-      <div class="brand"><img class="brand-logo" src="/medailles-gravees/assets/logo-dynastie-orkhan.png" alt="Logo de l’Élevage de la Dynastie d’Orkhan">Élevage de la Dynastie d’Orkhan</div>
+      <img class="site-logo" src="/medailles-gravees/assets/logo-dynastie-orkhan.png" alt="Logo de l’Élevage de la Dynastie d’Orkhan">
+      <div class="brand">Élevage de la Dynastie d’Orkhan</div>
       <section class="hero" aria-labelledby="page-title">
         <h1 id="page-title">Documents élevage</h1>
         <p class="subtitle">Tous les documents utiles pour préparer l’arrivée de votre chiot</p>

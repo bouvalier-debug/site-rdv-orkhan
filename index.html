@@ -64,7 +64,7 @@
       background: linear-gradient(135deg, var(--bordeaux) 0%, #5e1322 100%);
       color: var(--blanc-casse);
       text-align: center;
-      padding: 70px 24px 60px;
+      padding: 24px max(24px, calc(50% - 576px)) 60px;
       position: relative;
       border-bottom: 4px solid var(--dore);
     }
@@ -78,9 +78,9 @@
     }
     .site-logo {
       display: block;
-      width: 112px;
-      height: 112px;
-      margin: 0 auto 18px;
+      width: 92px;
+      height: 92px;
+      margin: 0 0 16px;
       object-fit: contain;
     }
     header .marque {
@@ -568,8 +568,8 @@
        9. RESPONSIVE SMARTPHONE
        ========================================================= */
     @media (max-width: 600px) {
-      header { padding: 50px 20px 46px; }
-      .site-logo { width: 84px; height: 84px; margin-bottom: 14px; }
+      header { padding: 14px 14px 46px; }
+      .site-logo { width: 70px; height: 70px; margin-bottom: 14px; }
       .carte { padding: 26px 20px; }
       main { padding: 0 12px 40px; }
       .selection-date { padding: 18px; }
