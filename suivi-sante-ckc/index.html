@@ -159,14 +159,26 @@ input:focus,select:focus{outline:none;border-color:var(--bx);}
 .calendar-btn:hover{background:#155332;border-color:#155332;}
 
 /* ── FOOTER ── */
+.cross-site-links{margin:28px 0 34px;}
+.cross-site-links h2{margin:0 0 14px;color:var(--bx);font-size:1.25rem;}
+.cross-site-links>p{margin:0 0 16px;color:var(--muted);font-size:.88rem;}
+.cross-site-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}
+.cross-site-link{display:block;padding:16px;border:1px solid var(--border);border-top:3px solid var(--or);border-radius:8px;background:var(--bg2);color:var(--text);text-decoration:none;transition:transform .2s,box-shadow .2s;}
+.cross-site-link:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(58,31,33,.12);}
+.cross-site-link strong{display:block;margin-bottom:5px;color:var(--bx);font-size:.95rem;}
+.cross-site-link span{display:block;color:var(--muted);font-size:.82rem;line-height:1.5;}
 footer{text-align:center;padding:18px 16px;color:var(--muted);font-size:.78rem;
        border-top:1px solid var(--border);margin-top:10px;line-height:1.8;}
 footer strong{color:var(--bx);}
 footer a{color:var(--or2);text-decoration:none;}
 
+@media(max-width:800px){
+  .cross-site-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+
 /* ── PRINT ── */
 @media print{
-  nav,.print-btn,.calendar-btn,.back-top,footer{display:none!important;}
+  nav,.print-btn,.calendar-btn,.back-top,.cross-site-links,footer{display:none!important;}
   .sec{display:none!important;}
   .sec.on{display:block!important;}
   .card{box-shadow:none!important;break-inside:avoid;margin-bottom:12px;}
@@ -174,6 +186,7 @@ footer a{color:var(--or2);text-decoration:none;}
   .hide{display:none!important;}
 }
 @media(max-width:500px){
+  .cross-site-grid{grid-template-columns:1fr;}
   .tbl{font-size:.8rem;}
   .tbl td,.tbl th{padding:7px 8px;}
   header h1{font-size:1.25rem;}
@@ -675,6 +688,16 @@ footer a{color:var(--or2);text-decoration:none;}
 
   <p style="font-size:.76rem;color:var(--muted);line-height:1.55;margin:2px 2px 16px;">Les offres et leurs conditions d'application sont définies par chaque partenaire et peuvent évoluer.</p>
 </div>
+
+<section class="cross-site-links" aria-labelledby="cross-site-title">
+  <h2 id="cross-site-title">Les autres services de l’élevage</h2>
+  <p>Retrouvez facilement les trois autres espaces Dynastie d’Orkhan.</p>
+  <div class="cross-site-grid">
+    <a class="cross-site-link" href="https://www.dynastiedorkhan.com/"><strong>Prendre rendez-vous</strong><span>Demandez votre visite, votre réservation ou le rendez-vous de départ.</span></a>
+    <a class="cross-site-link" href="https://www.dynastiedorkhan.com/medailles-gravees/"><strong>Médailles gravées Red Dingo</strong><span>Découvrez les médailles personnalisées proposées par l’élevage.</span></a>
+    <a class="cross-site-link" href="https://www.dynastiedorkhan.com/documents-elevage/"><strong>Documents d’élevage</strong><span>Accédez aux documents officiels, mémos et fiches pratiques.</span></a>
+  </div>
+</section>
 
 </main>
 

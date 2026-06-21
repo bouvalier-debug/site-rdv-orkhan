@@ -194,6 +194,10 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .grid.tools {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
     .grid.memos {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -337,7 +341,8 @@
     }
 
     @media (max-width: 980px) {
-      .grid.memos {
+      .grid.memos,
+      .grid.tools {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
@@ -360,6 +365,7 @@
       }
 
       .grid.two,
+      .grid.tools,
       .grid.memos {
         grid-template-columns: 1fr;
       }
@@ -506,12 +512,12 @@
         <h2 class="section-title" id="tools-title">Outils en ligne</h2>
         <p class="section-kicker">Accès rapides</p>
       </div>
-      <div class="grid two">
+      <div class="grid tools">
         <article class="card tool-card">
           <div class="card-body">
             <h3>Site Suivi santé CKC</h3>
             <p>Site interactif : calculs de vaccins, vermifugation, antiparasitaires, poids et conseils santé.</p>
-            <a class="button" href="/suivi-sante-ckc/">Accéder au site Suivi santé CKC</a>
+            <a class="button" href="https://www.dynastiedorkhan.com/suivi-sante-ckc/">Accéder au site Suivi santé CKC</a>
           </div>
         </article>
 
@@ -519,7 +525,15 @@
           <div class="card-body">
             <h3>Prendre rendez-vous à l’élevage</h3>
             <p>Demande de rendez-vous en ligne pour une visite, une réservation ou le départ du chiot.</p>
-            <a class="button" href="/">Prendre rendez-vous</a>
+            <a class="button" href="https://www.dynastiedorkhan.com/">Prendre rendez-vous</a>
+          </div>
+        </article>
+
+        <article class="card tool-card">
+          <div class="card-body">
+            <h3>Médailles gravées Red Dingo</h3>
+            <p>Découvrez les médailles personnalisées proposées aux familles de l’élevage.</p>
+            <a class="button" href="https://www.dynastiedorkhan.com/medailles-gravees/">Découvrir les médailles</a>
           </div>
         </article>
       </div>

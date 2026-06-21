@@ -11,6 +11,19 @@
   <style>
     .benefits{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px;margin:28px 0}.benefits h2{margin:0 0 6px}.benefits p{margin:0 0 16px}.benefit-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;padding:0;margin:0;list-style:none}.benefit-list li,.benefit-list>div{padding:10px 12px;background:#faf6f0;border-radius:8px}.benefit-list li::before{content:'✓';font-weight:bold;color:var(--bordeaux);margin-right:8px}.warranty{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}.warranty summary{cursor:pointer;font-weight:bold;color:var(--bordeaux)}.warranty p{margin:10px 0 0}.site-footer{margin-top:48px;padding:28px 0;border-top:2px solid var(--or);display:flex;align-items:center;justify-content:center;gap:20px;text-align:left}.site-footer img{width:88px;height:88px;object-fit:contain}.site-footer strong{display:block;color:var(--bordeaux);font-size:1.1rem}.site-footer p{margin:3px 0}.site-footer a{font-weight:bold}#to-top{position:fixed;right:18px;bottom:18px;width:48px;height:48px;padding:0;border-radius:50%;font-size:1.5rem;box-shadow:0 4px 14px #0003;opacity:0;visibility:hidden;transform:translateY(12px);transition:.2s;z-index:10}#to-top.visible{opacity:1;visibility:visible;transform:translateY(0)}@media(max-width:560px){.site-footer{align-items:flex-start;text-align:center;flex-direction:column}.site-footer img{margin:auto}}
   </style>
+  <style>
+    .cross-site-links{margin:48px 0 0;padding:28px 0 0;border-top:2px solid var(--or)}
+    .cross-site-links h2{margin:0 0 8px;color:var(--bordeaux)}
+    .cross-site-links>p{margin:0 0 18px;color:#655a59}
+    .cross-site-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .cross-site-link{display:block;min-height:150px;padding:18px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);text-decoration:none;box-shadow:0 5px 16px rgba(40,31,32,.06);transition:transform .2s,box-shadow .2s}
+    .cross-site-link::before{content:"";display:block;width:42px;height:3px;margin-bottom:15px;background:var(--or)}
+    .cross-site-link:hover{transform:translateY(-2px);box-shadow:0 9px 20px rgba(40,31,32,.12)}
+    .cross-site-link strong{display:block;margin-bottom:6px;color:var(--bordeaux);font-size:1rem}
+    .cross-site-link span{display:block;color:#655a59;font-size:.9rem;line-height:1.5}
+    @media(max-width:900px){.cross-site-grid{grid-template-columns:repeat(2,minmax(0,1fr)}}
+    @media(max-width:700px){.cross-site-grid{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
 <main>
@@ -40,6 +53,15 @@
     </div>
     <p class="hint">L'envoi constitue une demande de vérification, et non une commande définitive ni un paiement. Nous vous confirmerons le modèle, la gravure, le prix et la livraison avant tout règlement. Après validation définitive et lancement de la fabrication, la médaille personnalisée ne peut pas faire l'objet d'une rétractation, sauf défaut ou erreur imputable au vendeur ou au fabricant.</p><button type="submit">Envoyer ma demande de vérification</button><p class="status" id="message" role="status"></p>
   </form>
+  <section class="cross-site-links" aria-labelledby="cross-site-title">
+    <h2 id="cross-site-title">Les autres services de l’élevage</h2>
+    <p>Retrouvez facilement les trois autres espaces Dynastie d’Orkhan.</p>
+    <div class="cross-site-grid">
+      <a class="cross-site-link" href="https://www.dynastiedorkhan.com/"><strong>Prendre rendez-vous</strong><span>Demandez votre visite, votre réservation ou le rendez-vous de départ.</span></a>
+      <a class="cross-site-link" href="https://www.dynastiedorkhan.com/suivi-sante-ckc/"><strong>Suivi santé CKC</strong><span>Calculs de soins, de vaccination, de poids et conseils santé.</span></a>
+      <a class="cross-site-link" href="https://www.dynastiedorkhan.com/documents-elevage/"><strong>Documents d’élevage</strong><span>Documents officiels, mémos et fiches pratiques pour votre chiot.</span></a>
+    </div>
+  </section>
   <footer class="site-footer"><div><strong>Élevage de la Dynastie d'Orkhan</strong><p>52 rue de Masny, 59234 Monchecourt</p><p>SIRET : 421 173 824 00028</p><p><a href="tel:+33327990364">03 27 99 03 64</a> · <a href="mailto:contact@dynastiedorkhan.com">contact@dynastiedorkhan.com</a></p><p><a href="conditions-vente.html">Conditions de vente</a> · <a href="mentions-legales.html">Mentions légales</a> · <a href="confidentialite.html">Politique de confidentialité</a></p></div></footer>
 </main>
 <button id="to-top" type="button" aria-label="Remonter en haut de la page" title="Remonter en haut">↑</button>
