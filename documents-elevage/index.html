@@ -97,6 +97,13 @@
       background: var(--gold);
     }
 
+    .brand-logo {
+      width: 54px;
+      height: 54px;
+      flex: 0 0 auto;
+      object-fit: contain;
+    }
+
     .hero {
       max-width: 780px;
     }
@@ -357,6 +364,11 @@
         letter-spacing: 0.1em;
       }
 
+      .brand-logo {
+        width: 46px;
+        height: 46px;
+      }
+
       main {
         width: min(100% - 28px, 1120px);
         margin-top: -28px;
@@ -404,7 +416,7 @@
 <body>
   <header class="site-header">
     <div class="header-inner">
-      <div class="brand">Élevage de la Dynastie d’Orkhan</div>
+      <div class="brand"><img class="brand-logo" src="/medailles-gravees/assets/logo-dynastie-orkhan.png" alt="Logo de l’Élevage de la Dynastie d’Orkhan">Élevage de la Dynastie d’Orkhan</div>
       <section class="hero" aria-labelledby="page-title">
         <h1 id="page-title">Documents élevage</h1>
         <p class="subtitle">Tous les documents utiles pour préparer l’arrivée de votre chiot</p>
