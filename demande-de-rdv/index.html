@@ -586,9 +586,15 @@
       .grille-liens-sites { grid-template-columns: 1fr; }
     }
   </style>
+  <style>
+    .ecosystem-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;padding:14px 20px;background:#fff;border-bottom:1px solid rgba(198,164,92,.42);font-family:'Lato',sans-serif}
+    .ecosystem-nav a{display:inline-flex;align-items:center;min-height:40px;padding:7px 13px;border:1px solid rgba(198,164,92,.42);border-radius:999px;color:#7B1D2E;background:#fffdf8;font-weight:700;text-decoration:none}
+    .ecosystem-nav a[aria-current="page"]{color:#fff;background:#7B1D2E;border-color:#7B1D2E}
+  </style>
 </head>
 
 <body>
+  <nav class="ecosystem-nav" aria-label="Navigation principale"><a href="https://dynastiedorkhan.chiens-de-france.com/cavalier-king-charles">Accueil</a><a href="/suivi-sante-ckc/">Suivi Santé CKC</a><a href="/documents-elevage/">Documents</a><a href="/demande-de-rdv/" aria-current="page">Rendez-vous</a><a href="/">Boutique</a><a href="mailto:contact@dynastiedorkhan.com">Contact</a></nav>
 
   <!-- ====================== EN-TÊTE ====================== -->
   <header>

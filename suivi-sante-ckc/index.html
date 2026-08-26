@@ -195,8 +195,14 @@ footer a{color:var(--or2);text-decoration:none;}
   header h1{font-size:1.25rem;}
 }
 </style>
+<style>
+.ecosystem-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;padding:14px 20px;background:#fff;border-bottom:1px solid var(--border)}
+.ecosystem-nav a{display:inline-flex;align-items:center;min-height:40px;padding:7px 13px;border:1px solid var(--border);border-radius:999px;color:var(--bx);background:var(--bg2);font-weight:700;text-decoration:none}
+.ecosystem-nav a[aria-current="page"]{color:#fff;background:var(--bx);border-color:var(--bx)}
+</style>
 </head>
 <body>
+<nav class="ecosystem-nav" aria-label="Navigation principale"><a href="https://dynastiedorkhan.chiens-de-france.com/cavalier-king-charles">Accueil</a><a href="/suivi-sante-ckc/" aria-current="page">Suivi Santé CKC</a><a href="/documents-elevage/">Documents</a><a href="/demande-de-rdv/">Rendez-vous</a><a href="/">Boutique</a><a href="mailto:contact@dynastiedorkhan.com">Contact</a></nav>
 
 <header>
   <img class="site-logo" src="/medailles-gravees/assets/logo-dynastie-orkhan.png" alt="Logo de l’Élevage de la Dynastie d’Orkhan">
@@ -217,7 +223,7 @@ footer a{color:var(--or2);text-decoration:none;}
     <div class="tab" onclick="showSec('saisons',this)">🌦️ Saisons</div>
     <div class="tab" onclick="showSec('partenaires',this)">🤝 Nos partenaires</div>
     <a class="tab" href="/documents-elevage/">📖 Documents</a>
-    <a class="tab" href="/">📅 Rendez-vous</a>
+    <a class="tab" href="/demande-de-rdv/">📅 Rendez-vous</a>
   </div>
 </nav>
 
@@ -698,7 +704,7 @@ footer a{color:var(--or2);text-decoration:none;}
   <p>Retrouvez facilement les trois autres espaces Dynastie d’Orkhan.</p>
   <div class="cross-site-grid">
     <a class="cross-site-link" href="https://www.dynastiedorkhan.com/demande-de-rdv/"><strong>Prendre rendez-vous</strong><span>Demandez votre visite, votre réservation ou le rendez-vous de départ.</span></a>
-    <a class="cross-site-link" href="https://www.dynastiedorkhan.com/demande-de-rdv/"><strong>Boutique Dynastie d’Orkhan</strong><span>Découvrez les produits et services proposés par l’élevage.</span></a>
+    <a class="cross-site-link" href="/"><strong>Boutique Dynastie d’Orkhan</strong><span>Découvrez les produits et services proposés par l’élevage.</span></a>
     <a class="cross-site-link" href="https://www.dynastiedorkhan.com/documents-elevage/"><strong>Documents d’élevage</strong><span>Accédez aux documents officiels, mémos et fiches pratiques.</span></a>
   </div>
 </section>

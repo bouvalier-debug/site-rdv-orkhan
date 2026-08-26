@@ -413,8 +413,14 @@
       }
     }
   </style>
+  <style>
+    .ecosystem-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;padding:14px 20px;background:#fff;border-bottom:1px solid var(--line)}
+    .ecosystem-nav a{display:inline-flex;align-items:center;min-height:40px;padding:7px 13px;border:1px solid var(--line);border-radius:999px;color:var(--burgundy);background:var(--cream);font-weight:700;text-decoration:none}
+    .ecosystem-nav a[aria-current="page"]{color:#fff;background:var(--burgundy);border-color:var(--burgundy)}
+  </style>
 </head>
 <body>
+  <nav class="ecosystem-nav" aria-label="Navigation principale"><a href="https://dynastiedorkhan.chiens-de-france.com/cavalier-king-charles">Accueil</a><a href="/suivi-sante-ckc/">Suivi Santé CKC</a><a href="/documents-elevage/" aria-current="page">Documents</a><a href="/demande-de-rdv/">Rendez-vous</a><a href="/">Boutique</a><a href="mailto:contact@dynastiedorkhan.com">Contact</a></nav>
   <header class="site-header">
     <div class="header-inner">
       <img class="site-logo" src="/medailles-gravees/assets/logo-dynastie-orkhan.png" alt="Logo de l’Élevage de la Dynastie d’Orkhan">
@@ -545,7 +551,7 @@
           <div class="card-body">
             <h3>Boutique Dynastie d’Orkhan</h3>
             <p>Découvrez les produits et services proposés par l’élevage.</p>
-            <a class="button" href="https://www.dynastiedorkhan.com/demande-de-rdv/">Découvrir la boutique</a>
+            <a class="button" href="/">Découvrir la boutique</a>
           </div>
         </article>
       </div>
