@@ -1,24 +1,383 @@
-:root{--wine:#731d32;--wine-dark:#4e1222;--gold:#bd9452;--cream:#f8f2e8;--paper:#fffdf9;--ink:#261d1f;--muted:#6b5e60;--line:#e6d9c8;--shadow:0 18px 50px rgba(78,18,34,.1);--bordeaux:var(--wine);--bordeaux-clair:var(--wine);--dore:var(--gold);--dore-clair:var(--gold);--or:var(--gold);--blanc-casse:var(--paper);--gris-clair:var(--cream);--gris-texte:var(--ink);--gris-bordure:var(--line);--ombre:var(--shadow);--ombre-forte:var(--shadow);--radius:8px;--sand:var(--cream);--sea:var(--wine);--orange:var(--gold);--green:var(--wine);--pink:var(--gold)}
-html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:var(--paper);font-family:"Manrope",Arial,sans-serif;font-size:16px;line-height:1.65}h1,h2,h3,.nom,.marque,.signature{font-family:"Lora",Georgia,serif;line-height:1.15}h1{font-weight:600;letter-spacing:-.025em}h2,h3{color:var(--wine)}a{color:var(--wine);text-underline-offset:3px}main{width:min(1180px,calc(100% - 40px));max-width:none;margin-inline:auto;padding:40px 0 76px}
-.brand{gap:12px;margin-bottom:18px}.brand img{width:76px;height:76px}.brand-name,.marque{color:var(--wine);font-family:"Lora",Georgia,serif;font-size:1.08rem;font-weight:700;letter-spacing:0;text-transform:none}.site-nav,.ecosystem-nav{gap:12px;margin-bottom:24px}.ecosystem-nav{position:sticky;top:0;z-index:20;justify-content:center;padding:14px 20px;border-bottom:1px solid var(--line);background:rgba(255,253,249,.96);box-shadow:none;backdrop-filter:blur(12px)}.site-nav a,.ecosystem-nav a{min-height:44px;padding:9px 16px;border:1px solid var(--line);border-radius:999px;color:var(--wine);background:#fff;font-size:.84rem;font-weight:800;text-decoration:none}.site-nav a:hover,.ecosystem-nav a:hover{border-color:var(--gold)}.site-nav a.active,.ecosystem-nav a[aria-current=page]{border-color:var(--wine);color:#fff;background:var(--wine)}
-.hero,body>header{color:var(--ink);background-color:var(--cream);background-image:linear-gradient(90deg,rgba(255,253,249,.72),rgba(255,253,249,.48) 56%,rgba(255,253,249,.06)),url("/assets/banniere-dynastie-orkhan.webp");background-repeat:no-repeat;background-position:center 58%;background-size:cover;border:0;border-radius:0;box-shadow:none}.hero{min-height:438px;padding:clamp(34px,6vw,58px)}body>header{min-height:438px;padding:58px max(20px,calc(50% - 590px)) 42px;background-image:linear-gradient(rgba(255,253,249,.52),rgba(255,253,249,.52)),url("/assets/banniere-dynastie-orkhan.webp")}body>header::after{width:90px;height:2px;margin-top:24px;background:var(--gold)}.hero h1,body>header h1{max-width:900px;margin:8px 0 16px;color:var(--ink);font-size:clamp(2rem,4vw,3.35rem);line-height:1.15}body>header h1{margin-inline:auto}.hero p,.sous-titre{color:var(--muted);font-size:1.05rem}.eyebrow{color:var(--wine);font-size:.76rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase}.site-logo{width:92px;height:92px}
-.carte,.step,.price-card,.card,form,.product-card,.media-card,.cart-panel,.pack,.choice,.calendrier-dates,.message-important,.regles{border:1px solid var(--line);border-radius:6px;background:#fff;box-shadow:0 10px 34px rgba(78,18,34,.06)}.carte{padding:clamp(24px,4vw,40px)}.carte h2,.section-title,.price-card h2,.pack h2,.cart-head h2{color:var(--wine);font-size:clamp(1.65rem,3vw,2.35rem)}.notice,.message-important,.regles,.rappel-creneau{border-left:4px solid var(--gold);border-radius:0;background:var(--cream);color:var(--muted)}.step span{color:#fff;background:var(--wine)}.step strong,.product-card h3,.category,.amount,.pack-price,.status{color:var(--wine)}.pack{border:1px solid var(--gold);background:var(--cream)}.benefits li::before{color:var(--wine)}.product-card img,.hero img,.media-card img{border-radius:6px}
-button,.bouton-envoi{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 17px;border:1px solid var(--wine);border-radius:999px;color:#fff;background:var(--wine);font-family:"Manrope",Arial,sans-serif;font-weight:800}button:hover,.bouton-envoi:hover{background:var(--wine-dark)}button.secondary{border-color:var(--wine);color:var(--wine);background:transparent}button.secondary:hover{color:#fff;background:var(--wine)}input,select,textarea,.toolbar input,.toolbar select,.customer input,.customer textarea{min-height:48px;padding:10px 12px;border:1px solid #cbbdb1;border-radius:5px;color:var(--ink);background:#fff;font-family:"Manrope",Arial,sans-serif}input:focus,select:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:3px solid rgba(189,148,82,.45);outline-offset:2px}label,.intitule{color:var(--ink);font-weight:800}
-.site-footer,body>footer{margin-top:48px;padding:38px max(20px,calc(50% - 590px));border:0;color:#f7ede7;background:var(--wine-dark);text-align:left}.site-footer strong,body>footer .nom{color:#fff;font-family:"Lora",Georgia,serif;font-size:1.2rem}.site-footer p,body>footer p{color:#d8c3c7}.site-footer a,body>footer a{color:#fff}
-.facebook-fab{position:fixed;right:24px;bottom:24px;z-index:30;display:grid;place-items:center;width:48px;height:48px;border:1px solid var(--gold);border-radius:50%;color:#fff;background:var(--wine);box-shadow:0 8px 22px rgba(78,18,34,.24);transition:transform .2s,background .2s}.facebook-fab:hover{color:#fff;background:var(--wine-dark);transform:translateY(-2px)}.facebook-fab svg{display:block;width:21px;height:21px;fill:currentColor}
-@media(min-width:701px){body:not(:has(> .ecosystem-nav)) main{padding-top:18px}body:not(:has(> .ecosystem-nav)) main>.brand{display:inline-flex;align-items:center;vertical-align:middle;margin:0 26px 18px 0}body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type{display:inline-flex;align-items:center;vertical-align:middle;flex-wrap:nowrap;gap:16px;max-width:calc(100% - 360px);margin:0 0 18px}body:not(:has(> .ecosystem-nav)) main>.site-nav:nth-of-type(2){display:none}body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a{order:10;min-height:44px;padding:10px 5px;border:0;border-radius:0;color:var(--wine);background:transparent;font-size:.84rem;white-space:nowrap}body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="https://dynastiedorkhan.chiens-de-france.com/cavalier-king-charles"]{order:1}body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/suivi-sante-ckc/"]{order:2}body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/documents-elevage/"]{order:3}body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/"]{order:4}body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href^="mailto:"]{order:5}body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-de-rdv/"]{order:6;margin-left:6px;padding:10px 17px;border:1px solid var(--wine);border-radius:999px;color:#fff;background:var(--wine)}body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a.active:not([href="/demande-de-rdv/"]){color:var(--wine);background:transparent;box-shadow:inset 0 -2px 0 var(--gold)}body:not(:has(> .ecosystem-nav)) main>.hero{clear:both}body:has(> .ecosystem-nav)>.ecosystem-nav{min-height:92px;justify-content:flex-end;gap:18px;margin-bottom:0;padding:0 max(20px,calc(50% - 590px)) 0 max(320px,calc(50% - 270px))}body:has(> .ecosystem-nav)>.ecosystem-nav a{order:10;min-height:44px;padding:10px 5px;border:0;border-radius:0;color:var(--wine);background:transparent;font-size:.84rem;white-space:nowrap}body:has(> .ecosystem-nav)>.ecosystem-nav a[href="https://dynastiedorkhan.chiens-de-france.com/cavalier-king-charles"]{order:1}body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/suivi-sante-ckc/"]{order:2}body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/documents-elevage/"]{order:3}body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/"]{order:4}body:has(> .ecosystem-nav)>.ecosystem-nav a[href^="mailto:"]{order:5}body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]{order:6;margin-left:6px;padding:10px 17px;border:1px solid var(--wine);border-radius:999px;color:#fff;background:var(--wine)}body:has(> .ecosystem-nav)>header .site-logo{position:fixed;top:8px;left:max(20px,calc(50% - 590px));z-index:31;width:76px;height:76px;margin:0}body:has(> .ecosystem-nav)>header .marque{position:fixed;top:31px;left:max(108px,calc(50% - 502px));z-index:31;margin:0;color:var(--ink)!important;font-size:1.08rem;white-space:nowrap;text-transform:none;letter-spacing:0}body:has(> .ecosystem-nav)>header{display:flex;flex-direction:column;justify-content:center}body:has(> .ecosystem-nav)>header h1{margin-top:0}}
-@media(max-width:700px){main{width:calc(100% - 28px);max-width:1180px;padding-top:24px}.brand{min-width:0}.brand img{width:60px;height:60px}.brand-name{min-width:0;overflow-wrap:anywhere}.site-nav,.ecosystem-nav{gap:8px;max-width:100%}.site-nav{flex-wrap:wrap}.ecosystem-nav{position:static;justify-content:flex-start;overflow-x:visible;padding:10px 14px;flex-wrap:wrap}.site-nav a,.ecosystem-nav a{flex:0 1 auto;max-width:100%;min-height:40px;padding:7px 12px;font-size:.78rem;white-space:normal}.hero,body>header{min-height:0;padding:175px 22px 40px;background-color:var(--cream);background-image:linear-gradient(to bottom,rgba(255,253,249,.03),rgba(255,253,249,.14) 125px,var(--cream) 175px),url("/assets/banniere-dynastie-orkhan.webp");background-position:center top;background-size:100% auto}.hero{min-height:527px}.hero,.carte,form,.cart-panel,.pack,.media-card,.product-card,.choice,.calendrier-dates,.message-important,.regles{min-width:0;max-width:100%}.hero img{margin-top:20px;max-width:100%}img,video,iframe{max-width:100%}.facebook-fab{right:16px;bottom:16px;width:46px;height:46px}.site-footer,body>footer{padding:32px 20px 88px;overflow-wrap:anywhere}}
-@media(max-width:520px){.hero{min-height:559px}}
-@media(max-width:420px){.hero{min-height:585px}}
-@media(max-width:360px){.hero{min-height:637px}}
-body>header .sous-titre{color:var(--muted)!important;opacity:1!important}body>header .marque{color:var(--wine)!important}
-@media print{.facebook-fab{display:none!important}}
-
-/* Harmonisation finale : bannière pleine largeur, couleurs renforcées, CTA identique */
-@media(min-width:701px){
-  .hero,body>header{background-image:linear-gradient(90deg,rgba(255,253,249,.55),rgba(255,253,249,.28) 56%,rgba(255,253,249,.02)),url("/assets/banniere-dynastie-orkhan.webp")}
-  body>header{background-image:linear-gradient(rgba(255,253,249,.34),rgba(255,253,249,.34)),url("/assets/banniere-dynastie-orkhan.webp")}
-  body:not(:has(> .ecosystem-nav)) main>.hero{width:100vw;margin-left:calc(50% - 50vw);padding-left:max(20px,calc(50vw - 590px));padding-right:max(20px,calc(50vw - 590px))}
-  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-de-rdv/"],body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:48px;margin-left:6px;padding:11px 18px;border:1px solid var(--wine);border-radius:999px;color:#fff;background:var(--wine);font-family:"Manrope",Arial,sans-serif;font-size:.84rem;font-weight:800;line-height:1;white-space:nowrap}
+:root{
+  --wine:#731d32;
+  --wine-dark:#4e1222;
+  --gold:#bd9452;
+  --cream:#f8f2e8;
+  --paper:#fffdf9;
+  --ink:#261d1f;
+  --muted:#6b5e60;
+  --line:#e6d9c8;
+  --shadow:0 18px 50px rgba(78,18,34,.10);
+  --bordeaux:var(--wine);
+  --bordeaux-clair:var(--wine);
+  --dore:var(--gold);
+  --dore-clair:var(--gold);
+  --or:var(--gold);
+  --blanc-casse:var(--paper);
+  --gris-clair:var(--cream);
+  --gris-texte:var(--ink);
+  --gris-bordure:var(--line);
+  --ombre:var(--shadow);
+  --ombre-forte:var(--shadow);
+  --radius:8px;
+  --sand:var(--cream);
+  --sea:var(--wine);
+  --orange:var(--gold);
+  --green:var(--wine);
+  --pink:var(--gold);
 }
-@media(max-width:700px){body:not(:has(> .ecosystem-nav)) main>.hero{width:100vw;margin-left:calc(50% - 50vw)}}
+
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  overflow-x:clip;
+  color:var(--ink);
+  background:var(--paper);
+  font-family:"Manrope",Arial,sans-serif;
+  font-size:16px;
+  line-height:1.65;
+}
+*{box-sizing:border-box}
+h1,h2,h3,.nom,.marque,.signature{font-family:"Lora",Georgia,serif;line-height:1.15}
+h1{font-weight:600;letter-spacing:-.025em}
+h2,h3{color:var(--wine)}
+a{color:var(--wine);text-underline-offset:3px}
+main{width:min(1180px,calc(100% - 40px));max-width:none;margin-inline:auto;padding:0 0 76px}
+
+/* Identité commune */
+.brand{display:flex;align-items:center;gap:12px;margin:0}
+.brand img{width:76px;height:76px;object-fit:contain;flex:0 0 auto}
+.brand-name,.marque{
+  margin:0;
+  color:var(--wine)!important;
+  font-family:"Lora",Georgia,serif!important;
+  font-size:1.08rem!important;
+  font-weight:700!important;
+  letter-spacing:0!important;
+  text-transform:none!important;
+  white-space:nowrap;
+}
+
+/* Navigation commune */
+.site-nav,.ecosystem-nav{display:flex;align-items:center;gap:16px}
+.site-nav a,.ecosystem-nav a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:44px;
+  padding:10px 5px;
+  border:0;
+  border-radius:0;
+  color:var(--wine);
+  background:transparent;
+  font-family:"Manrope",Arial,sans-serif;
+  font-size:.84rem;
+  font-weight:800;
+  line-height:1;
+  text-decoration:none;
+  white-space:nowrap;
+}
+.site-nav a:hover,.ecosystem-nav a:hover{color:var(--wine-dark)}
+.site-nav a.active:not([href="/demande-de-rdv/"]){color:var(--wine);background:transparent;box-shadow:inset 0 -2px 0 var(--gold)}
+
+/* CTA Rendez-vous : dimensions strictement identiques partout */
+body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-de-rdv/"],
+body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:auto!important;
+  height:48px!important;
+  min-height:48px!important;
+  max-height:48px!important;
+  margin-left:6px!important;
+  padding:0 18px!important;
+  border:1px solid var(--wine)!important;
+  border-radius:999px!important;
+  color:#fff!important;
+  background:var(--wine)!important;
+  font-family:"Manrope",Arial,sans-serif!important;
+  font-size:.84rem!important;
+  font-weight:800!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  align-self:center!important;
+  flex:0 0 auto!important;
+}
+body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-de-rdv/"]:hover,
+body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]:hover{background:var(--wine-dark)!important}
+
+/* Bandeau supérieur Boutique / Médailles / Cosmétiques */
+@media(min-width:701px){
+  body:not(:has(> .ecosystem-nav)) main>.brand{
+    display:inline-flex;
+    height:112px;
+    margin:0 26px 0 0;
+    vertical-align:top;
+  }
+  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type{
+    display:inline-flex;
+    align-items:center;
+    height:112px;
+    max-width:calc(100% - 360px);
+    margin:0;
+    vertical-align:top;
+    flex-wrap:nowrap;
+  }
+  body:not(:has(> .ecosystem-nav)) main>.site-nav:nth-of-type(2){display:none}
+
+  /* Bandeau supérieur RDV : mêmes hauteur, logo, nom, alignement et CTA */
+  body:has(> .ecosystem-nav)>.ecosystem-nav{
+    position:relative!important;
+    top:auto!important;
+    z-index:20;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    width:100%;
+    height:112px!important;
+    min-height:112px!important;
+    max-height:112px!important;
+    margin:0!important;
+    padding:0 max(20px,calc(50% - 590px))!important;
+    gap:16px!important;
+    border-bottom:1px solid var(--line);
+    background:rgba(255,253,249,.98)!important;
+    box-shadow:none!important;
+    backdrop-filter:blur(12px);
+    overflow:visible!important;
+  }
+  body:has(> .ecosystem-nav)>.ecosystem-nav a:first-child{
+    margin-left:clamp(330px,30vw,430px);
+  }
+  body:has(> .ecosystem-nav)>header{
+    position:static!important;
+  }
+  body:has(> .ecosystem-nav)>header .site-logo{
+    position:absolute!important;
+    top:18px!important;
+    left:max(20px,calc(50% - 590px))!important;
+    z-index:31!important;
+    width:76px!important;
+    height:76px!important;
+    margin:0!important;
+    object-fit:contain!important;
+  }
+  body:has(> .ecosystem-nav)>header .marque{
+    position:absolute!important;
+    top:43px!important;
+    left:max(108px,calc(50% - 502px))!important;
+    z-index:31!important;
+    margin:0!important;
+    color:var(--wine)!important;
+  }
+}
+
+/* Bannière : une seule règle visuelle pour les 3 pages */
+.hero,body>header{
+  color:var(--ink)!important;
+  background-color:var(--cream)!important;
+  background-image:
+    linear-gradient(90deg,rgba(255,253,249,.42),rgba(255,253,249,.20) 56%,rgba(255,253,249,.02)),
+    url("/assets/banniere-dynastie-orkhan.webp")!important;
+  background-repeat:no-repeat!important;
+  background-position:center 58%!important;
+  background-size:cover!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.hero h1,body>header h1{
+  color:var(--ink)!important;
+  font-family:"Lora",Georgia,serif!important;
+  line-height:1.15!important;
+}
+.hero p,.sous-titre{color:var(--muted)!important}
+.eyebrow{color:var(--wine)!important;font-weight:900!important;letter-spacing:.13em!important;text-transform:uppercase!important}
+
+@media(min-width:701px){
+  .hero,body>header{
+    width:100vw!important;
+    height:438px!important;
+    min-height:438px!important;
+    max-height:438px!important;
+    overflow:hidden!important;
+  }
+  body:not(:has(> .ecosystem-nav)) main>.hero{
+    clear:both;
+    margin-left:calc(50% - 50vw)!important;
+    padding:42px max(20px,calc(50vw - 590px))!important;
+  }
+  body>header{
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    padding:58px max(20px,calc(50% - 590px)) 42px!important;
+  }
+  body:not(:has(> .ecosystem-nav)) main>.hero>img{
+    width:auto!important;
+    max-width:min(48%,720px)!important;
+    max-height:330px!important;
+    margin:0!important;
+    object-fit:contain!important;
+    justify-self:end!important;
+    align-self:center!important;
+  }
+}
+
+/* Cartes et formulaires : garder la même finition sur les 3 espaces */
+.carte,.step,.price-card,.card,form,.product-card,.media-card,.cart-panel,.pack,.choice,.calendrier-dates,.message-important,.regles{
+  border:1px solid var(--line)!important;
+  border-radius:6px!important;
+  background:#fff!important;
+  box-shadow:0 10px 34px rgba(78,18,34,.06)!important;
+}
+.carte{padding:clamp(24px,4vw,40px)!important}
+.carte h2,.section-title,.price-card h2,.pack h2,.cart-head h2{color:var(--wine)!important}
+.notice,.message-important,.regles,.rappel-creneau{border-left:4px solid var(--gold)!important;border-radius:0!important;background:var(--cream)!important;color:var(--muted)!important}
+.step span{color:#fff!important;background:var(--wine)!important}
+.step strong,.product-card h3,.category,.amount,.pack-price,.status{color:var(--wine)!important}
+.pack{border-color:var(--gold)!important;background:var(--cream)!important}
+.benefits li::before{color:var(--wine)!important}
+.product-card img,.hero img,.media-card img{border-radius:6px}
+
+button,.bouton-envoi{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:44px;
+  padding:10px 17px;
+  border:1px solid var(--wine);
+  border-radius:999px;
+  color:#fff;
+  background:var(--wine);
+  font-family:"Manrope",Arial,sans-serif;
+  font-weight:800;
+}
+button:hover,.bouton-envoi:hover{background:var(--wine-dark)}
+button.secondary{border-color:var(--wine);color:var(--wine);background:transparent}
+button.secondary:hover{color:#fff;background:var(--wine)}
+input,select,textarea,.toolbar input,.toolbar select,.customer input,.customer textarea{
+  min-height:48px;
+  padding:10px 12px;
+  border:1px solid #cbbdb1;
+  border-radius:5px;
+  color:var(--ink);
+  background:#fff;
+  font-family:"Manrope",Arial,sans-serif;
+}
+input:focus,select:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:3px solid rgba(189,148,82,.45);outline-offset:2px}
+label,.intitule{color:var(--ink);font-weight:800}
+
+.site-footer,body>footer{
+  margin-top:48px;
+  padding:38px max(20px,calc(50% - 590px));
+  border:0;
+  color:#f7ede7;
+  background:var(--wine-dark);
+  text-align:left;
+}
+.site-footer strong,body>footer .nom{color:#fff;font-family:"Lora",Georgia,serif;font-size:1.2rem}
+.site-footer p,body>footer p{color:#d8c3c7}
+.site-footer a,body>footer a{color:#fff}
+
+.facebook-fab{
+  position:fixed;
+  right:24px;
+  bottom:24px;
+  z-index:30;
+  display:grid;
+  place-items:center;
+  width:48px;
+  height:48px;
+  border:1px solid var(--gold);
+  border-radius:50%;
+  color:#fff;
+  background:var(--wine);
+  box-shadow:0 8px 22px rgba(78,18,34,.24);
+  transition:transform .2s,background .2s;
+}
+.facebook-fab:hover{color:#fff;background:var(--wine-dark);transform:translateY(-2px)}
+.facebook-fab svg{display:block;width:21px;height:21px;fill:currentColor}
+
+/* Responsive : pas de débordement horizontal et logique cohérente */
+@media(max-width:700px){
+  body{overflow-x:clip}
+  main{width:calc(100% - 28px);max-width:1180px;padding:14px 0 56px}
+  .brand{min-width:0;margin-bottom:12px}
+  .brand img{width:60px;height:60px}
+  .brand-name{min-width:0;overflow-wrap:anywhere;white-space:normal!important}
+  .site-nav,.ecosystem-nav{gap:8px;max-width:100%;flex-wrap:wrap}
+  .site-nav a,.ecosystem-nav a{flex:0 1 auto;max-width:100%;min-height:40px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:.78rem;white-space:normal}
+  .site-nav a.active:not([href="/demande-de-rdv/"]){border-color:var(--wine);color:#fff;background:var(--wine);box-shadow:none}
+  body:not(:has(> .ecosystem-nav)) main>.site-nav:nth-of-type(2){display:flex;margin-top:10px}
+  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-de-rdv/"],
+  body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]{
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    margin-left:0!important;
+    padding:0 14px!important;
+    font-size:.78rem!important;
+  }
+  body:has(> .ecosystem-nav)>.ecosystem-nav{
+    position:relative!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    min-height:118px!important;
+    padding:74px 14px 12px!important;
+    gap:8px!important;
+    border-bottom:1px solid var(--line);
+    background:rgba(255,253,249,.98)!important;
+  }
+  body:has(> .ecosystem-nav)>header{position:static!important}
+  body:has(> .ecosystem-nav)>header .site-logo{
+    position:absolute!important;
+    top:10px!important;
+    left:14px!important;
+    z-index:31!important;
+    width:60px!important;
+    height:60px!important;
+    margin:0!important;
+  }
+  body:has(> .ecosystem-nav)>header .marque{
+    position:absolute!important;
+    top:29px!important;
+    left:86px!important;
+    right:14px!important;
+    z-index:31!important;
+    margin:0!important;
+    color:var(--wine)!important;
+    font-size:.98rem!important;
+    white-space:normal!important;
+  }
+  .hero,body>header{
+    width:100vw!important;
+    min-height:560px!important;
+    margin-left:calc(50% - 50vw)!important;
+    padding:185px 22px 36px!important;
+    background-image:
+      linear-gradient(to bottom,rgba(255,253,249,.04),rgba(255,253,249,.16) 145px,rgba(255,253,249,.70) 270px,rgba(255,253,249,.92) 100%),
+      url("/assets/banniere-dynastie-orkhan.webp")!important;
+    background-position:center top!important;
+    background-size:cover!important;
+    overflow:hidden!important;
+  }
+  body:has(> .ecosystem-nav)>header{margin-left:0!important}
+  body:not(:has(> .ecosystem-nav)) main>.hero>img{
+    width:100%!important;
+    max-width:100%!important;
+    max-height:230px!important;
+    margin-top:18px!important;
+    object-fit:contain!important;
+  }
+  .hero,.carte,form,.cart-panel,.pack,.media-card,.product-card,.choice,.calendrier-dates,.message-important,.regles{min-width:0;max-width:100%}
+  img,video,iframe{max-width:100%}
+  .facebook-fab{right:16px;bottom:16px;width:46px;height:46px}
+  .site-footer,body>footer{padding:32px 20px 88px;overflow-wrap:anywhere}
+}
+
+body>header .sous-titre{color:var(--muted)!important;opacity:1!important}
+body>header .marque{color:var(--wine)!important}
+@media print{.facebook-fab{display:none!important}}
