@@ -132,8 +132,8 @@ body:not(:has(> .ecosystem-nav)) main>.hero:has(>img[src="/cosmetiques/assets/ro
 /* Bloc de marque unifié : même rendu que le portail principal, entièrement cliquable */
 body:not(:has(> .ecosystem-nav)) main>.brand{display:none!important}
 body:has(> .ecosystem-nav)>header .site-logo,body:has(> .ecosystem-nav)>header .marque{display:none!important}
-body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type>a[href="https://dynastie-orkhan-public.vercel.app/"],
-body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public.vercel.app/"]{
+body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type>a[href="https://www.dynastiedorkhan.com/"],
+body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://www.dynastiedorkhan.com/"]{
   position:relative!important;
   display:flex!important;
   flex-direction:column!important;
@@ -160,8 +160,8 @@ body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public
   white-space:normal!important;
   flex:0 0 330px!important;
 }
-body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type>a[href="https://dynastie-orkhan-public.vercel.app/"]::before,
-body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public.vercel.app/"]::before{
+body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type>a[href="https://www.dynastiedorkhan.com/"]::before,
+body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://www.dynastiedorkhan.com/"]::before{
   content:"Dynastie d’Orkhan";
   display:block;
   color:var(--ink);
@@ -170,8 +170,8 @@ body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public
   font-weight:700;
   line-height:1.15;
 }
-body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type>a[href="https://dynastie-orkhan-public.vercel.app/"]::after,
-body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public.vercel.app/"]::after{
+body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type>a[href="https://www.dynastiedorkhan.com/"]::after,
+body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://www.dynastiedorkhan.com/"]::after{
   content:"CAVALIER KING CHARLES & BULLMASTIFF";
   display:block;
   margin-top:5px;
@@ -186,13 +186,13 @@ body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public
 }
 @media(min-width:701px){
   body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type{display:flex!important;width:100%!important;max-width:none!important;margin:0!important}
-  body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public.vercel.app/"]{margin-left:0!important}
+  body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://www.dynastiedorkhan.com/"]{margin-left:0!important}
 }
 @media(max-width:700px){
   body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type,
   body:has(> .ecosystem-nav)>.ecosystem-nav{padding-top:0!important}
-  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type>a[href="https://dynastie-orkhan-public.vercel.app/"],
-  body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public.vercel.app/"]{
+  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type>a[href="https://www.dynastiedorkhan.com/"],
+  body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://www.dynastiedorkhan.com/"]{
     width:100%!important;
     min-width:100%!important;
     height:76px!important;
@@ -202,8 +202,8 @@ body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public
     background-size:60px 60px!important;
     flex:0 0 100%!important;
   }
-  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type>a[href="https://dynastie-orkhan-public.vercel.app/"]::after,
-  body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public.vercel.app/"]::after{display:none}
+  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type>a[href="https://www.dynastiedorkhan.com/"]::after,
+  body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://www.dynastiedorkhan.com/"]::after{display:none}
   body:has(> .ecosystem-nav)>.ecosystem-nav{min-height:0!important;padding:0 14px 12px!important}
 }
 
