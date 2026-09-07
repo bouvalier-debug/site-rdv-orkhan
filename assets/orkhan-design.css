@@ -207,4 +207,14 @@ body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public
   body:has(> .ecosystem-nav)>.ecosystem-nav{min-height:0!important;padding:0 14px 12px!important}
 }
 
+/* Libellé du CTA unifié avec le portail principal */
+body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-de-rdv/"],
+body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]{font-size:0!important}
+body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-de-rdv/"]::after,
+body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]::after{content:"Prendre rendez-vous";font-size:.84rem;font-weight:800;line-height:1}
+@media(max-width:700px){
+  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-de-rdv/"]::after,
+  body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]::after{font-size:.78rem}
+}
+
 @media print{.facebook-fab{display:none!important}}
