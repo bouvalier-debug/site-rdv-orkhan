@@ -124,4 +124,9 @@ input,select,textarea,.toolbar input,.toolbar select,.customer input,.customer t
   .site-footer,body>footer{padding:32px 20px 88px;overflow-wrap:anywhere}
 }
 
+/* Dernier ajustement visuel : même cadrage RDV et retrait du visuel saisonnier Artero */
+body:not(:has(> .ecosystem-nav)) main>.hero>img[src="/cosmetiques/assets/routine-ete-artero.png"]{display:none!important}
+body:not(:has(> .ecosystem-nav)) main>.hero:has(>img[src="/cosmetiques/assets/routine-ete-artero.png"]){grid-template-columns:1fr!important}
+@media(min-width:701px){body:has(> .ecosystem-nav)>header{margin-left:calc(50% - 50vw)!important}}
+
 @media print{.facebook-fab{display:none!important}}
