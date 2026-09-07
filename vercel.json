@@ -3,5 +3,56 @@
   "alias": [
     "boutique.dynastiedorkhan.com",
     "rdv.dynastiedorkhan.com"
+  ],
+  "redirects": [
+    {
+      "source": "/demande-de-rdv/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "boutique.dynastiedorkhan.com"
+        }
+      ],
+      "destination": "https://rdv.dynastiedorkhan.com/demande-de-rdv/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/cosmetiques/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "rdv.dynastiedorkhan.com"
+        }
+      ],
+      "destination": "https://boutique.dynastiedorkhan.com/cosmetiques/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "rdv.dynastiedorkhan.com"
+        },
+        {
+          "type": "header",
+          "key": "referer",
+          "value": "https://rdv\\.dynastiedorkhan\\.com/demande-de-rdv/?.*"
+        }
+      ],
+      "destination": "https://boutique.dynastiedorkhan.com/",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "rdv.dynastiedorkhan.com"
+        }
+      ],
+      "destination": "https://rdv.dynastiedorkhan.com/demande-de-rdv/",
+      "permanent": true
+    }
   ]
 }
