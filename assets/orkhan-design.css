@@ -129,4 +129,82 @@ body:not(:has(> .ecosystem-nav)) main>.hero>img[src="/cosmetiques/assets/routine
 body:not(:has(> .ecosystem-nav)) main>.hero:has(>img[src="/cosmetiques/assets/routine-ete-artero.png"]){grid-template-columns:1fr!important}
 @media(min-width:701px){body:has(> .ecosystem-nav)>header{margin-left:calc(50% - 50vw)!important}}
 
+/* Bloc de marque unifié : même rendu que le portail principal, entièrement cliquable */
+body:not(:has(> .ecosystem-nav)) main>.brand{display:none!important}
+body:has(> .ecosystem-nav)>header .site-logo,body:has(> .ecosystem-nav)>header .marque{display:none!important}
+body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type>a[href="https://dynastie-orkhan-public.vercel.app/"],
+body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public.vercel.app/"]{
+  position:relative!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  width:330px!important;
+  min-width:330px!important;
+  height:112px!important;
+  min-height:112px!important;
+  margin:0 26px 0 0!important;
+  padding:0 0 0 88px!important;
+  border:0!important;
+  border-radius:0!important;
+  color:var(--ink)!important;
+  background-color:transparent!important;
+  background-image:url("/medailles-gravees/assets/logo-dynastie-orkhan.png")!important;
+  background-repeat:no-repeat!important;
+  background-position:left center!important;
+  background-size:76px 76px!important;
+  box-shadow:none!important;
+  font-size:0!important;
+  line-height:1.2!important;
+  text-decoration:none!important;
+  white-space:normal!important;
+  flex:0 0 330px!important;
+}
+body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type>a[href="https://dynastie-orkhan-public.vercel.app/"]::before,
+body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public.vercel.app/"]::before{
+  content:"Dynastie d’Orkhan";
+  display:block;
+  color:var(--ink);
+  font-family:"Lora",Georgia,serif;
+  font-size:1.08rem;
+  font-weight:700;
+  line-height:1.15;
+}
+body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type>a[href="https://dynastie-orkhan-public.vercel.app/"]::after,
+body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public.vercel.app/"]::after{
+  content:"CAVALIER KING CHARLES & BULLMASTIFF";
+  display:block;
+  margin-top:5px;
+  color:var(--muted);
+  font-family:"Manrope",Arial,sans-serif;
+  font-size:.68rem;
+  font-weight:400;
+  letter-spacing:.04em;
+  line-height:1.25;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+@media(min-width:701px){
+  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type{display:flex!important;width:100%!important;max-width:none!important;margin:0!important}
+  body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public.vercel.app/"]{margin-left:0!important}
+}
+@media(max-width:700px){
+  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type,
+  body:has(> .ecosystem-nav)>.ecosystem-nav{padding-top:0!important}
+  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type>a[href="https://dynastie-orkhan-public.vercel.app/"],
+  body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public.vercel.app/"]{
+    width:100%!important;
+    min-width:100%!important;
+    height:76px!important;
+    min-height:76px!important;
+    margin:0!important;
+    padding:0 0 0 72px!important;
+    background-size:60px 60px!important;
+    flex:0 0 100%!important;
+  }
+  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type>a[href="https://dynastie-orkhan-public.vercel.app/"]::after,
+  body:has(> .ecosystem-nav)>.ecosystem-nav>a[href="https://dynastie-orkhan-public.vercel.app/"]::after{display:none}
+  body:has(> .ecosystem-nav)>.ecosystem-nav{min-height:0!important;padding:0 14px 12px!important}
+}
+
 @media print{.facebook-fab{display:none!important}}
