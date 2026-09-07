@@ -13,3 +13,12 @@ button,.bouton-envoi{display:inline-flex;align-items:center;justify-content:cent
 @media(max-width:360px){.hero{min-height:637px}}
 body>header .sous-titre{color:var(--muted)!important;opacity:1!important}body>header .marque{color:var(--wine)!important}
 @media print{.facebook-fab{display:none!important}}
+
+/* Harmonisation finale : bannière pleine largeur, couleurs renforcées, CTA identique */
+@media(min-width:701px){
+  .hero,body>header{background-image:linear-gradient(90deg,rgba(255,253,249,.55),rgba(255,253,249,.28) 56%,rgba(255,253,249,.02)),url("/assets/banniere-dynastie-orkhan.webp")}
+  body>header{background-image:linear-gradient(rgba(255,253,249,.34),rgba(255,253,249,.34)),url("/assets/banniere-dynastie-orkhan.webp")}
+  body:not(:has(> .ecosystem-nav)) main>.hero{width:100vw;margin-left:calc(50% - 50vw);padding-left:max(20px,calc(50vw - 590px));padding-right:max(20px,calc(50vw - 590px))}
+  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-de-rdv/"],body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:48px;margin-left:6px;padding:11px 18px;border:1px solid var(--wine);border-radius:999px;color:#fff;background:var(--wine);font-family:"Manrope",Arial,sans-serif;font-size:.84rem;font-weight:800;line-height:1;white-space:nowrap}
+}
+@media(max-width:700px){body:not(:has(> .ecosystem-nav)) main>.hero{width:100vw;margin-left:calc(50% - 50vw)}}
