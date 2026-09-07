@@ -1,6 +1,10 @@
 ﻿<!doctype html>
 <html lang="fr">
 <head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&amp;family=Manrope:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/orkhan-design.css">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cosmétiques chien Artero - soins d'été | Dynastie d'Orkhan</title>
@@ -10,6 +14,7 @@
   </style>
 </head>
 <body>
+<link rel="stylesheet" href="/assets/orkhan-design.css">
 <main>
   <div class="brand"><img src="/medailles-gravees/assets/logo-dynastie-orkhan.png" alt="Logo de l'Élevage de la Dynastie d'Orkhan"><p class="brand-name">Élevage de la Dynastie d'Orkhan</p></div>
   <nav class="site-nav" aria-label="Navigation principale"><a href="https://dynastiedorkhan.chiens-de-france.com/cavalier-king-charles">Accueil</a><a href="/suivi-sante-ckc/">Suivi Santé CKC</a><a href="/documents-elevage/">Documents</a><a href="/demande-de-rdv/">Rendez-vous</a><a class="active" href="/">Boutique</a><a href="mailto:contact@dynastiedorkhan.com">Contact</a></nav>
@@ -97,6 +102,7 @@ document.getElementById('copy-request').addEventListener('click',async()=>{if(!v
 document.getElementById('send-request').addEventListener('click',()=>{if(!validateCart())return;const subject=encodeURIComponent('Demande cosmétiques Artero');const body=encodeURIComponent(buildRequest());window.location.href=`mailto:contact@dynastiedorkhan.com?subject=${subject}&body=${body}`});
 renderProducts();renderCart();
 </script>
+  <a class="facebook-fab" href="https://www.facebook.com/dynastiedorkhan" target="_blank" rel="noopener noreferrer" aria-label="Suivre l’Élevage de la Dynastie d’Orkhan sur Facebook"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06H297V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg></a>
 </body>
 </html>
 
