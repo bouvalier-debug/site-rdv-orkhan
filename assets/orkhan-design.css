@@ -73,7 +73,7 @@ body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-d
 /* Bannière : mêmes largeur, hauteur, cadrage et voile */
 .hero,body>header{color:var(--ink)!important;background-color:var(--cream)!important;background-image:linear-gradient(90deg,rgba(255,253,249,.42),rgba(255,253,249,.20) 56%,rgba(255,253,249,.02)),url("/assets/banniere-dynastie-orkhan.webp")!important;background-repeat:no-repeat!important;background-position:center 58%!important;background-size:cover!important;border:0!important;border-radius:0!important;box-shadow:none!important}
 .hero h1,body>header h1{color:var(--ink)!important;font-family:"Lora",Georgia,serif!important;line-height:1.15!important}
-.hero p,.sous-titre{color:var(--muted)!important}
+.hero p,.sous-titre{color:var(--ink)!important}
 .eyebrow{color:var(--wine)!important;font-weight:900!important;letter-spacing:.13em!important;text-transform:uppercase!important}
 body>header .sous-titre{opacity:1!important}
 
