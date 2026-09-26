@@ -5,3 +5,30 @@
 .field span:has(>input[type="checkbox"]){display:flex;align-items:flex-start;gap:10px}
 .field input[type="checkbox"]{width:20px;min-width:20px;height:20px;min-height:20px;margin:2px 0 0;padding:0;flex:0 0 20px;accent-color:var(--wine)}
 .field input[type="checkbox"]:focus-visible{border-color:var(--wine);outline:3px solid rgba(184,138,49,.32);outline-offset:2px}
+
+/* En-tête et bannière alignés sur les autres rayons de la boutique. */
+header.shell>.brand{display:none}
+header.shell>.site-nav:first-of-type{display:flex;width:100%;max-width:none;margin:0;align-items:center;gap:16px}
+header.shell>.site-nav:first-of-type>a[href="https://www.dynastiedorkhan.com/"]{position:relative;display:flex;flex:0 0 330px;flex-direction:column;align-items:flex-start;justify-content:center;width:330px;min-width:330px;height:112px;min-height:112px;margin:0 26px 0 0;padding:0 0 0 88px;border:0;border-radius:0;color:var(--ink);background-color:transparent;background-image:url("/medailles-gravees/assets/logo-dynastie-orkhan.png");background-repeat:no-repeat;background-position:left center;background-size:76px 76px;box-shadow:none;font-size:0;line-height:1.2;text-decoration:none;white-space:normal}
+header.shell>.site-nav:first-of-type>a[href="https://www.dynastiedorkhan.com/"]::before{content:"Dynastie d’Orkhan";display:block;color:var(--ink);font-family:"Lora",Georgia,serif;font-size:1.08rem;font-weight:700;line-height:1.15}
+header.shell>.site-nav:first-of-type>a[href="https://www.dynastiedorkhan.com/"]::after{content:"CAVALIER KING CHARLES & BULLMASTIFF";display:block;margin-top:5px;color:var(--muted);font-size:.68rem;font-weight:400;letter-spacing:.04em;line-height:1.25;white-space:nowrap}
+header.shell>.site-nav a{min-height:44px;padding:10px 5px;border:0;border-radius:0;color:var(--wine);background:transparent;font-size:.84rem;line-height:1;white-space:nowrap}
+header.shell>.site-nav a.active{border:0;color:var(--wine);background:transparent;box-shadow:inset 0 -2px 0 var(--gold)}
+header.shell>.site-nav:first-of-type a[href="/demande-de-rdv/"]{height:48px;min-height:48px;margin-left:6px;padding:0 18px;border:1px solid var(--wine);border-radius:999px;color:#fff;background:var(--wine);box-shadow:none}
+header.shell>.site-nav:nth-of-type(2){display:flex;justify-content:center;gap:16px;margin:12px 0 22px}
+.hero{width:100vw;height:438px;min-height:438px;max-height:438px;margin:0 0 0 calc(50% - 50vw);padding:42px max(20px,calc(50vw - 590px));overflow:hidden;color:var(--ink);background-color:var(--cream);background-image:linear-gradient(90deg,rgba(255,253,249,.42),rgba(255,253,249,.20) 56%,rgba(255,253,249,.02)),url("/assets/banniere-dynastie-orkhan.webp");background-repeat:no-repeat;background-position:center 58%;background-size:cover;border:0;border-radius:0;box-shadow:none}
+.hero-copy{max-width:760px}.hero h1{color:var(--ink);font-size:clamp(2rem,5vw,3.4rem);line-height:1.15}.hero .lead{color:var(--ink)}
+.hero-details{padding-top:48px}
+
+@media(max-width:700px){
+  header.shell{width:calc(100% - 28px)}
+  header.shell>.site-nav{gap:8px;max-width:100%;flex-wrap:wrap}
+  header.shell>.site-nav a{flex:0 1 auto;max-width:100%;min-height:40px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:.78rem;white-space:normal}
+  header.shell>.site-nav a.active{border-color:var(--wine);color:#fff;background:var(--wine);box-shadow:none}
+  header.shell>.site-nav:first-of-type>a[href="https://www.dynastiedorkhan.com/"]{flex:0 0 100%;width:100%;min-width:100%;height:76px;min-height:76px;margin:0;padding:0 0 0 72px;border:0;background-color:transparent;background-size:60px 60px}
+  header.shell>.site-nav:first-of-type>a[href="https://www.dynastiedorkhan.com/"]::after{display:none}
+  header.shell>.site-nav:first-of-type a[href="/demande-de-rdv/"]{height:42px;min-height:42px;margin-left:0;padding:0 14px}
+  header.shell>.site-nav:nth-of-type(2){justify-content:flex-start;margin-top:10px}
+  .hero{width:100vw;height:auto;min-height:560px;max-height:none;margin-left:calc(50% - 50vw);padding:185px 22px 36px;background-image:linear-gradient(to bottom,rgba(255,253,249,.04),rgba(255,253,249,.16) 145px,rgba(255,253,249,.70) 270px,rgba(255,253,249,.92) 100%),url("/assets/banniere-dynastie-orkhan.webp");background-position:center top;background-size:cover}
+  .hero-details{padding-top:42px}
+}
