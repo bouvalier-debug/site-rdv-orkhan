@@ -97,9 +97,9 @@ input,select,textarea,.toolbar input,.toolbar select,.customer input,.customer t
 .site-footer p,body>footer p{color:#d8c3c7}
 .site-footer a,body>footer a{color:#fff}
 
-.facebook-fab{position:fixed;right:24px;bottom:24px;z-index:30;display:grid;place-items:center;width:48px;height:48px;border:1px solid var(--gold);border-radius:50%;color:#fff;background:var(--wine);box-shadow:0 8px 22px rgba(78,18,34,.24);transition:transform .2s,background .2s}
-.facebook-fab:hover{color:#fff;background:var(--wine-dark);transform:translateY(-2px)}
-.facebook-fab svg{display:block;width:21px;height:21px;fill:currentColor}
+.facebook-fab{position:fixed;right:24px;bottom:calc(18px + 48px + 16px);z-index:30;display:grid;place-items:center;width:48px;height:48px;border:0;border-radius:50%;color:#fff;background:transparent url("/assets/facebook-logo.webp") center/contain no-repeat;box-shadow:0 8px 22px rgba(78,18,34,.24);transition:transform .2s,opacity .2s}
+.facebook-fab:hover{color:#fff;opacity:.9;transform:translateY(-2px)}
+.facebook-fab svg{display:none}
 
 /* Mobile */
 @media(max-width:700px){
@@ -121,7 +121,7 @@ input,select,textarea,.toolbar input,.toolbar select,.customer input,.customer t
   body:not(:has(> .ecosystem-nav)) main>.hero>img{width:100%!important;max-width:100%!important;max-height:230px!important;margin-top:18px!important;object-fit:contain!important}
   .hero,.carte,form,.cart-panel,.pack,.media-card,.product-card,.choice,.calendrier-dates,.message-important,.regles{min-width:0;max-width:100%}
   img,video,iframe{max-width:100%}
-  .facebook-fab{right:16px;bottom:16px;width:46px;height:46px}
+  .facebook-fab{right:16px;width:46px;height:46px}
   .site-footer,body>footer{padding:32px 20px 88px;overflow-wrap:anywhere}
 }
 
