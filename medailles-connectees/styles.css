@@ -14,6 +14,10 @@ header.shell>.site-nav:first-of-type>a[href="https://www.dynastiedorkhan.com/"]:
 header.shell>.site-nav:first-of-type>a[href="https://www.dynastiedorkhan.com/"]::after{content:"CAVALIER KING CHARLES & BULLMASTIFF";display:block;margin-top:5px;color:var(--muted);font-size:.68rem;font-weight:400;letter-spacing:.04em;line-height:1.25;white-space:nowrap}
 header.shell>.site-nav a{min-height:44px;padding:10px 5px;border:0;border-radius:0;color:var(--wine);background:transparent;font-size:.84rem;line-height:1;white-space:nowrap}
 header.shell>.site-nav a.active{border:0;color:var(--wine);background:transparent;box-shadow:inset 0 -2px 0 var(--gold)}
+header.shell>.site-nav:first-of-type a[href="https://www.dynastiedorkhan.com/contact/"]{order:3}
+header.shell>.site-nav:first-of-type a[href="/"]{order:4}
+header.shell>.site-nav:first-of-type a[href="/demande-de-rdv/"]{order:5;font-size:0}
+header.shell>.site-nav:first-of-type a[href="/demande-de-rdv/"]::after{content:"Prendre rendez-vous";font-size:.84rem;font-weight:800;line-height:1}
 header.shell>.site-nav:first-of-type a[href="/demande-de-rdv/"]{height:48px;min-height:48px;margin-left:6px;padding:0 18px;border:1px solid var(--wine);border-radius:999px;color:#fff;background:var(--wine);box-shadow:none}
 header.shell>.site-nav:nth-of-type(2){display:flex;justify-content:center;gap:16px;margin:12px 0 22px}
 .hero{width:100vw;height:438px;min-height:438px;max-height:438px;margin:0 0 0 calc(50% - 50vw);padding:42px max(20px,calc(50vw - 590px));overflow:hidden;color:var(--ink);background-color:var(--cream);background-image:linear-gradient(90deg,rgba(255,253,249,.42),rgba(255,253,249,.20) 56%,rgba(255,253,249,.02)),url("/assets/banniere-dynastie-orkhan.webp");background-repeat:no-repeat;background-position:center 58%;background-size:cover;border:0;border-radius:0;box-shadow:none}
@@ -28,6 +32,7 @@ header.shell>.site-nav:nth-of-type(2){display:flex;justify-content:center;gap:16
   header.shell>.site-nav:first-of-type>a[href="https://www.dynastiedorkhan.com/"]{flex:0 0 100%;width:100%;min-width:100%;height:76px;min-height:76px;margin:0;padding:0 0 0 72px;border:0;background-color:transparent;background-size:60px 60px}
   header.shell>.site-nav:first-of-type>a[href="https://www.dynastiedorkhan.com/"]::after{display:none}
   header.shell>.site-nav:first-of-type a[href="/demande-de-rdv/"]{height:42px;min-height:42px;margin-left:0;padding:0 14px}
+  header.shell>.site-nav:first-of-type a[href="/demande-de-rdv/"]::after{font-size:.78rem}
   header.shell>.site-nav:nth-of-type(2){justify-content:flex-start;margin-top:10px}
   .hero{width:100vw;height:auto;min-height:560px;max-height:none;margin-left:calc(50% - 50vw);padding:185px 22px 36px;background-image:linear-gradient(to bottom,rgba(255,253,249,.04),rgba(255,253,249,.16) 145px,rgba(255,253,249,.70) 270px,rgba(255,253,249,.92) 100%),url("/assets/banniere-dynastie-orkhan.webp");background-position:center top;background-size:cover}
   .hero-details{padding-top:42px}
