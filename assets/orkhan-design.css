@@ -61,7 +61,7 @@ body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-d
 @media(min-width:701px){
   body:not(:has(> .ecosystem-nav)) main>.brand{display:inline-flex;height:112px;margin:0 26px 0 0;vertical-align:top}
   body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type{display:inline-flex;align-items:center;height:112px;max-width:calc(100% - 360px);margin:0;vertical-align:top;flex-wrap:nowrap}
-  body:not(:has(> .ecosystem-nav)) main>.site-nav:nth-of-type(2){display:none}
+  body:not(:has(> .ecosystem-nav)) main>.site-nav:nth-of-type(2){display:flex;justify-content:center;margin:12px 0 22px}
 
   body:has(> .ecosystem-nav)>.ecosystem-nav{position:relative!important;top:auto!important;z-index:20;display:flex!important;align-items:center!important;justify-content:flex-start!important;width:100%;height:112px!important;min-height:112px!important;max-height:112px!important;margin:0!important;padding:0 max(20px,calc(50% - 590px))!important;gap:16px!important;border-bottom:1px solid var(--line);background:rgba(255,253,249,.98)!important;box-shadow:none!important;backdrop-filter:blur(12px);overflow:visible!important}
   body:has(> .ecosystem-nav)>.ecosystem-nav a:first-child{margin-left:clamp(330px,30vw,430px)}
