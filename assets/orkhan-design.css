@@ -100,6 +100,8 @@ input,select,textarea,.toolbar input,.toolbar select,.customer input,.customer t
 .facebook-fab{position:fixed;right:24px;bottom:calc(18px + 48px + 16px);z-index:30;display:grid;place-items:center;width:48px;height:48px;border:0;border-radius:50%;color:#fff;background:transparent url("/assets/facebook-logo.webp") center/contain no-repeat;box-shadow:0 8px 22px rgba(78,18,34,.24);transition:transform .2s,opacity .2s}
 .facebook-fab:hover{color:#fff;opacity:.9;transform:translateY(-2px)}
 .facebook-fab svg{display:none}
+#to-top{position:fixed;right:18px;bottom:18px;width:48px;height:48px;padding:0;border-radius:50%;font-size:1.5rem;box-shadow:0 4px 14px #0003;opacity:0;visibility:hidden;transform:translateY(12px);transition:.2s;z-index:30}
+#to-top.visible{opacity:1;visibility:visible;transform:translateY(0)}
 
 /* Mobile */
 @media(max-width:700px){
@@ -218,4 +220,4 @@ body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]::after{cont
   body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]::after{font-size:.78rem}
 }
 
-@media print{.facebook-fab{display:none!important}}
+@media print{.facebook-fab,#to-top{display:none!important}}

@@ -5,6 +5,17 @@
 .field span:has(>input[type="checkbox"]){display:flex;align-items:flex-start;gap:10px}
 .field input[type="checkbox"]{width:20px;min-width:20px;height:20px;min-height:20px;margin:2px 0 0;padding:0;flex:0 0 20px;accent-color:var(--wine)}
 .field input[type="checkbox"]:focus-visible{border-color:var(--wine);outline:3px solid rgba(184,138,49,.32);outline-offset:2px}
+#to-top{border:0;color:#fff;background:var(--wine);cursor:pointer}
+#to-top:hover{background:var(--wine-dark)}
+main>.site-nav a{min-height:44px;padding:10px 5px;border:0;border-radius:0;color:var(--wine);background:transparent;font-size:.84rem;line-height:1;white-space:nowrap}
+main>.site-nav a:hover,main>.site-nav a:focus-visible{border:0;color:var(--wine-dark);background:transparent}
+main>.site-nav a.active{border:0;color:var(--wine);background:transparent;box-shadow:inset 0 -2px 0 var(--gold)}
+
+@media(max-width:700px){
+  main>.site-nav{display:flex;gap:8px;flex-wrap:wrap}
+  main>.site-nav a{flex:0 1 auto;max-width:100%;min-height:40px;padding:7px 12px;border:0;border-radius:0;background:transparent;font-size:.78rem;white-space:normal}
+  main>.site-nav a.active{border:0;color:var(--wine);background:transparent;box-shadow:inset 0 -2px 0 var(--gold)}
+}
 
 /* En-tête et bannière alignés sur les autres rayons de la boutique. */
 header.shell>.brand{display:none}
