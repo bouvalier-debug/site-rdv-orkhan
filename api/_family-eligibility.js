@@ -48,6 +48,7 @@ async function verifyFamilyChip(chipNumber, options = {}) {
 
   const managerUrl = options.managerUrl || process.env.ORKHAN_MANAGER_URL;
   const secret = options.secret || process.env.ORKHAN_FAMILY_API_SECRET;
+  const vercelBypassSecret = options.vercelBypassSecret || process.env.ORKHAN_MANAGER_VERCEL_BYPASS_SECRET;
   if (!managerUrl || !secret) return { status: "unavailable", recognized: false };
 
   const controller = new AbortController();
@@ -57,7 +58,8 @@ async function verifyFamilyChip(chipNumber, options = {}) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-dynastie-family-token": secret
+        "x-dynastie-family-token": secret,
+        ...(vercelBypassSecret ? { "x-vercel-protection-bypass": vercelBypassSecret } : {})
       },
       body: JSON.stringify({ chipNumber: normalized }),
       signal: controller.signal

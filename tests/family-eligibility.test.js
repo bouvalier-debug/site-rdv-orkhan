@@ -33,6 +33,34 @@ test("relaie la puce avec le secret uniquement côté serveur", async () => {
   assert.equal(request.options.headers["x-dynastie-family-token"], "preview-secret");
 });
 
+test("ajoute le bypass Vercel uniquement lorsqu’une variable serveur le fournit", async () => {
+  let headers;
+  await verifyFamilyChip("250123456789012", {
+    managerUrl: "https://manager.preview.test",
+    secret: "preview-secret",
+    vercelBypassSecret: "vercel-preview-bypass",
+    fetch: async (_url, options) => {
+      headers = options.headers;
+      return { ok: true, json: async () => ({ recognized: true }) };
+    }
+  });
+  assert.equal(headers["x-dynastie-family-token"], "preview-secret");
+  assert.equal(headers["x-vercel-protection-bypass"], "vercel-preview-bypass");
+});
+
+test("ne dépend pas d’un bypass Vercel hors Preview", async () => {
+  let headers;
+  await verifyFamilyChip("250123456789012", {
+    managerUrl: "https://manager.production.test",
+    secret: "production-secret",
+    fetch: async (_url, options) => {
+      headers = options.headers;
+      return { ok: true, json: async () => ({ recognized: true }) };
+    }
+  });
+  assert.equal("x-vercel-protection-bypass" in headers, false);
+});
+
 test("ne contacte pas Orkhan Manager pour un format invalide", async () => {
   let called = false;
   const result = await verifyFamilyChip("invalid", { fetch: async () => { called = true; } });
