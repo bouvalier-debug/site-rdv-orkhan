@@ -8,7 +8,8 @@ function responseRecorder() {
     headers: {},
     setHeader(name, value) { this.headers[name] = value; },
     status(code) { this.statusCode = code; return this; },
-    json(body) { this.body = body; return this; }
+    json(body) { this.body = body; return this; },
+    end(body) { this.rawBody = body; return this; }
   };
 }
 
@@ -101,4 +102,13 @@ test("refuse les méthodes autres que POST", async () => {
   const res = responseRecorder();
   await handler({ method: "GET", headers: {}, socket: {} }, res);
   assert.equal(res.statusCode, 405);
+});
+
+test("renvoie le contrat JSON complet pour une puce invalide", async () => {
+  const res = responseRecorder();
+  await handler({ method: "POST", body: { chipNumber: "123" }, headers: {}, socket: {} }, res);
+  assert.equal(res.statusCode, 400);
+  assert.deepEqual(JSON.parse(res.rawBody), { recognized: false, error: "invalid_chip" });
+  assert.equal(res.headers["Content-Type"], "application/json; charset=utf-8");
+  assert.equal(res.headers["Cache-Control"], "no-store");
 });

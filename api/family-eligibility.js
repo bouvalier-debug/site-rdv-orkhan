@@ -5,12 +5,21 @@ function send(res, status, body) {
   return res.status(status).json(body);
 }
 
+function sendInvalidChip(res) {
+  const body = JSON.stringify({ recognized: false, error: "invalid_chip" });
+  res.statusCode = 400;
+  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Content-Length", Buffer.byteLength(body));
+  return res.end(body);
+}
+
 module.exports = async (req, res) => {
   if (req.method !== "POST") return send(res, 405, { error: "method_not_allowed" });
   if (!consumeRequest(clientIp(req))) return send(res, 429, { error: "rate_limited" });
 
   const result = await verifyFamilyChip(req.body?.chipNumber);
-  if (result.status === "invalid") return send(res, 400, { recognized: false, error: "invalid_chip" });
+  if (result.status === "invalid") return sendInvalidChip(res);
   if (result.status === "unavailable") return send(res, 503, { recognized: false, error: "service_unavailable" });
   return send(res, 200, { recognized: result.recognized });
 };
