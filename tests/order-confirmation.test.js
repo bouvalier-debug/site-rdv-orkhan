@@ -2,7 +2,13 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const { confirmationSnapshot, retrieveCheckoutSession } = require("../api/order-confirmation");
+const { checkoutMarkerCookie } = require("../api/checkout");
+const {
+  clearMarkerCookie,
+  confirmationSnapshot,
+  markerMatches,
+  retrieveCheckoutSession
+} = require("../api/order-confirmation");
 
 const reference = "BOUT-2026-B39D17114C";
 
@@ -54,11 +60,27 @@ test("la récupération Stripe utilise uniquement la clé serveur", async () => 
   assert.equal(request.options.headers.Authorization, "Bearer sk_test_fake");
 });
 
-test("la page de confirmation vérifie la session côté serveur et vide le panier seulement après paid", () => {
+test("le marqueur de checkout est HttpOnly et lié au numéro de commande", () => {
+  const cookie = checkoutMarkerCookie(reference);
+  assert.match(cookie, new RegExp(`orkhan_checkout=${reference}`));
+  assert.match(cookie, /HttpOnly/);
+  assert.match(cookie, /Secure/);
+  assert.match(cookie, /SameSite=Lax/);
+});
+
+test("le nettoyage local n'est autorisé que pour la commande marquée dans le navigateur", () => {
+  assert.equal(markerMatches({ headers: { cookie: `foo=1; orkhan_checkout=${reference}` } }, reference), true);
+  assert.equal(markerMatches({ headers: { cookie: "orkhan_checkout=BOUT-2026-AAAAAAAAAA" } }, reference), false);
+  assert.match(clearMarkerCookie(), /Max-Age=0/);
+});
+
+test("la page de confirmation vérifie la session côté serveur et nettoie panier et coordonnées seulement si autorisé", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "panier", "confirmation", "index.html"), "utf8");
   assert.match(html, /api\/order-confirmation\?session_id=/);
   assert.match(html, /result\.paymentStatus === "paid"/);
+  assert.match(html, /result\.clearLocalCheckout === true/);
   assert.match(html, /localStorage\.removeItem\(CART_KEY\)/);
+  assert.match(html, /localStorage\.removeItem\(CUSTOMER_KEY\)/);
   assert.match(html, /Aucune donnée personnelle n’est affichée/);
   assert.doesNotMatch(html, /customer_details|firstName|lastName|postalCode/);
 });
