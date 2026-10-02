@@ -1,8 +1,11 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const {
   STORAGE_KEY,
   CUSTOMER_STORAGE_KEY,
+  EMPTY_SHIPPING_MESSAGE,
   buildQuotePayload,
   createCartStore,
   createCustomerStore,
@@ -12,6 +15,8 @@ const {
   requestQuote,
   requiredCustomerFields
 } = require("../assets/cart");
+
+const cartPage = fs.readFileSync(path.join(__dirname, "..", "panier", "index.html"), "utf8");
 
 function memoryStorage(initial = {}) {
   const values = new Map(Object.entries(initial));
@@ -146,4 +151,17 @@ test("les coordonnées ne sont jamais envoyées à cart-quote", () => {
   });
   assert.equal("customer" in payload, false);
   assert.doesNotMatch(JSON.stringify(payload), /David|example\.test/);
+});
+
+test("la page affiche l'aide livraison et le nouveau libellé coordonnées", () => {
+  assert.ok(cartPage.includes(EMPTY_SHIPPING_MESSAGE));
+  assert.match(cartPage, />Enregistrer mes coordonnées<\/button>/);
+  assert.doesNotMatch(cartPage, />Vérifier mes coordonnées<\/button>/);
+});
+
+test("le pays est un select stable limité à France et Belgique", () => {
+  assert.match(cartPage, /<select name="country"[^>]*>/);
+  assert.match(cartPage, /<option value="FR">France<\/option>/);
+  assert.match(cartPage, /<option value="BE">Belgique<\/option>/);
+  assert.doesNotMatch(cartPage, /<input name="country"/);
 });

@@ -16,6 +16,7 @@
   const CUSTOMER_STORAGE_KEY = "orkhan-shop-customer-v1";
   const STORAGE_VERSION = 1;
   const MAX_QUANTITY = 20;
+  const EMPTY_SHIPPING_MESSAGE = "Les modes de livraison disponibles s’afficheront selon le contenu de votre panier.";
   const PRICE_KEYS = /^(price|priceCents|unitPrice|unitPriceCents|subtotal|subtotalCents|shipping|shippingCents|total|totalCents)$/i;
   const MODE_LABELS = Object.freeze({
     pickup: "Retrait à l’élevage",
@@ -343,6 +344,7 @@
       const quote = result?.quote;
       const modes = quote?.availableShippingModes || result?.availableModes || [];
       modesNode.replaceChildren();
+      if (!modes.length) modesNode.append(element(document, "p", "shipping-empty", EMPTY_SHIPPING_MESSAGE));
       for (const mode of modes) {
         const label = element(document, "label", "shipping-choice");
         const input = element(document, "input");
@@ -385,7 +387,7 @@
         selectedShipping = null;
         lastResult = null;
         renderLines(items, null);
-        modesNode.replaceChildren();
+        modesNode.replaceChildren(element(document, "p", "shipping-empty", EMPTY_SHIPPING_MESSAGE));
         statusNode.hidden = true;
         transportNode.hidden = true;
         subtotalNode.textContent = money(0);
@@ -447,6 +449,7 @@
     MAX_QUANTITY,
     CUSTOMER_FIELDS,
     CUSTOMER_STORAGE_KEY,
+    EMPTY_SHIPPING_MESSAGE,
     MODE_LABELS,
     STORAGE_KEY,
     STORAGE_VERSION,

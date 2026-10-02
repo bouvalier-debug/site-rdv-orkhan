@@ -49,9 +49,9 @@
             <label class="full">Complément d’adresse <span>(facultatif)</span><input name="addressExtra" autocomplete="address-line2"></label>
             <label>Code postal<input name="postalCode" autocomplete="postal-code"></label>
             <label>Ville<input name="city" autocomplete="address-level2"></label>
-            <label>Pays<input name="country" autocomplete="country-name" placeholder="Ex. France"></label>
+            <label>Pays<select name="country" autocomplete="country"><option value="">Choisir un pays</option><option value="FR">France</option><option value="BE">Belgique</option></select></label>
             <p class="field-hint" data-address-hint>Adresse requise pour une livraison.</p>
-            <button class="customer-submit" type="submit">Vérifier mes coordonnées</button>
+            <button class="customer-submit" type="submit">Enregistrer mes coordonnées</button>
             <p class="customer-status" data-customer-status role="status" hidden></p>
           </div>
         </form>
@@ -60,7 +60,7 @@
       <aside class="cart-summary">
         <section class="summary-card" aria-labelledby="shipping-title">
           <h2 id="shipping-title">Livraison</h2>
-          <div class="shipping-modes" data-shipping-modes></div>
+          <div class="shipping-modes" data-shipping-modes><p class="shipping-empty">Les modes de livraison disponibles s’afficheront selon le contenu de votre panier.</p></div>
           <div class="transport-placeholder" data-transport-placeholder hidden>
             <p><strong>Choix Mondial Relay à venir</strong><br>L’interface accueillera ici le futur choix Point Relais/Locker ou l’adresse de livraison à domicile, une fois la solution transport définitive configurée.</p>
             <div class="transport-fields" data-relay-fields hidden>Emplacement réservé au sélecteur Point Relais ou Locker.</div>
