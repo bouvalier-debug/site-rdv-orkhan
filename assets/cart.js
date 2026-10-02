@@ -125,12 +125,20 @@
       return persist();
     }
 
+    function syncFromStorage() {
+      items = storage ? parseStoredCart(storage.getItem(STORAGE_KEY)) : [];
+      const state = snapshot();
+      listeners.forEach((listener) => listener(state));
+      return state;
+    }
+
     return {
       add,
       clear,
       count: () => items.reduce((sum, item) => sum + item.quantity, 0),
       getItems: snapshot,
       remove,
+      syncFromStorage,
       subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
       updateQuantity
     };
@@ -440,9 +448,16 @@
   }
 
   function autoInit(root) {
-    const store = createCartStore();
+    const store = createCartStore({ storage: root.localStorage });
     updateCounters(root.document, store.count());
     if (root.document.querySelector("[data-cart-page]")) mountCartPage(root, { store });
+    if (typeof root.addEventListener === "function") {
+      root.addEventListener("storage", (event) => {
+        if (event.key !== STORAGE_KEY && event.key !== null) return;
+        store.syncFromStorage();
+        updateCounters(root.document, store.count());
+      });
+    }
   }
 
   return {

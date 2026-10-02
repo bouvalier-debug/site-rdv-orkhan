@@ -6,6 +6,7 @@ const {
   STORAGE_KEY,
   CUSTOMER_STORAGE_KEY,
   EMPTY_SHIPPING_MESSAGE,
+  autoInit,
   buildQuotePayload,
   createCartStore,
   createCustomerStore,
@@ -46,6 +47,30 @@ test("plusieurs lignes sont ajoutées et conservées dans localStorage", () => {
   assert.equal(store.getItems().length, 2);
   assert.equal(store.count(), 3);
   assert.equal(JSON.parse(storage.getItem(STORAGE_KEY)).items.length, 2);
+});
+
+test("le compteur additionne les quantités et se resynchronise entre onglets", () => {
+  const storage = memoryStorage();
+  const badges = [{ textContent: "", hidden: true, setAttribute(name, value) { this[name] = value; } }];
+  const listeners = {};
+  const root = {
+    localStorage: storage,
+    document: {
+      querySelector: () => null,
+      querySelectorAll: (selector) => selector === "[data-cart-count]" ? badges : []
+    },
+    addEventListener(type, listener) { listeners[type] = listener; }
+  };
+  autoInit(root);
+  const otherTab = storeWithIds(storage);
+  otherTab.add({ productId: "animoco", quantity: 1 });
+  otherTab.add({ productId: "cosmetics:bye-bye", quantity: 1 });
+  otherTab.add({ productId: "cosmetics:samba", quantity: 1 });
+  otherTab.add({ productId: "cosmetics:block", quantity: 2 });
+  listeners.storage({ key: STORAGE_KEY });
+  assert.equal(badges[0].textContent, "5");
+  assert.equal(badges[0].hidden, false);
+  assert.equal(badges[0]["aria-label"], "5 articles dans le panier");
 });
 
 test("les quantités sont modifiables uniquement de 1 à 20", () => {
