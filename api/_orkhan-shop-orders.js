@@ -11,6 +11,7 @@ function endpoint(baseUrl, pathname) {
 function createManagerClient(options = {}) {
   const baseUrl = options.baseUrl || process.env.ORKHAN_MANAGER_URL;
   const secret = options.secret || process.env.ORKHAN_SHOP_ORDERS_SECRET;
+  const vercelBypassSecret = options.vercelBypassSecret || process.env.ORKHAN_MANAGER_VERCEL_BYPASS_SECRET;
   const fetchImpl = options.fetch || fetch;
   if (!baseUrl || !secret) throw new Error("orkhan_manager_not_configured");
 
@@ -23,6 +24,7 @@ function createManagerClient(options = {}) {
         headers: {
           "Content-Type": "application/json",
           "X-Orkhan-Shop-Orders-Secret": secret,
+          ...(vercelBypassSecret ? { "x-vercel-protection-bypass": vercelBypassSecret } : {}),
           ...init.headers
         },
         signal: controller.signal
