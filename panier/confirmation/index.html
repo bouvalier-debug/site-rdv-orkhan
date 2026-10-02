@@ -35,6 +35,7 @@
     (function () {
       "use strict";
       const CART_KEY = "orkhan-shop-cart-v1";
+      const CUSTOMER_KEY = "orkhan-shop-customer-v1";
       const card = document.querySelector("[data-confirmation-card]");
       const icon = document.querySelector("[data-confirmation-icon]");
       const title = document.querySelector("[data-confirmation-title]");
@@ -68,7 +69,12 @@
           reference.textContent = result.orderReference;
           referenceBox.hidden = false;
           if (result.paymentStatus === "paid") {
-            try { window.localStorage.removeItem(CART_KEY); } catch {}
+            if (result.clearLocalCheckout === true) {
+              try {
+                window.localStorage.removeItem(CART_KEY);
+                window.localStorage.removeItem(CUSTOMER_KEY);
+              } catch {}
+            }
             card.className = "confirmation-card";
             icon.textContent = "✓";
             title.textContent = "Merci pour votre commande";
