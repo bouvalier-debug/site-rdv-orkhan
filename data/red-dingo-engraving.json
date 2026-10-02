@@ -1,0 +1,9 @@
+{
+  "status": "provisional_pending_david_confirmation",
+  "sizes": {
+    "S": { "lineCharacterLimits": [10, 12, 10] },
+    "M": { "lineCharacterLimits": [16, 16, 16, 16, 10] },
+    "L": { "lineCharacterLimits": [19, 19, 19, 19, 18] }
+  },
+  "referenceOverrides": {}
+}
