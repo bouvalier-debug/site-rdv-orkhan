@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Confirmation de commande | Dynastie d’Orkhan</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&amp;family=Manrope:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/orkhan-design.css">
+  <style>
+    .confirmation-shell{max-width:760px;margin:0 auto;padding:72px 20px 96px}.confirmation-card{padding:38px;border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:var(--shadow);text-align:center}.confirmation-icon{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 18px;border-radius:50%;background:var(--cream);color:var(--wine);font-size:2rem;font-weight:900}.confirmation-card h1{margin:0 0 12px;color:var(--wine);font-size:clamp(2rem,5vw,3.3rem)}.confirmation-card p{margin:8px auto;max-width:620px;color:var(--muted)}.confirmation-reference{margin:24px 0;padding:16px;border:1px solid var(--line);border-radius:8px;background:var(--cream)}.confirmation-reference span{display:block;color:var(--muted);font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.confirmation-reference strong{display:block;margin-top:5px;color:var(--ink);font-size:1.15rem;overflow-wrap:anywhere}.confirmation-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:28px}.confirmation-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:10px 18px;border-radius:999px;text-decoration:none;font-weight:800}.confirmation-actions .primary{background:var(--wine);color:#fff}.confirmation-actions .secondary{border:1px solid var(--line);color:var(--wine);background:#fff}.confirmation-note{margin-top:22px!important;font-size:.84rem}.status-pending .confirmation-icon{background:#fff3da}.status-error .confirmation-icon{background:#fde8e8;color:#8f1d2c}@media(max-width:520px){.confirmation-shell{padding:36px 14px 64px}.confirmation-card{padding:26px 18px}}
+  </style>
+</head>
+<body>
+  <main class="confirmation-shell">
+    <section class="confirmation-card status-pending" data-confirmation-card aria-live="polite">
+      <div class="confirmation-icon" data-confirmation-icon>…</div>
+      <h1 data-confirmation-title>Vérification du paiement…</h1>
+      <p data-confirmation-message>Nous vérifions votre paiement sécurisé auprès de Stripe.</p>
+      <div class="confirmation-reference" data-confirmation-reference hidden>
+        <span>Numéro de commande</span>
+        <strong data-order-reference></strong>
+      </div>
+      <div class="confirmation-actions">
+        <a class="primary" href="/">Retour à la boutique</a>
+        <a class="secondary" href="/panier/">Voir le panier</a>
+      </div>
+      <p class="confirmation-note">Aucune donnée personnelle n’est affichée sur cette page.</p>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+      const CART_KEY = "orkhan-shop-cart-v1";
+      const card = document.querySelector("[data-confirmation-card]");
+      const icon = document.querySelector("[data-confirmation-icon]");
+      const title = document.querySelector("[data-confirmation-title]");
+      const message = document.querySelector("[data-confirmation-message]");
+      const referenceBox = document.querySelector("[data-confirmation-reference]");
+      const reference = document.querySelector("[data-order-reference]");
+      const sessionId = new URLSearchParams(window.location.search).get("session_id");
+      let attempts = 0;
+
+      function showError(text) {
+        card.className = "confirmation-card status-error";
+        icon.textContent = "!";
+        title.textContent = "Confirmation indisponible";
+        message.textContent = text;
+      }
+
+      async function check() {
+        if (!sessionId) {
+          showError("Le lien de confirmation est incomplet. Votre paiement n’a pas été modifié.");
+          return;
+        }
+        attempts += 1;
+        try {
+          const response = await fetch(`/api/order-confirmation?session_id=${encodeURIComponent(sessionId)}`, {
+            method: "GET",
+            headers: { Accept: "application/json" },
+            cache: "no-store"
+          });
+          const result = await response.json();
+          if (!response.ok || !result.ok) throw new Error(result.error || "confirmation_unavailable");
+          reference.textContent = result.orderReference;
+          referenceBox.hidden = false;
+          if (result.paymentStatus === "paid") {
+            try { window.localStorage.removeItem(CART_KEY); } catch {}
+            card.className = "confirmation-card";
+            icon.textContent = "✓";
+            title.textContent = "Merci pour votre commande";
+            message.textContent = "Votre paiement a été confirmé. Conservez votre numéro de commande pour toute demande concernant cet achat.";
+            return;
+          }
+          card.className = "confirmation-card status-pending";
+          icon.textContent = "…";
+          title.textContent = "Paiement en cours de confirmation";
+          message.textContent = "La confirmation peut prendre quelques secondes. Cette page se met à jour automatiquement.";
+          if (attempts < 10) window.setTimeout(check, 2000);
+        } catch {
+          if (attempts < 3) {
+            window.setTimeout(check, 1500);
+            return;
+          }
+          showError("Nous ne pouvons pas vérifier le paiement pour le moment. Ne recommencez pas le paiement. Conservez cette page et réessayez plus tard.");
+        }
+      }
+
+      check();
+    }());
+  </script>
+</body>
+</html>
