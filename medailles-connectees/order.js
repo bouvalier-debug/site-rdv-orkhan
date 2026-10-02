@@ -5,13 +5,14 @@ const CONNECTED_MEDAL_BE_SHIPPING_CENTS = 490;
 
 const form = document.getElementById("connected-order");
 const legacyFamilyFieldset = form.querySelector('input[name="famille_dynastie"]')?.closest("fieldset");
-legacyFamilyFieldset.innerHTML = `<legend>Tarif Famille Dynastie d’Orkhan <small>(facultatif)</small></legend><p class="family-note">Une puce reconnue dans le registre de l’élevage donne accès au tarif de 17,99 € par médaille. La puce sert uniquement à cette vérification et n’est pas conservée par la boutique.</p><div class="family-verification"><label class="field"><span>Numéro de puce du chien</span><input id="family-chip" name="chipNumber" inputmode="numeric" autocomplete="off" maxlength="32" placeholder="15 chiffres"></label><button class="button secondary" id="verify-family-chip" type="button">Vérifier la puce</button></div><p class="family-status idle" id="family-status" role="status" aria-live="polite">Saisissez les 15 chiffres de la puce pour vérifier votre tarif.</p>`;
+const legacySection = form.closest("section");
+legacySection.classList.add("legacy-section");
 const summaryQuantityRow = document.getElementById("summary-quantity").closest("div");
 const summaryRateRow = document.createElement("div");
 summaryRateRow.innerHTML = '<dt>Tarif appliqué</dt><dd id="summary-rate">Tarif public</dd>';
 summaryQuantityRow.after(summaryRateRow);
 const delivery = document.getElementById("delivery");
-const quantity = document.getElementById("quantity");
+const quantity = document.getElementById("animoco-cart-quantity");
 const chipInput = document.getElementById("family-chip");
 const verifyButton = document.getElementById("verify-family-chip");
 const familyStatus = document.getElementById("family-status");
@@ -90,6 +91,26 @@ verifyButton.addEventListener("click",async()=>{
 });
 refresh();
 
+const sharedCart = OrkhanCart.createCartStore();
+document.getElementById("add-animoco").addEventListener("click",()=>{
+  if(!quantity.reportValidity())return;
+  const message=document.getElementById("animoco-cart-message");
+  try{
+    const line=OrkhanProductCart.animocoLine({quantity:quantity.value,chipNumber:chipInput.value,familyEligible:familyEligible&&chipInput.value===verifiedChipValue});
+    OrkhanProductCart.addLine(sharedCart,line);
+    OrkhanCart.updateCounters(document,sharedCart.count());
+    message.innerHTML='Médaille Animoco ajoutée au panier. <a href="/panier/">Voir mon panier</a>';
+    message.classList.add("visible");
+  }catch{
+    message.textContent="Choisissez une quantité comprise entre 1 et 20.";
+    message.classList.add("visible");
+  }
+});
+document.getElementById("show-legacy-animoco").addEventListener("click",()=>{
+  legacySection.classList.toggle("visible");
+  if(legacySection.classList.contains("visible"))legacySection.scrollIntoView({behavior:"smooth"});
+});
+
 form.addEventListener("submit",async(event)=>{
   event.preventDefault();
   const button=form.querySelector('button[type="submit"]');
@@ -99,7 +120,7 @@ form.addEventListener("submit",async(event)=>{
   if(!form.reportValidity())return;
   button.disabled=true;button.textContent="Envoi en cours…";
   const payload=Object.fromEntries(new FormData(form));
-  if(!chipInput.value.trim()) delete payload.chipNumber;
+  if(chipInput.value.trim()) payload.chipNumber=chipInput.value; else delete payload.chipNumber;
   payload.type="medaille-connectee";
   payload.submissionId=crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`;
   try{

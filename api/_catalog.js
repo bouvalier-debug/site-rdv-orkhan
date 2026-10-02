@@ -15,7 +15,13 @@ const CATALOG_CONFIG = Object.freeze({
     familyPriceCents: 1799,
     weightGrams: null
   }),
-  parcelProducts: Object.freeze([]),
+  parcelProducts: Object.freeze([
+    Object.freeze({ id: "cosmetics:block", name: "Artero Block", family: "colis", priceCents: 2140, weightGrams: null }),
+    Object.freeze({ id: "cosmetics:bye-bye", name: "Artero Bye Bye 300 ml", family: "colis", priceCents: 1995, weightGrams: null }),
+    Object.freeze({ id: "cosmetics:samba", name: "Artero Samba", family: "colis", priceCents: 1145, weightGrams: null }),
+    Object.freeze({ id: "cosmetics:dfender", name: "Artero Dfender", family: "colis", priceCents: 2265, weightGrams: null }),
+    Object.freeze({ id: "cosmetics:pack-ete", name: "Pack Été complet", family: "colis", priceCents: 6995, weightGrams: null })
+  ]),
   futureKibbleProducts: Object.freeze([])
 });
 
