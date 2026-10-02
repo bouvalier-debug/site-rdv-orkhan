@@ -123,7 +123,7 @@ async function executeCheckout(input, options = {}) {
     lines,
     shippingCents: quote.shipping.priceCents,
     customerEmail: customerResult.customer.email,
-    successUrl: `${origin}/panier/confirmation/?order=${encodeURIComponent(orderReference)}`,
+    successUrl: `${origin}/panier/confirmation/?session_id={CHECKOUT_SESSION_ID}`,
     cancelUrl: `${origin}/panier/?payment=cancelled`
   });
   await manager.attachPaymentReference(orderReference, {
