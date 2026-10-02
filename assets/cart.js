@@ -204,6 +204,25 @@
     return payload;
   }
 
+  function buildCheckoutPayload(items, shipping, customer, checkoutAttemptId) {
+    const payload = buildQuotePayload(items, shipping);
+    payload.customer = sanitizeCustomer(customer);
+    payload.checkoutAttemptId = checkoutAttemptId;
+    return payload;
+  }
+
+  async function requestCheckout(payload, options = {}) {
+    const response = await (options.fetch || fetch)(options.url || "/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    let result;
+    try { result = await response.json(); } catch { result = { error: "invalid_server_response" }; }
+    if (!response.ok && !result.error) result.error = "checkout_unavailable";
+    return result;
+  }
+
   function money(cents) {
     return Number.isInteger(cents)
       ? new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(cents / 100)
@@ -287,9 +306,31 @@
     const transportNode = container.querySelector("[data-transport-placeholder]");
     const customerForm = container.querySelector("[data-customer-form]");
     const customerStatus = customerForm.querySelector("[data-customer-status]");
+    const checkoutButton = container.querySelector("[data-checkout-button]");
+    const checkoutStatus = container.querySelector("[data-checkout-status]");
     let selectedShipping = null;
     let lastResult = null;
     let requestSequence = 0;
+    let checkoutAttempt = null;
+
+    function newAttemptId() {
+      if (root.crypto && typeof root.crypto.randomUUID === "function") return root.crypto.randomUUID();
+      const bytes = new Uint8Array(16);
+      if (root.crypto && typeof root.crypto.getRandomValues === "function") root.crypto.getRandomValues(bytes);
+      else for (let index = 0; index < bytes.length; index += 1) bytes[index] = Math.floor(Math.random() * 256);
+      bytes[6] = (bytes[6] & 0x0f) | 0x40;
+      bytes[8] = (bytes[8] & 0x3f) | 0x80;
+      const hex = [...bytes].map((value) => value.toString(16).padStart(2, "0")).join("");
+      return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+    }
+
+    function attemptFor(payload) {
+      const signature = JSON.stringify({ items: payload.items, shipping: payload.shipping, customer: payload.customer });
+      if (!checkoutAttempt || checkoutAttempt.signature !== signature) {
+        checkoutAttempt = { signature, id: newAttemptId() };
+      }
+      return checkoutAttempt.id;
+    }
 
     function updateCustomerRequirements() {
       const required = new Set(requiredCustomerFields(selectedShipping?.mode));
@@ -440,6 +481,31 @@
       customerStatus.textContent = "Coordonnées enregistrées dans ce navigateur. Aucune commande n’a été créée.";
       customerStatus.hidden = false;
     });
+    if (checkoutButton) checkoutButton.addEventListener("click", async () => {
+      checkoutStatus.hidden = true;
+      if (!store.getItems().length || !selectedShipping || !lastResult?.quote?.totalCents) {
+        checkoutStatus.textContent = "Complétez le panier et choisissez un mode de livraison disponible.";
+        checkoutStatus.hidden = false;
+        return;
+      }
+      if (!customerForm.checkValidity()) {
+        customerForm.reportValidity();
+        return;
+      }
+      const basePayload = buildCheckoutPayload(store.getItems(), selectedShipping, customerStore.get(), "");
+      basePayload.checkoutAttemptId = attemptFor(basePayload);
+      checkoutButton.disabled = true;
+      checkoutStatus.textContent = "Préparation du paiement sécurisé…";
+      checkoutStatus.hidden = false;
+      try {
+        const result = await requestCheckout(basePayload, options);
+        if (!result.ok || typeof result.checkoutUrl !== "string") throw new Error(result.error || "checkout_unavailable");
+        root.location.assign(result.checkoutUrl);
+      } catch {
+        checkoutStatus.textContent = "Le paiement ne peut pas être préparé pour le moment. Réessayez dans quelques instants.";
+        checkoutButton.disabled = false;
+      }
+    });
 
     store.subscribe(() => updateCounters(document, store.count()));
     restoreCustomer();
@@ -470,6 +536,7 @@
     STORAGE_VERSION,
     autoInit,
     buildQuotePayload,
+    buildCheckoutPayload,
     createCartStore,
     createCustomerStore,
     money,
@@ -479,6 +546,7 @@
     parseStoredCustomer,
     quoteStatusMessage,
     requestQuote,
+    requestCheckout,
     requiredCustomerFields,
     safeOptionValue,
     sanitizeLine,

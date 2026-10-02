@@ -39,7 +39,7 @@
         <div class="cart-lines" data-cart-lines aria-live="polite"></div>
         <form class="customer-card" data-customer-form>
           <h2>Coordonnées</h2>
-          <p class="customer-intro">Ces informations restent uniquement dans votre navigateur à cette étape et préparent le futur passage de commande.</p>
+          <p class="customer-intro">Ces informations servent à préparer votre commande et sont transmises uniquement lorsque vous choisissez de payer.</p>
           <div class="customer-fields">
             <label>Prénom<input name="firstName" autocomplete="given-name" required></label>
             <label>Nom<input name="lastName" autocomplete="family-name" required></label>
@@ -76,7 +76,8 @@
             <div class="total-row"><span>Livraison</span><strong data-cart-shipping>—</strong></div>
             <div class="total-row total-row--grand"><span>Total</span><strong data-cart-total>—</strong></div>
           </div>
-          <p class="no-payment">Aucun paiement n’est proposé à cette étape. Le panier sert uniquement à préparer et vérifier le devis.</p>
+          <button class="customer-submit" type="button" data-checkout-button>Payer par carte</button>
+          <p class="customer-status" data-checkout-status role="status" aria-live="polite" hidden></p>
         </section>
       </aside>
     </section>

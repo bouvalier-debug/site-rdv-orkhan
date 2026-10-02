@@ -7,6 +7,7 @@ const {
   CUSTOMER_STORAGE_KEY,
   EMPTY_SHIPPING_MESSAGE,
   autoInit,
+  buildCheckoutPayload,
   buildQuotePayload,
   createCartStore,
   createCustomerStore,
@@ -14,6 +15,7 @@ const {
   parseStoredCustomer,
   quoteStatusMessage,
   requestQuote,
+  requestCheckout,
   requiredCustomerFields
 } = require("../assets/cart");
 
@@ -189,4 +191,30 @@ test("le pays est un select stable limité à France et Belgique", () => {
   assert.match(cartPage, /<option value="FR">France<\/option>/);
   assert.match(cartPage, /<option value="BE">Belgique<\/option>/);
   assert.doesNotMatch(cartPage, /<input name="country"/);
+});
+
+test("le checkout navigateur ne transmet aucun montant stocké", async () => {
+  const payload = buildCheckoutPayload([{
+    lineId: "line-1", productId: "animoco", quantity: 1, priceCents: 1,
+    options: { chipNumber: "250123456789012", totalCents: 1 }
+  }], { mode: "animoco-light-fr", priceCents: 1 }, {
+    firstName: "David", lastName: "Test", email: "david@example.test", phone: "0600000000",
+    address: "1 rue Test", postalCode: "59000", city: "Lille", country: "FR"
+  }, "123e4567-e89b-42d3-a456-426614174000");
+  assert.doesNotMatch(JSON.stringify(payload), /priceCents|totalCents/);
+  assert.equal(payload.items[0].options.chipNumber, "250123456789012");
+
+  let request;
+  const result = await requestCheckout(payload, { fetch: async (url, options) => {
+    request = { url, options };
+    return { ok: true, json: async () => ({ ok: true, checkoutUrl: "https://checkout.stripe.test/x" }) };
+  } });
+  assert.equal(request.url, "/api/checkout");
+  assert.deepEqual(JSON.parse(request.options.body), payload);
+  assert.equal(result.ok, true);
+});
+
+test("la page panier propose le paiement sans exposer de secret", () => {
+  assert.match(cartPage, /data-checkout-button[^>]*>Payer par carte<\/button>/);
+  assert.doesNotMatch(cartPage, /STRIPE_SECRET_KEY|ORKHAN_SHOP_ORDERS_SECRET/);
 });
