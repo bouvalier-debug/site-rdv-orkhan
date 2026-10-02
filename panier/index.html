@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Votre panier | Dynastie d’Orkhan</title>
+  <meta name="description" content="Consultez votre panier Dynastie d’Orkhan et obtenez un devis calculé côté serveur.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&amp;family=Manrope:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/orkhan-design.css">
+  <style>
+    .cart-nav{display:flex;align-items:center;min-height:112px;gap:18px}.cart-nav>a:first-child{margin-right:auto}.cart-link{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;font-weight:800;text-decoration:none}.cart-count{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;color:#fff;background:var(--wine);font-size:.75rem}.cart-hero{margin:0 0 32px;padding:42px 0 28px;border-bottom:1px solid var(--line)}.cart-hero h1{margin:0 0 8px;font-size:clamp(2.1rem,6vw,4rem)}.cart-hero p{max-width:720px;margin:0;color:var(--muted)}.cart-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,380px);gap:28px;align-items:start}.cart-main{display:grid;gap:24px}.cart-lines{display:grid;gap:16px}.cart-line{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:20px;align-items:center;padding:22px;border:1px solid var(--line);border-radius:8px;background:#fff;box-shadow:var(--shadow)}.cart-line__title{margin:0 0 10px;color:var(--wine);font-size:1.25rem}.cart-line__options{display:grid;grid-template-columns:max-content 1fr;gap:2px 10px;margin:0;color:var(--muted);font-size:.88rem}.cart-line__options dt{font-weight:800}.cart-line__options dd{margin:0;overflow-wrap:anywhere}.cart-line__controls{display:flex;align-items:end;gap:10px}.cart-quantity{display:grid;gap:4px;color:var(--muted);font-size:.78rem;font-weight:800}.cart-quantity input{width:72px;min-height:42px;padding:7px;border:1px solid var(--line);border-radius:6px;font:inherit}.cart-remove{min-height:42px;padding:8px 12px;border:1px solid var(--line);border-radius:6px;color:var(--wine);background:#fff;font-weight:800;cursor:pointer}.cart-line__price{display:grid;min-width:112px;text-align:right}.cart-line__unit{color:var(--muted);font-size:.78rem}.cart-line__price strong{color:var(--wine);font-size:1.12rem}.cart-empty{padding:42px 24px;border:1px dashed var(--gold);border-radius:8px;background:var(--cream);text-align:center}.cart-empty h2{margin-top:0}.customer-card{padding:24px;border:1px solid var(--line);border-radius:8px;background:#fff;box-shadow:var(--shadow)}.customer-card h2{margin-top:0}.customer-intro{margin-top:-6px;color:var(--muted);font-size:.9rem}.customer-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}.customer-fields label{display:grid;gap:5px;color:var(--ink);font-size:.86rem;font-weight:800}.customer-fields .full{grid-column:1/-1}.customer-fields input,.customer-fields select{width:100%;min-height:46px;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:#fff;font:inherit}.customer-fields input:invalid:not(:placeholder-shown){border-color:#a13a4b}.field-hint{grid-column:1/-1;margin:-4px 0 0;color:var(--muted);font-size:.8rem}.customer-submit{grid-column:1/-1;justify-self:start;min-height:44px;padding:9px 15px;border:0;border-radius:999px;color:#fff;background:var(--wine);font:inherit;font-weight:800;cursor:pointer}.customer-status{grid-column:1/-1;margin:0;padding:12px;border-left:4px solid var(--gold);background:var(--cream);font-size:.86rem}.cart-summary{position:sticky;top:18px;display:grid;gap:22px}.summary-card{padding:24px;border:1px solid var(--line);border-radius:8px;background:#fff;box-shadow:var(--shadow)}.summary-card h2{margin-top:0}.shipping-modes{display:grid;gap:10px;margin:18px 0}.shipping-choice{display:flex;gap:12px;padding:13px;border:1px solid var(--line);border-radius:7px;cursor:pointer}.shipping-choice:has(input:checked){border-color:var(--wine);background:#fbf5f5}.shipping-choice input{margin-top:5px}.shipping-choice span{display:grid}.shipping-choice small{color:var(--muted)}.transport-placeholder{margin:16px 0;padding:14px;border-left:4px solid var(--gold);background:var(--cream);font-size:.9rem}.transport-placeholder p{margin:0}.transport-fields{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);color:var(--muted)}.cart-status{margin:16px 0;padding:13px;border-radius:6px;background:#fff3da}.cart-status[data-kind="shipping_unavailable"]{border-left:4px solid var(--gold)}.totals{display:grid;gap:8px;margin:22px 0 0;padding-top:18px;border-top:1px solid var(--line)}.total-row{display:flex;justify-content:space-between;gap:18px}.total-row--grand{margin-top:5px;padding-top:12px;border-top:1px solid var(--line);color:var(--wine);font-size:1.25rem;font-weight:900}.no-payment{margin:20px 0 0;color:var(--muted);font-size:.85rem}.server-note{display:flex;gap:8px;align-items:flex-start;margin:0 0 18px;color:var(--muted);font-size:.85rem}.server-note::before{content:"✓";display:grid;place-items:center;flex:0 0 22px;height:22px;border-radius:50%;color:#fff;background:var(--wine);font-weight:900}.cart-actions{margin-top:22px}.cart-actions a{display:inline-flex;min-height:44px;align-items:center;padding:9px 15px;border-radius:999px;color:#fff;background:var(--wine);font-weight:800;text-decoration:none}
+    @media(max-width:800px){.cart-nav{min-height:auto;padding:12px 0;flex-wrap:wrap}.cart-layout{grid-template-columns:1fr}.cart-summary{position:static}.cart-line{grid-template-columns:1fr}.cart-line__controls{justify-content:flex-start}.cart-line__price{text-align:left}.cart-hero{padding-top:24px}}
+    @media(max-width:480px){.cart-line{padding:17px}.cart-line__controls{align-items:stretch;flex-direction:column}.cart-quantity input{width:100%}.cart-remove{width:100%}.summary-card,.customer-card{padding:18px}.customer-fields{grid-template-columns:1fr}.customer-fields .full{grid-column:auto}}
+  </style>
+  <script src="/assets/cart.js" defer></script>
+</head>
+<body>
+  <main>
+    <nav class="cart-nav" aria-label="Navigation boutique">
+      <a href="/">← Continuer mes achats</a>
+      <a class="cart-link" href="/panier/" aria-current="page">Panier <span class="cart-count" data-cart-count hidden>0</span></a>
+    </nav>
+
+    <header class="cart-hero">
+      <p class="eyebrow">Boutique Dynastie d’Orkhan</p>
+      <h1>Votre panier</h1>
+      <p>Les prix et les frais sont recalculés par notre serveur. Aucun montant enregistré dans votre navigateur n’est utilisé pour établir le devis.</p>
+    </header>
+
+    <section class="cart-layout" data-cart-page>
+      <div class="cart-main">
+        <div class="cart-empty" data-cart-empty>
+          <h2>Votre panier est vide</h2>
+          <p>Les pages produits pourront bientôt ajouter ici les articles Animoco, Red Dingo et les produits expédiés en colis.</p>
+          <div class="cart-actions"><a href="/">Découvrir la boutique</a></div>
+        </div>
+        <div class="cart-lines" data-cart-lines aria-live="polite"></div>
+        <form class="customer-card" data-customer-form>
+          <h2>Coordonnées</h2>
+          <p class="customer-intro">Ces informations restent uniquement dans votre navigateur à cette étape et préparent le futur passage de commande.</p>
+          <div class="customer-fields">
+            <label>Prénom<input name="firstName" autocomplete="given-name" required></label>
+            <label>Nom<input name="lastName" autocomplete="family-name" required></label>
+            <label>E-mail<input name="email" type="email" autocomplete="email" required></label>
+            <label>Téléphone<input name="phone" type="tel" autocomplete="tel" required></label>
+            <label class="full">Adresse<input name="address" autocomplete="address-line1"></label>
+            <label class="full">Complément d’adresse <span>(facultatif)</span><input name="addressExtra" autocomplete="address-line2"></label>
+            <label>Code postal<input name="postalCode" autocomplete="postal-code"></label>
+            <label>Ville<input name="city" autocomplete="address-level2"></label>
+            <label>Pays<input name="country" autocomplete="country-name" placeholder="Ex. France"></label>
+            <p class="field-hint" data-address-hint>Adresse requise pour une livraison.</p>
+            <button class="customer-submit" type="submit">Vérifier mes coordonnées</button>
+            <p class="customer-status" data-customer-status role="status" hidden></p>
+          </div>
+        </form>
+      </div>
+
+      <aside class="cart-summary">
+        <section class="summary-card" aria-labelledby="shipping-title">
+          <h2 id="shipping-title">Livraison</h2>
+          <div class="shipping-modes" data-shipping-modes></div>
+          <div class="transport-placeholder" data-transport-placeholder hidden>
+            <p><strong>Choix Mondial Relay à venir</strong><br>L’interface accueillera ici le futur choix Point Relais/Locker ou l’adresse de livraison à domicile, une fois la solution transport définitive configurée.</p>
+            <div class="transport-fields" data-relay-fields hidden>Emplacement réservé au sélecteur Point Relais ou Locker.</div>
+            <div class="transport-fields" data-home-fields hidden>Emplacement réservé à l’adresse de livraison à domicile.</div>
+          </div>
+          <p class="cart-status" data-cart-status role="status" aria-live="polite" hidden></p>
+        </section>
+        <section class="summary-card" aria-labelledby="summary-title">
+          <h2 id="summary-title">Récapitulatif</h2>
+          <p class="server-note">Montants vérifiés et calculés côté serveur.</p>
+          <div class="totals">
+            <div class="total-row"><span>Sous-total</span><strong data-cart-subtotal>—</strong></div>
+            <div class="total-row"><span>Livraison</span><strong data-cart-shipping>—</strong></div>
+            <div class="total-row total-row--grand"><span>Total</span><strong data-cart-total>—</strong></div>
+          </div>
+          <p class="no-payment">Aucun paiement n’est proposé à cette étape. Le panier sert uniquement à préparer et vérifier le devis.</p>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div><strong>Élevage de la Dynastie d’Orkhan</strong><p>52 rue de Masny, 59234 Monchecourt</p><p><a href="tel:+33327990364">03 27 99 03 64</a> · <a href="mailto:contact@dynastiedorkhan.com">contact@dynastiedorkhan.com</a></p></div>
+  </footer>
+</body>
+</html>
