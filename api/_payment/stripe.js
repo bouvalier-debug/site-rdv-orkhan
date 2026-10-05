@@ -59,6 +59,27 @@ function createStripeAdapter(options = {}) {
   };
 }
 
+async function findCheckoutSessionByPaymentIntent(paymentIntent, options = {}) {
+  const secretKey = options.secretKey || process.env.STRIPE_SECRET_KEY;
+  const fetchImpl = options.fetch || fetch;
+  if (!secretKey) throw new Error("stripe_not_configured");
+  const url = new URL(options.apiUrl || STRIPE_API_URL);
+  url.searchParams.set("payment_intent", paymentIntent);
+  url.searchParams.set("limit", "2");
+  const response = await fetchImpl(url.toString(), {
+    method: "GET",
+    headers: { Authorization: `Bearer ${secretKey}` }
+  });
+  let body;
+  try { body = await response.json(); } catch { body = {}; }
+  if (!response.ok || !Array.isArray(body.data)) {
+    const error = new Error("stripe_session_lookup_failed");
+    error.status = response.status;
+    throw error;
+  }
+  return body.data;
+}
+
 function parseSignatureHeader(header) {
   const values = {};
   for (const part of String(header || "").split(",")) {
@@ -94,6 +115,7 @@ module.exports = {
   SIGNATURE_TOLERANCE_SECONDS,
   checkoutParameters,
   createStripeAdapter,
+  findCheckoutSessionByPaymentIntent,
   parseSignatureHeader,
   verifyStripeSignature
 };

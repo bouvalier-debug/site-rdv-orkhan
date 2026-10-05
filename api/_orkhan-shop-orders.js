@@ -62,6 +62,12 @@ function createManagerClient(options = {}) {
         method: "POST",
         body: JSON.stringify(payload)
       });
+    },
+    markRefunded(reference, payload) {
+      return request(`/api/shop-orders/${encodeURIComponent(reference)}/refund`, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
     }
   };
 }
