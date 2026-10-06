@@ -81,6 +81,7 @@ test("la page de confirmation vérifie la session côté serveur et nettoie pani
   assert.match(html, /result\.clearLocalCheckout === true/);
   assert.match(html, /localStorage\.removeItem\(CART_KEY\)/);
   assert.match(html, /localStorage\.removeItem\(CUSTOMER_KEY\)/);
+  assert.doesNotMatch(html, /localStorage\.removeItem\(["']orkhan-shop-customer-v2["']\)/);
   assert.match(html, /Aucune donnée personnelle n’est affichée/);
   assert.doesNotMatch(html, /customer_details|firstName|lastName|postalCode/);
 });

@@ -13,18 +13,20 @@
   "use strict";
 
   const STORAGE_KEY = "orkhan-shop-cart-v1";
-  const CUSTOMER_STORAGE_KEY = "orkhan-shop-customer-v1";
+  const LEGACY_CUSTOMER_STORAGE_KEY = "orkhan-shop-customer-v1";
+  const CUSTOMER_STORAGE_KEY = "orkhan-shop-customer-v2";
+  const SHOP_LEGAL_CURRENT_VERSION = "cgv-2026-10-05";
   const STORAGE_VERSION = 1;
   const MAX_QUANTITY = 20;
   const EMPTY_SHIPPING_MESSAGE = "Les modes de livraison disponibles s’afficheront selon le contenu de votre panier.";
   const PRICE_KEYS = /^(price|priceCents|unitPrice|unitPriceCents|subtotal|subtotalCents|shipping|shippingCents|total|totalCents)$/i;
   const MODE_LABELS = Object.freeze({
-    pickup: "Retrait à l’élevage",
-    "animoco-light-fr": "Envoi léger Animoco — France",
-    "animoco-light-be": "Envoi léger Animoco — Belgique",
+    pickup: "Retrait à l’élevage (gratuit)",
+    "animoco-light-fr": "France — La Poste, Lettre verte suivie",
+    "animoco-light-be": "Belgique — Mondial Relay, Point Relais ou Locker choisi par email après la commande",
     "mondial-relay-pickup": "Mondial Relay — Point Relais ou Locker",
     "mondial-relay-home": "Mondial Relay — Livraison à domicile",
-    "red-dingo-free": "Envoi Red Dingo offert"
+    "red-dingo-free": "Livraison Red Dingo comprise, expédition directe par Red Dingo"
   });
   const CUSTOMER_FIELDS = Object.freeze([
     "firstName", "lastName", "email", "phone", "address", "addressExtra", "postalCode", "city", "country"
@@ -62,11 +64,16 @@
     return { lineId, productId, quantity: value.quantity, ...(Object.keys(options).length ? { options } : {}) };
   }
 
-  function parseStoredCart(raw) {
+  function validStoredDate(value, maximumAgeDays, now = Date.now()) {
+    const timestamp = typeof value === "string" ? Date.parse(value) : NaN;
+    return Number.isFinite(timestamp) && timestamp <= now && now - timestamp <= maximumAgeDays * 86_400_000;
+  }
+
+  function parseStoredCart(raw, now = Date.now()) {
     if (!raw) return [];
     try {
       const parsed = JSON.parse(raw);
-      if (!parsed || parsed.version !== STORAGE_VERSION || !Array.isArray(parsed.items)) return [];
+      if (!parsed || parsed.version !== STORAGE_VERSION || !Array.isArray(parsed.items) || !validStoredDate(parsed.updatedAt, 30, now)) return [];
       return parsed.items.map(sanitizeLine).filter(Boolean);
     } catch {
       return [];
@@ -82,14 +89,15 @@
     const storage = options.storage || (typeof localStorage !== "undefined" ? localStorage : null);
     const idFactory = options.idFactory || createLineId;
     const listeners = new Set();
-    let items = storage ? parseStoredCart(storage.getItem(STORAGE_KEY)) : [];
+    let items = storage ? parseStoredCart(storage.getItem(STORAGE_KEY), options.now?.() || Date.now()) : [];
+    if (storage && !items.length && storage.getItem(STORAGE_KEY)) storage.removeItem(STORAGE_KEY);
 
     function snapshot() {
       return items.map((item) => ({ ...item, ...(item.options ? { options: safeOptionValue(item.options) } : {}) }));
     }
 
     function persist() {
-      if (storage) storage.setItem(STORAGE_KEY, JSON.stringify({ version: STORAGE_VERSION, items }));
+      if (storage) storage.setItem(STORAGE_KEY, JSON.stringify({ version: STORAGE_VERSION, updatedAt: new Date(options.now?.() || Date.now()).toISOString(), items }));
       const state = snapshot();
       listeners.forEach((listener) => listener(state));
       return state;
@@ -126,7 +134,7 @@
     }
 
     function syncFromStorage() {
-      items = storage ? parseStoredCart(storage.getItem(STORAGE_KEY)) : [];
+      items = storage ? parseStoredCart(storage.getItem(STORAGE_KEY), options.now?.() || Date.now()) : [];
       const state = snapshot();
       listeners.forEach((listener) => listener(state));
       return state;
@@ -152,25 +160,40 @@
     return customer;
   }
 
-  function parseStoredCustomer(raw) {
-    if (!raw) return sanitizeCustomer({});
+  function parseStoredCustomer(raw, now = Date.now()) {
+    if (!raw) return { customer: sanitizeCustomer({}), savedAt: null };
     try {
       const parsed = JSON.parse(raw);
-      return parsed?.version === STORAGE_VERSION ? sanitizeCustomer(parsed.customer) : sanitizeCustomer({});
+      return parsed?.version === 2 && validStoredDate(parsed.savedAt, 365, now)
+        ? { customer: sanitizeCustomer(parsed.customer), savedAt: parsed.savedAt }
+        : { customer: sanitizeCustomer({}), savedAt: null };
     } catch {
-      return sanitizeCustomer({});
+      return { customer: sanitizeCustomer({}), savedAt: null };
     }
   }
 
   function createCustomerStore(options = {}) {
     const storage = options.storage || (typeof localStorage !== "undefined" ? localStorage : null);
-    let customer = storage ? parseStoredCustomer(storage.getItem(CUSTOMER_STORAGE_KEY)) : sanitizeCustomer({});
+    if (storage) storage.removeItem(LEGACY_CUSTOMER_STORAGE_KEY);
+    const restored = storage ? parseStoredCustomer(storage.getItem(CUSTOMER_STORAGE_KEY), options.now?.() || Date.now()) : { customer: sanitizeCustomer({}), savedAt: null };
+    let customer = restored.customer;
+    let savedAt = restored.savedAt;
+    let remember = Boolean(savedAt);
+    if (storage && !savedAt) storage.removeItem(CUSTOMER_STORAGE_KEY);
     function persist() {
-      if (storage) storage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify({ version: STORAGE_VERSION, customer }));
+      if (storage && remember) storage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify({ version: 2, savedAt, customer }));
       return { ...customer };
     }
     return {
       get: () => ({ ...customer }),
+      isRemembered: () => remember,
+      setRemember(value) {
+        remember = value === true;
+        if (remember) { savedAt ||= new Date(options.now?.() || Date.now()).toISOString(); persist(); }
+        else { savedAt = null; if (storage) storage.removeItem(CUSTOMER_STORAGE_KEY); }
+        return remember;
+      },
+      clear() { customer = sanitizeCustomer({}); remember = false; savedAt = null; if (storage) storage.removeItem(CUSTOMER_STORAGE_KEY); return { ...customer }; },
       setField(field, value) {
         if (!CUSTOMER_FIELDS.includes(field)) return { ...customer };
         customer = { ...customer, [field]: typeof value === "string" ? value.slice(0, 300) : "" };
@@ -208,6 +231,8 @@
     const payload = buildQuotePayload(items, shipping);
     payload.customer = sanitizeCustomer(customer);
     payload.checkoutAttemptId = checkoutAttemptId;
+    payload.legalAcceptance = { version: SHOP_LEGAL_CURRENT_VERSION, accepted: true };
+    if (items.some((item) => /^red-dingo:/i.test(item.productId))) payload.engravingConfirmed = true;
     return payload;
   }
 
@@ -232,7 +257,7 @@
   function quoteStatusMessage(result) {
     const code = result?.error || result?.quote?.shippingStatus;
     if (code === "shipping_unavailable") {
-      return "Les tarifs colis ne sont pas encore disponibles. Aucun tarif de livraison n’a été appliqué. Vous pouvez choisir le retrait à l’élevage ou revenir plus tard.";
+      return "Pour cette commande, seul le retrait à l’élevage est proposé.";
     }
     if (code === "shipping_weight_missing") return "Le poids nécessaire au calcul de livraison est indisponible.";
     if (code === "invalid_relay_point") return "Choisissez un Point Relais ou Locker valide.";
@@ -290,6 +315,17 @@
     });
   }
 
+  function deliveryDelayLines({ hasRedDingo, hasOther, mode }) {
+    const result = [];
+    if (hasRedDingo && mode === "pickup") result.push("Médailles gravées : transmission à Red Dingo sous 24 h ouvrées, fabrication sous 7 à 10 jours ouvrés (indicatif), puis retrait à l’élevage sur rendez-vous dès réception.");
+    else if (hasRedDingo && ["red-dingo-free", "animoco-light-fr", "animoco-light-be"].includes(mode)) result.push("Médailles gravées : transmission à Red Dingo sous 24 h ouvrées, puis fabrication et expédition par Red Dingo sous 7 à 10 jours ouvrés (indicatif). Livraison comprise.");
+    if (hasOther && mode === "animoco-light-fr") result.push("Préparation et expédition sous 48 h ouvrées, puis La Poste Lettre verte suivie : 3 à 5 jours ouvrés (indicatif).");
+    else if (hasOther && mode === "animoco-light-be") result.push("Pour une livraison en Belgique, le Point Relais ou Locker Mondial Relay est choisi avec le client par email après la commande. Préparation et expédition sous 48 h ouvrées après votre choix, puis Mondial Relay : 3 à 6 jours ouvrés (indicatif).");
+    else if (hasOther && mode === "pickup") result.push("Disponible à l’élevage sous 24 h ouvrées, sur rendez-vous. Vous êtes prévenu par email.");
+    if (hasRedDingo && hasOther && mode !== "pickup" && result.length > 1) result.push("Les médailles Red Dingo sont expédiées séparément, directement par Red Dingo.");
+    return result;
+  }
+
   function mountCartPage(root, options = {}) {
     const document = root.document;
     const container = document.querySelector("[data-cart-page]");
@@ -303,11 +339,16 @@
     const subtotalNode = container.querySelector("[data-cart-subtotal]");
     const shippingNode = container.querySelector("[data-cart-shipping]");
     const totalNode = container.querySelector("[data-cart-total]");
-    const transportNode = container.querySelector("[data-transport-placeholder]");
     const customerForm = container.querySelector("[data-customer-form]");
     const customerStatus = customerForm.querySelector("[data-customer-status]");
     const checkoutButton = container.querySelector("[data-checkout-button]");
     const checkoutStatus = container.querySelector("[data-checkout-status]");
+    const rememberCustomer = container.querySelector("[data-remember-customer]");
+    const clearCustomer = container.querySelector("[data-clear-customer]");
+    const legalCheckbox = container.querySelector("[data-legal-acceptance]");
+    const engravingWrap = container.querySelector("[data-engraving-confirmation-wrap]");
+    const engravingCheckbox = container.querySelector("[data-engraving-confirmation]");
+    const delaysNode = container.querySelector("[data-delivery-delays]");
     let selectedShipping = null;
     let lastResult = null;
     let requestSequence = 0;
@@ -351,6 +392,7 @@
         if (Object.prototype.hasOwnProperty.call(customer, field.name)) field.value = customer[field.name];
       });
       updateCustomerRequirements();
+      if (rememberCustomer) rememberCustomer.checked = customerStore.isRemembered();
     }
 
     function renderLines(items, quote) {
@@ -367,6 +409,7 @@
           optionsList.append(element(document, "dt", "", humanizeOption(key)), element(document, "dd", "", value));
         });
         if (optionsList.children.length) info.append(optionsList);
+        if (/^red-dingo:/i.test(item.productId)) info.append(element(document, "p", "engraving-warning", "Produit personnalisé : pas de droit de rétractation. Vérifiez le texte de gravure, il sera reproduit exactement."));
         const controls = element(document, "div", "cart-line__controls");
         const quantityLabel = element(document, "label", "cart-quantity", "Quantité");
         const quantity = element(document, "input");
@@ -408,10 +451,6 @@
         modesNode.append(label);
       }
       if (selectedShipping && !modes.includes(selectedShipping.mode)) selectedShipping = null;
-      const parcel = quote?.shippingProfile?.kind === "parcel";
-      transportNode.hidden = !parcel;
-      transportNode.querySelector("[data-relay-fields]").hidden = selectedShipping?.mode !== "mondial-relay-pickup";
-      transportNode.querySelector("[data-home-fields]").hidden = selectedShipping?.mode !== "mondial-relay-home";
       updateCustomerRequirements();
     }
 
@@ -427,6 +466,13 @@
       statusNode.textContent = message;
       statusNode.hidden = !message;
       statusNode.dataset.kind = result?.error || quote?.shippingStatus || "ok";
+      const hasRedDingo = items.some((item) => /^red-dingo:/i.test(item.productId));
+      const hasOther = items.some((item) => !/^red-dingo:/i.test(item.productId));
+      if (engravingWrap) engravingWrap.hidden = !hasRedDingo;
+      if (delaysNode) {
+        const delays = selectedShipping ? deliveryDelayLines({ hasRedDingo, hasOther, mode: selectedShipping.mode }) : [];
+        delaysNode.textContent = delays.length ? delays.join(" ") : "Choisissez un mode de livraison pour afficher les délais.";
+      }
     }
 
     async function refresh() {
@@ -438,7 +484,7 @@
         renderLines(items, null);
         modesNode.replaceChildren(element(document, "p", "shipping-empty", EMPTY_SHIPPING_MESSAGE));
         statusNode.hidden = true;
-        transportNode.hidden = true;
+        if (engravingWrap) engravingWrap.hidden = true;
         subtotalNode.textContent = money(0);
         shippingNode.textContent = "—";
         totalNode.textContent = money(0);
@@ -476,11 +522,12 @@
     customerForm.addEventListener("input", (event) => {
       if (event.target.name) customerStore.setField(event.target.name, event.target.value);
     });
-    customerForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      customerStatus.textContent = "Coordonnées enregistrées dans ce navigateur. Aucune commande n’a été créée.";
-      customerStatus.hidden = false;
+    if (rememberCustomer) rememberCustomer.addEventListener("change", () => customerStore.setRemember(rememberCustomer.checked));
+    if (clearCustomer) clearCustomer.addEventListener("click", () => {
+      customerStore.clear(); customerForm.reset(); updateCustomerRequirements();
+      customerStatus.textContent = "Vos coordonnées enregistrées ont été effacées de ce navigateur."; customerStatus.hidden = false;
     });
+    customerForm.addEventListener("submit", (event) => event.preventDefault());
     if (checkoutButton) checkoutButton.addEventListener("click", async () => {
       checkoutStatus.hidden = true;
       if (!store.getItems().length || !selectedShipping || !lastResult?.quote?.totalCents) {
@@ -492,6 +539,8 @@
         customerForm.reportValidity();
         return;
       }
+      if (!legalCheckbox?.checked) { checkoutStatus.textContent = "Veuillez accepter les conditions générales de vente pour continuer."; checkoutStatus.hidden = false; return; }
+      if (!engravingWrap?.hidden && !engravingCheckbox?.checked) { checkoutStatus.textContent = "Veuillez confirmer avoir vérifié le texte de gravure de vos médailles Red Dingo."; checkoutStatus.hidden = false; return; }
       const basePayload = buildCheckoutPayload(store.getItems(), selectedShipping, customerStore.get(), "");
       basePayload.checkoutAttemptId = attemptFor(basePayload);
       checkoutButton.disabled = true;
@@ -501,8 +550,12 @@
         const result = await requestCheckout(basePayload, options);
         if (!result.ok || typeof result.checkoutUrl !== "string") throw new Error(result.error || "checkout_unavailable");
         root.location.assign(result.checkoutUrl);
-      } catch {
-        checkoutStatus.textContent = "Le paiement ne peut pas être préparé pour le moment. Réessayez dans quelques instants.";
+      } catch (error) {
+        if (error.message === "legal_version_outdated") {
+          legalCheckbox.checked = false;
+          checkoutStatus.innerHTML = 'Les conditions générales de vente ont été mises à jour. Merci de les relire et de les accepter à nouveau. <button type="button" data-reload>Recharger la page</button>';
+          checkoutStatus.querySelector("[data-reload]")?.addEventListener("click", () => root.location.reload());
+        } else checkoutStatus.textContent = "Le paiement ne peut pas être préparé pour le moment. Réessayez dans quelques instants.";
         checkoutButton.disabled = false;
       }
     });
@@ -530,6 +583,8 @@
     MAX_QUANTITY,
     CUSTOMER_FIELDS,
     CUSTOMER_STORAGE_KEY,
+    LEGACY_CUSTOMER_STORAGE_KEY,
+    SHOP_LEGAL_CURRENT_VERSION,
     EMPTY_SHIPPING_MESSAGE,
     MODE_LABELS,
     STORAGE_KEY,
@@ -539,6 +594,8 @@
     buildCheckoutPayload,
     createCartStore,
     createCustomerStore,
+    deliveryDelayLines,
+    validStoredDate,
     money,
     mountCartPage,
     optionRows,

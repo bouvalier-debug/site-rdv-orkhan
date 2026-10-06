@@ -19,7 +19,7 @@ main>.site-nav a.active{border:0;color:var(--wine);background:transparent;box-sh
   main>.site-nav a.active{border:0;color:var(--wine);background:transparent;box-shadow:inset 0 -2px 0 var(--gold)}
 }
 @media(max-width:560px){.family-verification{grid-template-columns:1fr}.family-verification .button{width:100%}}
-.cart-nav-link{gap:6px}.cart-badge{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;color:#fff;background:var(--wine);font-size:.72rem}.cart-add-status.visible{display:block;border-color:var(--gold);background:#fff8e8}.cart-add-status a{font-weight:900}.legacy-toggle{margin-top:12px;border:0;color:var(--wine);background:transparent;text-decoration:underline;cursor:pointer}.legacy-section{display:none}.legacy-section.visible{display:block}
+.cart-nav-link{gap:6px}.cart-badge{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;color:#fff;background:var(--wine);font-size:.72rem}.cart-add-status.visible{display:block;border-color:var(--gold);background:#fff8e8}.cart-add-status a{font-weight:900}
 
 /* En-tête et bannière alignés sur les autres rayons de la boutique. */
 header.shell>.brand{display:none}

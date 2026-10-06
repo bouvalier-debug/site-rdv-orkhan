@@ -111,11 +111,14 @@ test("le formulaire Red Dingo masque sans exiger la couleur quand le modèle n'e
   assert.match(html, /<input name="couleur" id="color" required placeholder="Ex\. bleu foncé">/);
 });
 
-test("les anciens endpoints et formulaires restent présents", () => {
+test("les anciens parcours directs ont été retirés au profit du panier commun", () => {
   const redDingo = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
   const animoco = fs.readFileSync(path.join(__dirname, "..", "medailles-connectees/index.html"), "utf8");
   const cosmetics = fs.readFileSync(path.join(__dirname, "..", "cosmetiques/index.html"), "utf8");
-  assert.match(redDingo, /\/api\/medaille-webhook/);
-  assert.match(animoco, /id="connected-order"/);
-  assert.match(cosmetics, /id="send-request"/);
+  assert.doesNotMatch(redDingo, /\/api\/medaille-webhook/);
+  assert.doesNotMatch(animoco, /id="connected-order"/);
+  assert.doesNotMatch(cosmetics, /id="send-request"/);
+  assert.match(redDingo, /Commander et payer/);
+  assert.match(animoco, /Ajouter au panier/);
+  assert.match(cosmetics, /Ajouter au panier/);
 });

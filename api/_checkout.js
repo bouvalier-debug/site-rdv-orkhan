@@ -6,6 +6,7 @@ const { createPaymentProvider } = require("./_payment");
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DELIVERY_FIELDS = ["address", "postalCode", "city", "country"];
+const SHOP_LEGAL_CURRENT_VERSION = "cgv-2026-10-05";
 
 function cleanString(value, maximum = 300) {
   return typeof value === "string" ? value.trim().slice(0, maximum) : "";
@@ -73,6 +74,8 @@ async function executeCheckout(input, options = {}) {
   if (!input?.shipping || typeof input.shipping.mode !== "string") {
     return { error: "shipping_required", status: 400 };
   }
+  if (input?.legalAcceptance?.accepted !== true) return { error: "legal_acceptance_required", status: 400 };
+  if (input.legalAcceptance.version !== SHOP_LEGAL_CURRENT_VERSION) return { error: "legal_version_outdated", status: 409 };
   const customerResult = validateCustomer(input.customer, input.shipping.mode);
   if (customerResult.error) return { ...customerResult, status: 400 };
 
@@ -96,6 +99,9 @@ async function executeCheckout(input, options = {}) {
   }
   const quote = quoteResult.quote;
   if (!quote.shipping || !Number.isInteger(quote.totalCents)) return { error: "shipping_required", status: 400 };
+  if (quote.lines.some((line) => line.family === "red-dingo" || /^red-dingo:/i.test(line.productId)) && input.engravingConfirmed !== true) {
+    return { error: "engraving_confirmation_required", status: 400 };
+  }
 
   const lines = orderLines(quote.lines);
   const orderPayload = {
@@ -106,7 +112,9 @@ async function executeCheckout(input, options = {}) {
     lines,
     shipping: shippingSnapshot(input.shipping, quote.shipping),
     customer: customerResult.customer,
-    dynastieFamilyEligible: familyEligible
+    dynastieFamilyEligible: familyEligible,
+    legalVersion: SHOP_LEGAL_CURRENT_VERSION,
+    legalAcceptedAt: (options.now ? options.now() : new Date()).toISOString()
   };
   const manager = options.manager || createManagerClient(options.managerOptions);
   const created = await manager.createOrder(orderPayload, attemptId);
@@ -140,5 +148,6 @@ module.exports = {
   orderLines,
   requestOrigin,
   shippingSnapshot,
-  validateCustomer
+  validateCustomer,
+  SHOP_LEGAL_CURRENT_VERSION
 };

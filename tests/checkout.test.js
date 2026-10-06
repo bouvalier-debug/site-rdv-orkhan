@@ -16,6 +16,7 @@ function checkoutInput(overrides = {}) {
     items: [{ productId: "animoco", quantity: 1, unitPriceCents: 1, totalCents: 1 }],
     shipping: { mode: "animoco-light-fr", priceCents: 1 },
     customer: CUSTOMER,
+    legalAcceptance: { version: "cgv-2026-10-05", accepted: true },
     totalCents: 1,
     ...overrides
   };
@@ -53,6 +54,8 @@ test("recalcule le prix serveur et crée la commande Manager avant Stripe", asyn
   assert.equal(deps.calls[0][1].lines[0].unitPriceCents, 1999);
   assert.equal(deps.calls[0][1].shippingCents, 350);
   assert.equal(deps.calls[0][1].totalCents, 2349);
+  assert.equal(deps.calls[0][1].legalVersion, "cgv-2026-10-05");
+  assert.match(deps.calls[0][1].legalAcceptedAt, /^\d{4}-\d{2}-\d{2}T/);
   assert.equal(deps.calls[1][1].lines[0].unitPriceCents, 1999);
   assert.equal(deps.calls[1][1].shippingCents, 350);
   assert.equal(deps.calls[1][1].orderReference, "BOUT-TEST");
@@ -121,6 +124,31 @@ test("un rejeu conserve les mêmes clés Manager et Stripe", async () => {
   assert.deepEqual(deps.calls.filter((call) => call[0] === "create").map((call) => call[2]), [ATTEMPT, ATTEMPT]);
   assert.deepEqual(deps.calls.filter((call) => call[0] === "stripe").map((call) => call[1].idempotencyKey),
     [ATTEMPT, ATTEMPT]);
+});
+
+test("refuse un consentement juridique absent ou d'une version obsolète", async () => {
+  const missing = dependencies();
+  assert.equal((await executeCheckout(checkoutInput({ legalAcceptance: undefined }), missing)).error, "legal_acceptance_required");
+  assert.deepEqual(missing.calls, []);
+  const old = dependencies();
+  assert.equal((await executeCheckout(checkoutInput({ legalAcceptance: { version: "ancienne", accepted: true } }), old)).error, "legal_version_outdated");
+  assert.deepEqual(old.calls, []);
+});
+
+test("ignore tout horodatage juridique envoyé par le navigateur", async () => {
+  const deps = dependencies({ now: () => new Date("2026-10-06T12:00:00.000Z") });
+  await executeCheckout(checkoutInput({ legalAcceptedAt: "2000-01-01T00:00:00.000Z", legalAcceptance: { version: "cgv-2026-10-05", accepted: true, acceptedAt: "2000-01-01T00:00:00.000Z" } }), deps);
+  assert.equal(deps.calls[0][1].legalAcceptedAt, "2026-10-06T12:00:00.000Z");
+});
+
+test("une Red Dingo exige la confirmation de gravure", async () => {
+  const deps = dependencies();
+  const result = await executeCheckout(checkoutInput({
+    items: [{ productId: "red-dingo:01-DR", quantity: 1, options: { size: "M", colour: "", frontLines: ["NALA"] } }],
+    shipping: { mode: "red-dingo-free" }
+  }), deps);
+  assert.equal(result.error, "engraving_confirmation_required");
+  assert.deepEqual(deps.calls, []);
 });
 
 test("l’adaptateur Stripe envoie un total exact, une metadata minimale et une clé d’idempotence", async () => {

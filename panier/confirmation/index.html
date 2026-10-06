@@ -77,8 +77,8 @@
             }
             card.className = "confirmation-card";
             icon.textContent = "✓";
-            title.textContent = "Merci pour votre commande";
-            message.textContent = "Votre paiement a été confirmé. Conservez votre numéro de commande pour toute demande concernant cet achat.";
+            title.textContent = "Merci, votre commande est enregistrée.";
+            message.textContent = "Un email de confirmation vous a été envoyé : il contient le récapitulatif de votre commande, les conditions générales de vente acceptées et le formulaire de rétractation. Pensez à vérifier vos courriers indésirables.";
             return;
           }
           card.className = "confirmation-card status-pending";
@@ -98,5 +98,6 @@
       check();
     }());
   </script>
+  <footer class="site-footer"><p><a href="/conditions-generales-de-vente/">Conditions générales de vente</a> · <a href="/confidentialite/">Politique de confidentialité</a> · <a href="/mentions-legales/">Mentions légales</a></p></footer>
 </body>
 </html>

@@ -6,6 +6,21 @@
   ],
   "redirects": [
     {
+      "source": "/medailles-gravees/conditions-vente.html",
+      "destination": "/conditions-generales-de-vente/",
+      "permanent": true
+    },
+    {
+      "source": "/medailles-gravees/confidentialite.html",
+      "destination": "/confidentialite/",
+      "permanent": true
+    },
+    {
+      "source": "/medailles-gravees/mentions-legales.html",
+      "destination": "/mentions-legales/",
+      "permanent": true
+    },
+    {
       "source": "/demande-de-rdv/:path*",
       "has": [
         {
