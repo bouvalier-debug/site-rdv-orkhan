@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Renoncer au contrat | Dynastie d'Orkhan</title><link rel="stylesheet" href="/assets/orkhan-design.css"><style>.withdrawal{max-width:760px;margin:auto;padding:32px 20px}.withdrawal h1{color:var(--bordeaux)}.withdrawal-form{display:grid;gap:16px}.withdrawal-form label{display:grid;gap:6px}.withdrawal-form input,.withdrawal-form textarea{width:100%}.withdrawal-actions{display:flex;gap:12px;flex-wrap:wrap}.withdrawal-summary,.withdrawal-result{padding:18px;border:1px solid var(--line);border-radius:8px;background:#fff}.honeypot{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}.site-footer{text-align:center;padding:24px;border-top:1px solid var(--line)}</style></head>
+<body><main class="withdrawal"><p><a href="/">← Retour à la boutique</a></p><h1>Renoncer au contrat (droit de rétractation)</h1>
+<p>Vous pouvez exercer ici votre droit de rétractation pour une commande passée sur la Boutique, dans les 14 jours suivant la réception de vos produits. Aucun compte n'est nécessaire.</p>
+<p>Les médailles gravées Red Dingo, produits personnalisés, ne bénéficient pas du droit de rétractation. Si votre demande concerne un défaut ou une erreur de gravure, écrivez-nous plutôt à <a href="mailto:contact@dynastiedorkhan.com">contact@dynastiedorkhan.com</a>.</p>
+<form id="withdrawal-form" class="withdrawal-form" novalidate>
+<label>Prénom (obligatoire)<input name="firstName" maxlength="100" required autocomplete="given-name"></label>
+<label>Nom (obligatoire)<input name="lastName" maxlength="100" required autocomplete="family-name"></label>
+<label>Référence de commande BOUT-… (obligatoire)<input name="orderReference" maxlength="40" required autocomplete="off"></label>
+<label>Email pour recevoir l'accusé de réception (obligatoire)<input name="email" type="email" maxlength="200" required autocomplete="email"></label>
+<label>Produits concernés (facultatif ; « toute la commande » si vide)<textarea name="products" maxlength="1000" rows="3"></textarea></label>
+<label>Message (facultatif)<textarea name="message" maxlength="2000" rows="4"></textarea></label>
+<label class="honeypot" aria-hidden="true">Site web<input name="website" tabindex="-1" autocomplete="off"></label>
+<div class="withdrawal-actions"><button id="continue" type="submit">Continuer</button></div>
+</form>
+<section id="withdrawal-summary" class="withdrawal-summary" hidden aria-live="polite"><p id="summary-text"></p><div class="withdrawal-actions"><button id="edit" type="button" class="secondary">Revenir modifier</button><button id="confirm" type="button">Confirmer la rétractation</button></div></section>
+<p id="withdrawal-status" class="withdrawal-result" role="status" hidden></p>
+</main><footer class="site-footer"><a href="/conditions-generales-de-vente/">Conditions générales de vente</a> · <a href="/confidentialite/">Politique de confidentialité</a> · <a href="/mentions-legales/">Mentions légales</a> · <a href="/renoncer-au-contrat/">Renoncer au contrat ici</a></footer><script src="/assets/withdrawal.js"></script></body></html>

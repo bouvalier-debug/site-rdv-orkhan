@@ -68,6 +68,13 @@ function createManagerClient(options = {}) {
         method: "POST",
         body: JSON.stringify(payload)
       });
+    },
+    createWithdrawalRequest(payload, idempotencyKey) {
+      return request("/api/shop-orders/withdrawal-requests", {
+        method: "POST",
+        headers: { "Idempotency-Key": idempotencyKey },
+        body: JSON.stringify(payload)
+      });
     }
   };
 }

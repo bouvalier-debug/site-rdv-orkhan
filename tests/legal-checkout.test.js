@@ -25,21 +25,25 @@ test("la page CGV générée correspond exactement au fichier commité", () => {
 test("le formulaire officiel conserve littéralement les sept marqueurs (*)", () => {
   const html = pageHtml();
   assert.equal((html.match(/\(\*\)/g) || []).length, 7);
-  assert.doesNotMatch(html, /<em>/);
+  assert.equal((html.match(/<em>/g) || []).length, 1);
+  assert.match(html, /<em>Référence de commande/);
+  const form = html.slice(html.indexOf("Formulaire de rétractation"));
+  assert.equal((form.match(/<em>/g) || []).length, 0);
   assert.match(html, /<strong>Formulaire de rétractation<\/strong>/);
   assert.equal(inline("*texte officiel* et **gras**"), "*texte officiel* et <strong>gras</strong>");
 });
 
-test("les pages légales et les pieds de page exposent les trois liens canoniques", () => {
+test("les pages Boutique exposent les quatre liens permanents", () => {
   for (const file of [
     "index.html", "medailles-connectees/index.html", "cosmetiques/index.html", "panier/index.html",
     "panier/confirmation/index.html", "conditions-generales-de-vente/index.html",
-    "confidentialite/index.html", "mentions-legales/index.html"
+    "confidentialite/index.html", "mentions-legales/index.html", "renoncer-au-contrat/index.html"
   ]) {
     const html = read(file);
     assert.match(html, /href="\/conditions-generales-de-vente\/"/);
     assert.match(html, /href="\/confidentialite\/"/);
     assert.match(html, /href="\/mentions-legales\/"/);
+    assert.match(html, /href="\/renoncer-au-contrat\/"/);
   }
 });
 
