@@ -5,7 +5,7 @@ const path = require("node:path");
 const { buildCatalog } = require("../api/_catalog");
 const { quoteCart } = require("../api/_cart");
 const { createCartStore, buildQuotePayload } = require("../assets/cart");
-const { addLine, animocoLine, cosmeticLine, redDingoLine } = require("../assets/product-cart");
+const { addLine, animocoLine, cosmeticLine, redDingoLine, showAddConfirmation } = require("../assets/product-cart");
 
 function memoryStorage() {
   const values = new Map();
@@ -130,4 +130,34 @@ test("le bouton de vérification de puce garde un texte avant, pendant et après
   assert.match(script, /verifyButton\.textContent="Vérification…"/);
   assert.match(script, /finally\{verifyButton\.disabled=false;verifyButton\.textContent="Vérifier la puce"\}/);
   assert.doesNotMatch(script, /verifyButton\.textContent=""/);
+});
+
+test("la confirmation d'ajout mutualisée apparaît sous le bouton avec le lien panier", () => {
+  const document = {
+    createElement(tag) {
+      return {
+        tag, children: [], hidden: true,
+        setAttribute(name, value) { this[name] = value; },
+        replaceChildren(...children) { this.children = children; },
+        append(...children) { this.children.push(...children); }
+      };
+    },
+    createTextNode(text) { return { text }; }
+  };
+  const button = { ownerDocument: document, insertAdjacentElement(position, node) { this.position = position; this.confirmation = node; } };
+  const node = showAddConfirmation(button, "Produit ajouté au panier.");
+  assert.equal(button.position, "afterend");
+  assert.equal(node.role, "status");
+  assert.equal(node.hidden, false);
+  assert.equal(node.children[1].href, "/panier/");
+  assert.equal(node.children[1].textContent, "Voir mon panier");
+});
+
+test("les trois pages utilisent la confirmation mutualisée avec leur libellé", () => {
+  const redDingo = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const animoco = fs.readFileSync(path.join(__dirname, "..", "medailles-connectees", "order.js"), "utf8");
+  const cosmetics = fs.readFileSync(path.join(__dirname, "..", "cosmetiques", "index.html"), "utf8");
+  assert.match(redDingo, /showAddConfirmation\(event\.currentTarget,'Médaille Red Dingo ajoutée au panier\.',message\)/);
+  assert.match(animoco, /showAddConfirmation\(event\.currentTarget,"Médaille Animoco ajoutée au panier\.",message\)/);
+  assert.match(cosmetics, /showAddConfirmation\(button,`\$\{product\.name\} ajouté au panier\.`\)/);
 });

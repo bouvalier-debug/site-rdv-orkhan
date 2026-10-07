@@ -60,5 +60,21 @@
     return store.count();
   }
 
-  return { addLine, animocoLine, cosmeticLine, engravingLines, quantity, redDingoLine };
+  function showAddConfirmation(button, message, existingNode) {
+    if (!button || !button.ownerDocument) throw new TypeError("confirmation_button_required");
+    const document = button.ownerDocument;
+    const node = existingNode || document.createElement("p");
+    if (!existingNode) button.insertAdjacentElement("afterend", node);
+    node.className = "product-cart-confirmation";
+    node.setAttribute("role", "status");
+    node.replaceChildren(document.createTextNode(`${message} `));
+    const link = document.createElement("a");
+    link.href = "/panier/";
+    link.textContent = "Voir mon panier";
+    node.append(link);
+    node.hidden = false;
+    return node;
+  }
+
+  return { addLine, animocoLine, cosmeticLine, engravingLines, quantity, redDingoLine, showAddConfirmation };
 }));

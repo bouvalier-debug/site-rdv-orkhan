@@ -261,6 +261,9 @@
     if (code === "family_verification_unavailable") {
       return "Le service de vérification du tarif Famille est momentanément indisponible. Réessayez dans quelques instants, ou retirez le numéro de puce pour commander au tarif public.";
     }
+    if (code === "shipping_country_mismatch") {
+      return "Le pays de l’adresse ne correspond pas au mode de livraison choisi. Vérifiez le pays ou choisissez le mode de livraison correspondant.";
+    }
     if (code === "shipping_weight_missing") return "Le poids nécessaire au calcul de livraison est indisponible.";
     if (code === "invalid_relay_point") return "Choisissez un Point Relais ou Locker valide.";
     if (code === "invalid_home_address") return "Complétez l’adresse de livraison à domicile.";
@@ -309,6 +312,18 @@
         : [];
     }
     return optionRows(item?.options).map(([key, value]) => [humanizeOption(key), value]);
+  }
+
+  function countryForShippingMode(mode) {
+    if (mode === "animoco-light-fr") return "FR";
+    if (mode === "animoco-light-be") return "BE";
+    return null;
+  }
+
+  function shippingModesForCountry(modes, country) {
+    if (country === "FR") return modes.filter((mode) => mode !== "animoco-light-be");
+    if (country === "BE") return modes.filter((mode) => mode !== "animoco-light-fr");
+    return [...modes];
   }
 
   function element(document, tag, className, text) {
@@ -360,6 +375,7 @@
     const engravingWrap = container.querySelector("[data-engraving-confirmation-wrap]");
     const engravingCheckbox = container.querySelector("[data-engraving-confirmation]");
     const delaysNode = container.querySelector("[data-delivery-delays]");
+    const countryField = customerForm.querySelector('[name="country"]');
     let selectedShipping = null;
     let lastResult = null;
     let requestSequence = 0;
@@ -445,7 +461,7 @@
 
     function renderModes(result) {
       const quote = result?.quote;
-      const modes = quote?.availableShippingModes || result?.availableModes || [];
+      const modes = shippingModesForCountry(quote?.availableShippingModes || result?.availableModes || [], countryField?.value);
       modesNode.replaceChildren();
       if (!modes.length) modesNode.append(element(document, "p", "shipping-empty", EMPTY_SHIPPING_MESSAGE));
       for (const mode of modes) {
@@ -529,10 +545,21 @@
     modesNode.addEventListener("change", (event) => {
       if (event.target.name !== "shipping-mode") return;
       selectedShipping = { mode: event.target.value };
+      const expectedCountry = countryForShippingMode(event.target.value);
+      if (expectedCountry && countryField) {
+        countryField.value = expectedCountry;
+        customerStore.setField("country", expectedCountry);
+      }
       refresh();
     });
     customerForm.addEventListener("input", (event) => {
       if (event.target.name) customerStore.setField(event.target.name, event.target.value);
+    });
+    if (countryField) countryField.addEventListener("change", () => {
+      if (selectedShipping && !shippingModesForCountry([selectedShipping.mode], countryField.value).length) {
+        selectedShipping = null;
+      }
+      refresh();
     });
     if (rememberCustomer) rememberCustomer.addEventListener("change", () => customerStore.setRemember(rememberCustomer.checked));
     if (clearCustomer) clearCustomer.addEventListener("click", () => {
@@ -604,6 +631,7 @@
     autoInit,
     buildQuotePayload,
     buildCheckoutPayload,
+    countryForShippingMode,
     createCartStore,
     createCustomerStore,
     deliveryDelayLines,
@@ -618,6 +646,7 @@
     requestQuote,
     requestCheckout,
     requiredCustomerFields,
+    shippingModesForCountry,
     safeOptionValue,
     sanitizeLine,
     sanitizeCustomer,

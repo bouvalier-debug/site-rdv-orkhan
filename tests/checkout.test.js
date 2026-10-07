@@ -111,6 +111,39 @@ test("un colis sans grille reste commandable uniquement en retrait", async () =>
   assert.equal(deps.calls[0][1].shippingCents, 0);
 });
 
+test("refuse un mode Animoco incompatible avec le pays avant tout appel externe", async () => {
+  for (const [mode, country] of [["animoco-light-fr", "BE"], ["animoco-light-be", "FR"]]) {
+    const deps = dependencies();
+    const result = await executeCheckout(checkoutInput({
+      shipping: { mode }, customer: { ...CUSTOMER, country }
+    }), deps);
+    assert.deepEqual(result, { error: "shipping_country_mismatch", status: 400 });
+    assert.deepEqual(deps.calls, []);
+  }
+});
+
+test("accepte les modes Animoco correspondant au pays", async () => {
+  for (const [mode, country, total] of [["animoco-light-fr", "FR", 2349], ["animoco-light-be", "BE", 2489]]) {
+    const deps = dependencies();
+    const result = await executeCheckout(checkoutInput({
+      shipping: { mode }, customer: { ...CUSTOMER, country }
+    }), deps);
+    assert.equal(result.ok, true);
+    assert.equal(deps.calls[0][1].totalCents, total);
+  }
+});
+
+test("accepte Red Dingo en France et en Belgique", async () => {
+  for (const country of ["FR", "BE"]) {
+    const deps = dependencies();
+    const result = await executeCheckout(checkoutInput({
+      items: [{ productId: "red-dingo:01-DR", quantity: 1, options: { size: "M", colour: "", frontLines: ["NALA"] } }],
+      shipping: { mode: "red-dingo-free" }, customer: { ...CUSTOMER, country }, engravingConfirmed: true
+    }), deps);
+    assert.equal(result.ok, true);
+  }
+});
+
 test("une erreur Stripe laisse seulement la commande PENDING sans rattachement", async () => {
   const deps = dependencies({ payment: {
     provider: "STRIPE",

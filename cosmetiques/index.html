@@ -57,11 +57,6 @@
     <article class="media-card"><div class="video-wrap"><iframe src="https://player.vimeo.com/video/1022003513?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" title="Vidéo Artero Dfender"></iframe></div></article>
   </section>
 
-  <section class="shared-cart-confirmation" aria-label="Panier commun">
-    <p class="status" id="shared-cart-status" role="status"></p>
-    <a class="secondary" href="/panier/">Voir mon panier</a>
-  </section>
-
   <footer class="site-footer"><strong>Élevage de la Dynastie d'Orkhan</strong><p><a href="https://www.dynastiedorkhan.com/">www.dynastiedorkhan.com</a></p><p><a href="tel:+33327990364">03 27 99 03 64</a> · <a href="mailto:contact@dynastiedorkhan.com">contact@dynastiedorkhan.com</a></p><p>SIRET : 421 173 824 00028</p><p><a href="/conditions-generales-de-vente/">Conditions générales de vente</a> · <a href="/confidentialite/">Politique de confidentialité</a> · <a href="/mentions-legales/">Mentions légales</a></p></footer>
 </main>
 <script src="https://player.vimeo.com/api/player.js"></script>
@@ -81,8 +76,8 @@ const euro=value=>value.toLocaleString('fr-FR',{style:'currency',currency:'EUR'}
 const escapeHtml=value=>String(value).replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 function renderProducts(){document.getElementById('products').innerHTML=cosmeticsProducts.map(product=>`<article class="product-card"><img loading="lazy" src="${product.image}" alt="${escapeHtml(product.name)}"><div class="product-body"><span class="category">${escapeHtml(product.category)}</span><h3>${escapeHtml(product.name)}</h3><p>${escapeHtml(product.description)}</p><p class="usage"><strong>Utilisation conseillée :</strong> ${escapeHtml(product.usage)}</p><ul class="benefits">${product.benefits.map(item=>`<li>${escapeHtml(item)}</li>`).join('')}</ul><p class="price">${euro(product.price)}</p><button type="button" data-add="${product.id}">${product.ctaLabel}</button></div></article>`).join('')}
 function findProduct(id){return id===packProduct.id?packProduct:cosmeticsProducts.find(product=>product.id===id)}
-function addToCart(id){try{window.OrkhanProductCart.addLine(sharedCart,window.OrkhanProductCart.cosmeticLine(id,1));window.OrkhanCart.updateCounters(document,sharedCart.count());const status=document.getElementById('shared-cart-status');status.textContent='Produit ajouté au panier.';status.classList.add('visible')}catch(error){const status=document.getElementById('shared-cart-status');status.textContent=error.message||'Impossible d’ajouter ce produit.';status.classList.add('visible')}}
-document.addEventListener('click',event=>{const add=event.target.closest('[data-add]');if(add)addToCart(add.dataset.add)});
+function addToCart(id,button){const product=findProduct(id);try{window.OrkhanProductCart.addLine(sharedCart,window.OrkhanProductCart.cosmeticLine(id,1));window.OrkhanCart.updateCounters(document,sharedCart.count());window.OrkhanProductCart.showAddConfirmation(button,`${product.name} ajouté au panier.`)}catch(error){window.OrkhanProductCart.showAddConfirmation(button,error.message||'Impossible d’ajouter ce produit.')}}
+document.addEventListener('click',event=>{const add=event.target.closest('[data-add]');if(add)addToCart(add.dataset.add,add)});
 renderProducts();window.OrkhanCart.updateCounters(document,sharedCart.count());
 </script>
   <button id="to-top" type="button" aria-label="Remonter en haut de la page" title="Remonter en haut">↑</button>
@@ -90,4 +85,3 @@ renderProducts();window.OrkhanCart.updateCounters(document,sharedCart.count());
   <a class="facebook-fab" href="https://www.facebook.com/dynastiedorkhan" target="_blank" rel="noopener noreferrer" aria-label="Suivre l’Élevage de la Dynastie d’Orkhan sur Facebook"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06H297V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg></a>
 </body>
 </html>
-

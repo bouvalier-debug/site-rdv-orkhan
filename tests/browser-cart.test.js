@@ -11,13 +11,15 @@ const {
   buildQuotePayload,
   createCartStore,
   createCustomerStore,
+  countryForShippingMode,
   displayOptionRows,
   parseStoredCart,
   parseStoredCustomer,
   quoteStatusMessage,
   requestQuote,
   requestCheckout,
-  requiredCustomerFields
+  requiredCustomerFields,
+  shippingModesForCountry
 } = require("../assets/cart");
 
 const cartPage = fs.readFileSync(path.join(__dirname, "..", "panier", "index.html"), "utf8");
@@ -228,6 +230,17 @@ test("le pays est un select stable limité à France et Belgique", () => {
   assert.match(cartPage, /<option value="FR">France<\/option>/);
   assert.match(cartPage, /<option value="BE">Belgique<\/option>/);
   assert.doesNotMatch(cartPage, /<input name="country"/);
+});
+
+test("le panier filtre les modes Animoco par pays et présélectionne le pays du mode", () => {
+  const modes = ["pickup", "animoco-light-fr", "animoco-light-be", "red-dingo-free"];
+  assert.deepEqual(shippingModesForCountry(modes, "FR"), ["pickup", "animoco-light-fr", "red-dingo-free"]);
+  assert.deepEqual(shippingModesForCountry(modes, "BE"), ["pickup", "animoco-light-be", "red-dingo-free"]);
+  assert.deepEqual(shippingModesForCountry(modes, ""), modes);
+  assert.equal(countryForShippingMode("animoco-light-fr"), "FR");
+  assert.equal(countryForShippingMode("animoco-light-be"), "BE");
+  assert.equal(countryForShippingMode("pickup"), null);
+  assert.equal(quoteStatusMessage({ error: "shipping_country_mismatch" }), "Le pays de l’adresse ne correspond pas au mode de livraison choisi. Vérifiez le pays ou choisissez le mode de livraison correspondant.");
 });
 
 test("le checkout navigateur ne transmet aucun montant stocké", async () => {
