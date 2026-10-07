@@ -26,7 +26,7 @@ function validateWithdrawalPayload(value) {
   const payload = {
     firstName: text(value.firstName, "first_name", 100, true),
     lastName: text(value.lastName, "last_name", 100, true),
-    orderReference: normalizeReference(value.orderReference),
+    orderReference: text(value.orderReference, "order_reference", 40, true),
     email: text(value.email, "email", 200, true).toLowerCase(),
     products: text(value.products, "products", 1000, false, true),
     message: text(value.message, "message", 2000, false, true)

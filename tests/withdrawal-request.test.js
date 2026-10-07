@@ -10,15 +10,41 @@ function response() {
 }
 const payload = { firstName: "David", lastName: "Boitel", orderReference: " bout-2026-abcdefghij ", email: "client@example.com", products: "", message: "" };
 
-test("le proxy normalise la référence, protège l'idempotence et ne divulgue pas le rattachement", async () => {
+test("le proxy conserve la référence saisie, protège l'idempotence et ne divulgue pas le rattachement", async () => {
   let sent;
   const req = { method: "POST", headers: { "idempotency-key": "123e4567-e89b-42d3-a456-426614174000" }, body: payload, socket: {} };
   const res = response();
   await handler(req, res, { consumeRequest: () => true, managerClient: { createWithdrawalRequest: async (body, key) => { sent = { body, key }; return { requestId: "request-1", recordedAt: "2026-10-07T12:32:00Z", operation: "created", matchStatus: "MATCHED_AUTO" }; } } });
   assert.equal(res.statusCode, 201);
   assert.deepEqual(res.body, { ok: true, requestId: "request-1", recordedAt: "2026-10-07T12:32:00Z" });
-  assert.equal(sent.body.orderReference, "BOUT-2026-ABCDEFGHIJ");
+  assert.equal(sent.body.orderReference, "bout-2026-abcdefghij");
   assert.equal(sent.key, req.headers["idempotency-key"]);
+});
+
+test("la règle CSS masque effectivement tous les éléments hidden", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "renoncer-au-contrat", "index.html"), "utf8");
+  assert.match(html, /\[hidden\]\{display:none!important\}/);
+  assert.match(html, /\.withdrawal-form:not\(\[hidden\]\)\{display:grid/);
+});
+
+test("la confirmation envoie le snapshot figé et non une relecture du formulaire caché", () => {
+  const script = fs.readFileSync(path.join(__dirname, "..", "assets", "withdrawal.js"), "utf8");
+  assert.match(script, /confirmedPayload\s*=\s*Object\.freeze\(\{ \.\.\.data \}\)/);
+  assert.match(script, /body:\s*JSON\.stringify\(confirmedPayload\)/);
+  assert.doesNotMatch(script, /body:\s*JSON\.stringify\(payload\(\)\)/);
+  assert.match(script, /if \(!form\.hidden\) \{ key = null; confirmedPayload = null; \}/);
+});
+
+test("le succès ne laisse visible que le message final", () => {
+  const script = fs.readFileSync(path.join(__dirname, "..", "assets", "withdrawal.js"), "utf8");
+  assert.match(script, /form\.hidden = true; summary\.hidden = true; status\.hidden = false/);
+});
+
+test("une erreur conserve le snapshot et la clé tandis que revenir modifier les invalide", () => {
+  const script = fs.readFileSync(path.join(__dirname, "..", "assets", "withdrawal.js"), "utf8");
+  const failure = script.slice(script.indexOf("} catch {"), script.indexOf("} finally"));
+  assert.doesNotMatch(failure, /key\s*=|confirmedPayload\s*=/);
+  assert.match(script, /getElementById\("edit"\)[\s\S]*key = null; confirmedPayload = null/);
 });
 
 test("le champ piège renvoie un faux succès sans appeler le Manager", async () => {
