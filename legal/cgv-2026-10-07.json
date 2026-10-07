@@ -1,0 +1,627 @@
+{
+  "version": "cgv-2026-10-07",
+  "title": "Conditions générales de vente — Boutique de l'Élevage de la Dynastie d'Orkhan",
+  "blocks": [
+    {
+      "type": "h2",
+      "text": "Conditions générales de vente — Boutique de l'Élevage de la Dynastie d'Orkhan"
+    },
+    {
+      "type": "p",
+      "text": "**Version cgv-2026-10-07 — validée le 07/10/2026, applicable aux commandes passées à compter de sa mise en ligne**"
+    },
+    {
+      "type": "h3",
+      "text": "Article 1 — Objet et champ d'application"
+    },
+    {
+      "type": "p",
+      "text": "1.1. Les présentes conditions générales de vente (ci-après « CGV ») régissent les ventes conclues à distance sur le site boutique.dynastiedorkhan.com (ci-après « la Boutique ») entre le vendeur désigné à l'article 2 et toute personne physique agissant à des fins qui n'entrent pas dans le cadre de son activité professionnelle (ci-après « le client »)."
+    },
+    {
+      "type": "p",
+      "text": "1.2. Elles s'appliquent à tous les produits proposés sur la Boutique : médailles gravées Red Dingo, médailles connectées Animoco et produits cosmétiques pour animaux."
+    },
+    {
+      "type": "p",
+      "text": "1.3. Le client doit les accepter avant de passer commande, en cochant la case prévue à cet effet. La version applicable est celle acceptée au moment de la commande. Son identifiant est enregistré avec la commande et rappelé dans l'email de confirmation. Cet email, envoyé après la confirmation du paiement, constitue la confirmation de la commande sur support durable : il reprend le récapitulatif de la commande et les informations essentielles, et comporte en pièces jointes, au format PDF, le texte intégral des présentes CGV dans la version acceptée, le formulaire type de rétractation et la facture de la commande."
+    },
+    {
+      "type": "h3",
+      "text": "Article 2 — Identité du vendeur"
+    },
+    {
+      "type": "ul",
+      "items": [
+        "**David Boitel**, entrepreneur individuel (EI)",
+        "Nom commercial : **Élevage de la Dynastie d'Orkhan**",
+        "Adresse : 52 rue de Masny, 59234 Monchecourt, France",
+        "Téléphone : 03 27 99 03 64",
+        "Email : contact@dynastiedorkhan.com",
+        "SIRET : 421 173 824 00028 — Code APE : 01.49Z",
+        "TVA non applicable, art. 293 B du CGI"
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Dans les présentes CGV, il est désigné « le vendeur »."
+    },
+    {
+      "type": "h3",
+      "text": "Article 3 — Produits"
+    },
+    {
+      "type": "p",
+      "text": "3.1. **Médailles gravées Red Dingo.** Médailles d'identification fabriquées, gravées et expédiées par la société Red Dingo, selon le modèle, la taille, la couleur et le texte de gravure choisis par le client. Ce sont des **biens personnalisés, confectionnés selon les indications du client**."
+    },
+    {
+      "type": "p",
+      "text": "3.2. **Médailles connectées Animoco.** Médailles d'identification comportant un QR code, sans puce électronique. Une fois activée, la médaille donne accès à un profil en ligne de l'animal. Ce service de profil en ligne est fourni et géré par Animoco, selon ses propres conditions d'utilisation."
+    },
+    {
+      "type": "p",
+      "text": "3.3. **Produits cosmétiques pour animaux** (marque Artero). En V1, ils sont proposés **uniquement en retrait à l'élevage**."
+    },
+    {
+      "type": "p",
+      "text": "3.4. Les caractéristiques essentielles de chaque produit sont présentées sur sa fiche produit. Les photographies illustrent les produits ; pour les médailles gravées, la gravure réalisée correspond au texte saisi par le client."
+    },
+    {
+      "type": "h3",
+      "text": "Article 4 — Prix"
+    },
+    {
+      "type": "p",
+      "text": "4.1. Les prix sont indiqués en euros. TVA non applicable, art. 293 B du CGI."
+    },
+    {
+      "type": "p",
+      "text": "4.2. Prix en vigueur à la date de la présente version :"
+    },
+    {
+      "type": "table",
+      "head": [
+        "Produit",
+        "Prix"
+      ],
+      "rows": [
+        [
+          "Médaille gravée Red Dingo",
+          "**16,95 €** l'unité, gravure et livraison comprises"
+        ],
+        [
+          "Médaille connectée Animoco",
+          "**19,99 €** l'unité"
+        ],
+        [
+          "Médaille connectée Animoco — tarif Famille Dynastie",
+          "**17,99 €** l'unité ; voir 4.3"
+        ],
+        [
+          "Produits cosmétiques",
+          "Prix indiqué sur chaque fiche produit"
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "4.3. **Tarif Famille Dynastie.** Il est réservé aux propriétaires d'un chien issu de l'Élevage de la Dynastie d'Orkhan. Il est accordé après vérification automatique, au moment de la commande, du numéro d'identification (puce) du chien saisi par le client. Si le numéro n'est pas reconnu, le prix public s'applique."
+    },
+    {
+      "type": "p",
+      "text": "4.4. Les frais de livraison éventuels sont indiqués avant la validation de la commande (article 7). Le prix total, frais compris, figure dans le récapitulatif affiché avant le bouton « Commander et payer ». Le prix facturé est celui affiché à ce moment-là."
+    },
+    {
+      "type": "h3",
+      "text": "Article 5 — Commande"
+    },
+    {
+      "type": "p",
+      "text": "5.1. Le client passe commande en suivant les étapes suivantes :"
+    },
+    {
+      "type": "ol",
+      "items": [
+        "il ajoute les produits au panier ; pour une médaille Red Dingo, il choisit le modèle, la taille, la couleur et saisit le texte de gravure ;",
+        "il renseigne ses coordonnées et choisit un mode de livraison ou de retrait ;",
+        "il vérifie le récapitulatif de la commande : produits, options, texte de gravure, prix, frais, total et délais ;",
+        "pour une médaille Red Dingo, il confirme avoir vérifié le texte de gravure ;",
+        "il accepte les présentes CGV en cochant la case prévue ;",
+        "il clique sur le bouton **« Commander et payer »**, qui vaut commande avec obligation de paiement ;",
+        "il règle la commande sur la page de paiement sécurisée."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "5.2. Jusqu'au clic sur « Commander et payer », le client peut modifier ou corriger sa commande à tout moment."
+    },
+    {
+      "type": "p",
+      "text": "5.3. **Le contrat est conclu dès la validation du paiement.** Le client reçoit alors par email une confirmation de commande, avec la référence de commande (BOUT-…), le récapitulatif de la commande et les informations essentielles. Le texte intégral des CGV acceptées, le formulaire type de rétractation et la facture de la commande sont joints à cet email au format PDF."
+    },
+    {
+      "type": "p",
+      "text": "5.4. **Texte de gravure.** La gravure Red Dingo est réalisée exactement selon le texte saisi par le client, sans correction. Le client est seul responsable de son contenu, qui doit respecter la loi et les droits des tiers."
+    },
+    {
+      "type": "p",
+      "text": "5.5. **Indisponibilité.** Si un produit commandé se révèle indisponible après la commande, le vendeur en informe le client par email sans délai et lui rembourse les sommes correspondantes au plus tard dans les 14 jours suivant le paiement."
+    },
+    {
+      "type": "h3",
+      "text": "Article 6 — Paiement"
+    },
+    {
+      "type": "p",
+      "text": "6.1. Le paiement est exigible à la commande. Il s'effectue en ligne par carte bancaire, ou par les autres moyens proposés sur la page de paiement, via le prestataire de paiement sécurisé Stripe."
+    },
+    {
+      "type": "p",
+      "text": "6.2. Le vendeur n'a jamais accès aux données de carte bancaire du client et ne les conserve pas."
+    },
+    {
+      "type": "p",
+      "text": "6.3. La commande n'est traitée qu'après confirmation du paiement par Stripe."
+    },
+    {
+      "type": "p",
+      "text": "6.4. **Facture.** Une facture acquittée est établie pour chaque commande après confirmation du paiement. Elle est jointe, au format PDF, à l'email de confirmation de commande. En cas de remboursement total ou partiel, un avoir est établi et adressé au client par email."
+    },
+    {
+      "type": "h3",
+      "text": "Article 7 — Livraison, retrait et délais"
+    },
+    {
+      "type": "p",
+      "text": "7.1. **Zones desservies :** France et Belgique uniquement."
+    },
+    {
+      "type": "p",
+      "text": "7.2. **Jours et heures ouvrés :** du lundi au vendredi, hors jours fériés. Les délais ci-dessous courent à compter de la validation du paiement."
+    },
+    {
+      "type": "p",
+      "text": "7.3. **Médailles gravées Red Dingo.**"
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Après vérification, le vendeur transmet la commande à Red Dingo **sous 24 heures ouvrées**.",
+        "Red Dingo fabrique et expédie la médaille selon son délai indicatif de **7 à 10 jours ouvrés**.",
+        "La livraison est **comprise dans le prix**. Red Dingo fabrique et expédie directement la médaille à l'adresse indiquée par le client, dans les pays pris en charge par son service de commande. La Boutique accepte actuellement les commandes pour la France et la Belgique uniquement (article 7.1).",
+        "**Deux références distinctes :** la référence Boutique (BOUT-…) identifie la commande. Dès validation par Red Dingo, un numéro de commande Red Dingo, distinct de la référence Boutique, est communiqué au client par email. Il permet de suivre l'avancement sur le service de suivi Red Dingo : https://reddingo.fr/tag-order-tracking/.",
+        "Le client peut aussi choisir le **retrait à l'élevage** (7.5) : la médaille est alors disponible après sa réception par le vendeur."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "7.4. **Médailles connectées Animoco — envoi léger** (jusqu'à 2 médailles par commande)."
+    },
+    {
+      "type": "table",
+      "head": [
+        "Destination",
+        "Transporteur",
+        "Frais",
+        "Préparation et expédition",
+        "Délai indicatif d'acheminement"
+      ],
+      "rows": [
+        [
+          "France",
+          "La Poste, Lettre verte suivie",
+          "3,50 €",
+          "sous 48 heures ouvrées",
+          "3 à 5 jours ouvrés"
+        ],
+        [
+          "Belgique",
+          "Mondial Relay, Point Relais ou Locker",
+          "4,90 €",
+          "sous 48 heures ouvrées après le choix du Point Relais",
+          "3 à 6 jours ouvrés"
+        ]
+      ]
+    },
+    {
+      "type": "p",
+      "text": "**Livraison en Belgique :** le Point Relais ou Locker Mondial Relay est choisi avec le client par email après la commande. Le vendeur contacte le client à l'adresse email indiquée dans la commande ; le délai de préparation et d'expédition de 48 heures ouvrées court à compter de la réponse du client."
+    },
+    {
+      "type": "p",
+      "text": "Au-delà de 2 médailles Animoco, ou si la commande comprend aussi des produits cosmétiques, seul le retrait à l'élevage est proposé en V1."
+    },
+    {
+      "type": "p",
+      "text": "7.5. **Retrait à l'élevage** (gratuit), au 52 rue de Masny, 59234 Monchecourt :"
+    },
+    {
+      "type": "ul",
+      "items": [
+        "produits Animoco et cosmétiques : disponibles **sous 24 heures ouvrées**, sur rendez-vous ;",
+        "médailles Red Dingo : disponibles dès leur réception par le vendeur, sur rendez-vous."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Le client est informé par email dès que sa commande est prête au retrait."
+    },
+    {
+      "type": "p",
+      "text": "7.6. **Commandes mixtes.** Une commande comprenant des médailles Red Dingo et d'autres produits peut être livrée en plusieurs envois : les médailles Red Dingo sont expédiées directement par Red Dingo."
+    },
+    {
+      "type": "p",
+      "text": "7.7. **Suivi.** Lorsqu'un numéro de suivi est disponible, il est communiqué au client par email au moment de l'expédition."
+    },
+    {
+      "type": "p",
+      "text": "7.8. **Responsabilité et retard.** Le vendeur est responsable envers le client du respect des délais annoncés, y compris lorsque la fabrication ou l'acheminement est confié à Red Dingo ou à un transporteur. En cas de retard, le client peut demander au vendeur, par écrit, d'effectuer la livraison dans un délai supplémentaire raisonnable. À défaut de livraison dans ce délai, il peut résoudre le contrat et obtenir le remboursement des sommes versées, dans les conditions prévues par le Code de la consommation (articles L216-1 et suivants)."
+    },
+    {
+      "type": "p",
+      "text": "7.9. **Transfert des risques.** Le risque de perte ou d'endommagement des produits est transféré au client lorsque lui-même, ou un tiers qu'il a désigné autre que le transporteur proposé par le vendeur, prend physiquement possession des produits."
+    },
+    {
+      "type": "p",
+      "text": "7.10. **Colis endommagé ou non reçu.** Le client est invité à signaler tout colis endommagé, incomplet ou non reçu à contact@dynastiedorkhan.com, si possible avec une photo. Le vendeur traite la demande directement avec le client."
+    },
+    {
+      "type": "h3",
+      "text": "Article 8 — Droit de rétractation"
+    },
+    {
+      "type": "p",
+      "text": "8.1. **Principe.** Sauf exceptions prévues à l'article 8.2, le client dispose d'un délai de **14 jours** pour se rétracter, sans avoir à motiver sa décision ni à supporter d'autres coûts que ceux prévus à l'article 8.5. Le délai court à compter de la réception du bien par le client, ou par un tiers qu'il a désigné autre que le transporteur. Lorsque la commande porte sur plusieurs biens livrés séparément, le délai court à compter de la réception du dernier bien."
+    },
+    {
+      "type": "p",
+      "text": "8.2. **Exceptions.**"
+    },
+    {
+      "type": "p",
+      "text": "**a) Médailles gravées Red Dingo.**"
+    },
+    {
+      "type": "quote",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Les médailles Red Dingo gravées sont des produits personnalisés, confectionnés selon vos indications. Elles ne bénéficient pas du droit de rétractation prévu pour les ventes à distance (article L221-28, 3°, du Code de la consommation). La gravure est réalisée exactement selon le texte que vous saisissez : vérifiez-le attentivement avant de payer. Cette exclusion ne concerne pas les produits défectueux, non conformes ou comportant une erreur imputable au vendeur ou au fabricant ; les garanties légales de conformité et des vices cachés restent applicables."
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "text": "**b) Produits cosmétiques descellés.** Le droit de rétractation ne peut pas être exercé pour un produit qui a été descellé par le client après la livraison et qui ne peut pas être renvoyé pour des raisons d'hygiène ou de protection de la santé (article L221-28, 5°). Cette exception s'apprécie produit par produit : elle ne s'applique que si la fiche produit l'indique expressément. À défaut d'indication sur la fiche, le droit de rétractation s'applique dans les conditions de l'article 8.1. Un produit cosmétique non descellé reste toujours rétractable."
+    },
+    {
+      "type": "p",
+      "text": "8.3. **Comment se rétracter.** Le client informe le vendeur de sa décision, avant l'expiration du délai, par l'un des moyens suivants :"
+    },
+    {
+      "type": "ul",
+      "items": [
+        "la **fonctionnalité de rétractation en ligne**, accessible en permanence par le lien **« Renoncer au contrat ici »**, présent en bas de toutes les pages de la Boutique et dans l'email de confirmation de commande ;",
+        "le **formulaire type de rétractation** joint aux présentes CGV et à l'email de confirmation, envoyé par email à contact@dynastiedorkhan.com ou par courrier au 52 rue de Masny, 59234 Monchecourt ;",
+        "toute autre déclaration dénuée d'ambiguïté exprimant sa volonté de se rétracter, par les mêmes moyens."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Une rétractation exercée en ligne fait l'objet d'un accusé de réception immédiat par email, indiquant son contenu, la date et l'heure."
+    },
+    {
+      "type": "p",
+      "text": "8.4. **Médailles Animoco activées.**"
+    },
+    {
+      "type": "p",
+      "text": "La médaille Animoco reste rétractable dans le délai de 14 jours, même après activation."
+    },
+    {
+      "type": "quote",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Avant de retourner une médaille Animoco activée, le client doit supprimer les données de son profil et dissocier la médaille de son compte. Le vendeur n'ayant pas accès au compte personnel du client, il ne peut pas effectuer cette opération à sa place."
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Si la médaille est reçue encore associée à un compte, la rétractation n'est pas refusée. Le vendeur recontacte le client pour qu'il procède à la dissociation, nécessaire au traitement complet du retour."
+    },
+    {
+      "type": "p",
+      "text": "8.5. **Retour des produits.**"
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Le client renvoie ou restitue les produits **au plus tard 14 jours** après avoir communiqué sa décision de se rétracter :"
+      ]
+    },
+    {
+      "type": "p",
+      "lines": [
+        "  - soit par envoi à : David Boitel — Élevage de la Dynastie d'Orkhan, 52 rue de Masny, 59234 Monchecourt, France ;",
+        "  - soit en main propre à l'élevage, sur rendez-vous pris à contact@dynastiedorkhan.com ou au 03 27 99 03 64."
+      ]
+    },
+    {
+      "type": "ul",
+      "items": [
+        "**Les frais de retour sont à la charge du client**, sauf si le retour est dû à une erreur du vendeur (produit différent de celui commandé, par exemple).",
+        "Les produits sont retournés complets (médaille, accessoires et emballage d'origine dans la mesure du possible). Il est conseillé d'utiliser un envoi suivi.",
+        "Un emballage ouvert ne fait pas, à lui seul, obstacle à la rétractation, sous réserve de l'exception des produits cosmétiques descellés (article 8.2 b)."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "8.6. **Dépréciation.**"
+    },
+    {
+      "type": "quote",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Si la médaille est retournée sans dépréciation, le remboursement est intégral. Une simple ouverture, activation ou manipulation nécessaire pour vérifier son fonctionnement n'entraîne pas de décote. En revanche, si elle a été portée ou utilisée au-delà d'un simple essai et présente une dépréciation, notamment des rayures, traces d'usure ou dommages, le montant remboursé pourra être diminué à proportion de cette dépréciation."
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "text": "La même règle s'applique aux autres produits : la responsabilité du client n'est engagée qu'en cas de dépréciation résultant de manipulations autres que celles nécessaires pour établir la nature, les caractéristiques et le bon fonctionnement du produit. Toute dépréciation est constatée à réception et expliquée au client avant d'être déduite."
+    },
+    {
+      "type": "p",
+      "text": "8.7. **Remboursement.**"
+    },
+    {
+      "type": "ul",
+      "items": [
+        "Le vendeur rembourse **toutes les sommes versées**, y compris les frais de livraison initiaux, au plus tard **14 jours** à compter du jour où il est informé de la décision de rétractation.",
+        "Il peut différer le remboursement jusqu'à la récupération des produits, ou jusqu'à ce que le client ait fourni une preuve de leur expédition, la date retenue étant celle du premier de ces faits.",
+        "Le remboursement est effectué sur le **même moyen de paiement** que celui utilisé pour la commande, sauf accord exprès du client pour un autre moyen. Il n'occasionne aucun frais pour le client.",
+        "Si le client a expressément choisi un mode de livraison plus coûteux que le mode standard proposé, le supplément n'est pas remboursé."
+      ]
+    },
+    {
+      "type": "h3",
+      "text": "Article 9 — Erreur de gravure ou défaut d'une médaille Red Dingo"
+    },
+    {
+      "type": "quote",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "En cas de défaut de la médaille ou d'erreur de gravure qui ne vient pas de votre saisie, contactez-nous à contact@dynastiedorkhan.com en joignant une photo : nous traitons votre demande."
+        },
+        {
+          "type": "p",
+          "text": "Si l'erreur est imputable à Red Dingo (gravure différente du texte transmis, défaut de fabrication), vous pouvez aussi demander directement une médaille de remplacement via le formulaire de correction Red Dingo, avec le numéro à 8 chiffres inscrit sur l'enveloppe, en indiquant « Élevage de la Dynastie d'Orkhan » comme magasin d'achat ; merci alors de nous en informer. Cette démarche est facultative et ne remplace pas nos obligations : si un remplacement n'est pas possible ou n'intervient pas dans un délai raisonnable, nous vous remboursons."
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Une faute de frappe dans le texte saisi par le client n'est pas une erreur du vendeur ni du fabricant."
+    },
+    {
+      "type": "h3",
+      "text": "Article 10 — Garanties légales"
+    },
+    {
+      "type": "p",
+      "text": "Le vendeur est tenu de la garantie légale de conformité (articles L217-1 et suivants du Code de la consommation) et de la garantie légale des vices cachés (articles 1641 à 1649 du Code civil), pour tous les produits vendus sur la Boutique, y compris les médailles Red Dingo. Le client exerce ces garanties **auprès du vendeur**, à contact@dynastiedorkhan.com."
+    },
+    {
+      "type": "quote",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "**Garantie légale de conformité**"
+        },
+        {
+          "type": "p",
+          "text": "Le consommateur dispose d'un délai de deux ans à compter de la délivrance du bien pour obtenir la mise en œuvre de la garantie légale de conformité en cas d'apparition d'un défaut de conformité. Durant ce délai, le consommateur n'est tenu d'établir que l'existence du défaut de conformité et non la date d'apparition de celui-ci."
+        },
+        {
+          "type": "p",
+          "text": "Lorsque le contrat de vente du bien prévoit la fourniture d'un contenu numérique ou d'un service numérique de manière continue pendant une durée supérieure à deux ans, la garantie légale est applicable à ce contenu numérique ou ce service numérique tout au long de la période de fourniture prévue. Durant ce délai, le consommateur n'est tenu d'établir que l'existence du défaut de conformité affectant le contenu numérique ou le service numérique et non la date d'apparition de celui-ci."
+        },
+        {
+          "type": "p",
+          "text": "La garantie légale de conformité emporte obligation pour le professionnel, le cas échéant, de fournir toutes les mises à jour nécessaires au maintien de la conformité du bien."
+        },
+        {
+          "type": "p",
+          "text": "La garantie légale de conformité donne au consommateur droit à la réparation ou au remplacement du bien dans un délai de trente jours suivant sa demande, sans frais et sans inconvénient majeur pour lui."
+        },
+        {
+          "type": "p",
+          "text": "Si le bien est réparé dans le cadre de la garantie légale de conformité, le consommateur bénéficie d'une extension de six mois de la garantie initiale."
+        },
+        {
+          "type": "p",
+          "text": "Si le consommateur demande la réparation du bien, mais que le vendeur impose le remplacement, la garantie légale de conformité est renouvelée pour une période de deux ans à compter de la date de remplacement du bien."
+        },
+        {
+          "type": "p",
+          "lines": [
+            "Le consommateur peut obtenir une réduction du prix d'achat en conservant le bien ou mettre fin au contrat en se faisant rembourser intégralement contre restitution du bien, si :",
+            "1° Le professionnel refuse de réparer ou de remplacer le bien ;",
+            "2° La réparation ou le remplacement du bien intervient après un délai de trente jours ;",
+            "3° La réparation ou le remplacement du bien occasionne un inconvénient majeur pour le consommateur, notamment lorsque le consommateur supporte définitivement les frais de reprise ou d'enlèvement du bien non conforme, ou s'il supporte les frais d'installation du bien réparé ou de remplacement ;",
+            "4° La non-conformité du bien persiste en dépit de la tentative de mise en conformité du vendeur restée infructueuse."
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Le consommateur a également droit à une réduction du prix du bien ou à la résolution du contrat lorsque le défaut de conformité est si grave qu'il justifie que la réduction du prix ou la résolution du contrat soit immédiate. Le consommateur n'est alors pas tenu de demander la réparation ou le remplacement du bien au préalable."
+        },
+        {
+          "type": "p",
+          "text": "Le consommateur n'a pas droit à la résolution de la vente si le défaut de conformité est mineur."
+        },
+        {
+          "type": "p",
+          "text": "Toute période d'immobilisation du bien en vue de sa réparation ou de son remplacement suspend la garantie qui restait à courir jusqu'à la délivrance du bien remis en état."
+        },
+        {
+          "type": "p",
+          "text": "Les droits mentionnés ci-dessus résultent de l'application des articles L. 217-1 à L. 217-32 du code de la consommation."
+        },
+        {
+          "type": "p",
+          "text": "Le vendeur qui fait obstacle de mauvaise foi à la mise en œuvre de la garantie légale de conformité encourt une amende civile d'un montant maximal de 300 000 euros, qui peut être porté jusqu'à 10 % du chiffre d'affaires moyen annuel (article L. 241-5 du code de la consommation)."
+        },
+        {
+          "type": "p",
+          "text": "Le consommateur bénéficie également de la garantie légale des vices cachés en application des articles 1641 à 1649 du code civil, pendant une durée de deux ans à compter de la découverte du défaut. Cette garantie donne droit à une réduction de prix si le bien est conservé ou à un remboursement intégral contre restitution du bien."
+        }
+      ]
+    },
+    {
+      "type": "h3",
+      "text": "Article 11 — Garantie commerciale proposée par Red Dingo"
+    },
+    {
+      "type": "p",
+      "text": "Red Dingo annonce une garantie commerciale à vie pour ses médailles d'identification, hors modèles en plastique, notamment contre les défauts et concernant la lisibilité de la gravure. Cette garantie est accordée par Red Dingo selon les conditions en vigueur publiées sur son site officiel : https://reddingo.fr/our-guarantee/. Elle est proposée sans frais supplémentaires."
+    },
+    {
+      "type": "p",
+      "text": "Pour toute demande concernant une médaille achetée sur la Boutique, le client peut s'adresser directement au vendeur à contact@dynastiedorkhan.com. Le vendeur reste en tout état de cause responsable des garanties légales prévues à l'article 10. La garantie commerciale Red Dingo ne limite ni ne remplace ces garanties légales."
+    },
+    {
+      "type": "h3",
+      "text": "Article 12 — Service client et réclamations"
+    },
+    {
+      "type": "p",
+      "text": "Pour toute question ou réclamation : contact@dynastiedorkhan.com ou 03 27 99 03 64, en indiquant la référence de commande (BOUT-…)."
+    },
+    {
+      "type": "h3",
+      "text": "Article 13 — Médiation de la consommation"
+    },
+    {
+      "type": "p",
+      "text": "En cas de litige non résolu après une réclamation écrite adressée au vendeur, le client peut recourir gratuitement au médiateur de la consommation dont relève le vendeur :"
+    },
+    {
+      "type": "p",
+      "lines": [
+        "**CM2C — Centre de la Médiation de la Consommation de Conciliateurs de Justice**",
+        "49 rue de Ponthieu, 75008 Paris — https://www.cm2c.net"
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Le recours à la médiation est facultatif. Le client reste libre de saisir les juridictions compétentes."
+    },
+    {
+      "type": "h3",
+      "text": "Article 14 — Données personnelles"
+    },
+    {
+      "type": "p",
+      "text": "Les données personnelles du client sont traitées conformément à la politique de confidentialité de la Boutique, accessible en bas de chaque page."
+    },
+    {
+      "type": "h3",
+      "text": "Article 15 — Archivage et preuve"
+    },
+    {
+      "type": "p",
+      "text": "15.1. Le vendeur conserve les données de commande pour la durée nécessaire à leur finalité : les pièces comptables et justificatifs pendant 10 ans ; les autres éléments de preuve de la commande, dont la version des CGV acceptée, pendant 5 ans."
+    },
+    {
+      "type": "p",
+      "text": "15.2. **Commandes d'au moins 120 €.** Le contrat conclu par voie électronique est archivé pendant 10 ans à compter de la livraison. Le client peut y accéder à tout moment sur demande à contact@dynastiedorkhan.com."
+    },
+    {
+      "type": "p",
+      "text": "15.3. Les enregistrements informatiques du vendeur et de son prestataire de paiement font foi des commandes, de la version des CGV acceptée et des paiements, sauf preuve contraire."
+    },
+    {
+      "type": "h3",
+      "text": "Article 16 — Droit applicable et litiges"
+    },
+    {
+      "type": "p",
+      "text": "16.1. Les présentes CGV sont soumises au droit français. Pour les clients résidant en Belgique, ce choix ne les prive pas de la protection que leur assurent les dispositions impératives de la loi belge."
+    },
+    {
+      "type": "p",
+      "text": "16.2. Les litiges relèvent des juridictions compétentes selon les règles de droit commun, le client pouvant notamment saisir la juridiction du lieu où il demeurait au moment de la conclusion du contrat."
+    },
+    {
+      "type": "h3",
+      "text": "Article 17 — Modification des CGV"
+    },
+    {
+      "type": "p",
+      "text": "Le vendeur peut modifier les présentes CGV à tout moment. Chaque version porte un identifiant et une date. La version applicable à une commande est celle acceptée par le client au moment de cette commande."
+    },
+    {
+      "type": "h2",
+      "text": "Annexe : formulaire type de rétractation"
+    },
+    {
+      "type": "p",
+      "text": "*Référence de commande BOUT-… (facultatif, pour faciliter le traitement de votre demande) : ……………*"
+    },
+    {
+      "type": "quote",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "**Formulaire de rétractation**"
+        },
+        {
+          "type": "p",
+          "text": "(Veuillez compléter et renvoyer le présent formulaire uniquement si vous souhaitez vous rétracter du contrat.)"
+        },
+        {
+          "type": "p",
+          "text": "À l'attention de David Boitel — Élevage de la Dynastie d'Orkhan, 52 rue de Masny, 59234 Monchecourt, France — contact@dynastiedorkhan.com :"
+        },
+        {
+          "type": "p",
+          "text": "Je/Nous (*) vous notifie/notifions (*) par la présente ma/notre (*) rétractation du contrat portant sur la vente du bien (*) ci-dessous :"
+        },
+        {
+          "type": "p",
+          "text": "— Commandé le (*)/reçu le (*) :"
+        },
+        {
+          "type": "p",
+          "text": "— Nom du (des) consommateur(s) :"
+        },
+        {
+          "type": "p",
+          "text": "— Adresse du (des) consommateur(s) :"
+        },
+        {
+          "type": "p",
+          "text": "— Signature du (des) consommateur(s) (uniquement en cas de notification du présent formulaire sur papier) :"
+        },
+        {
+          "type": "p",
+          "text": "— Date :"
+        },
+        {
+          "type": "p",
+          "text": "(*) Rayez la mention inutile."
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Les médailles gravées Red Dingo, produits personnalisés, ne bénéficient pas du droit de rétractation (article 8.2 des CGV). Vous pouvez aussi vous rétracter en ligne via le lien « Renoncer au contrat ici »."
+    }
+  ]
+}

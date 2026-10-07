@@ -15,7 +15,7 @@
   const STORAGE_KEY = "orkhan-shop-cart-v1";
   const LEGACY_CUSTOMER_STORAGE_KEY = "orkhan-shop-customer-v1";
   const CUSTOMER_STORAGE_KEY = "orkhan-shop-customer-v2";
-  const SHOP_LEGAL_CURRENT_VERSION = "cgv-2026-10-05";
+  const SHOP_LEGAL_CURRENT_VERSION = "cgv-2026-10-07";
   const STORAGE_VERSION = 1;
   const MAX_QUANTITY = 20;
   const EMPTY_SHIPPING_MESSAGE = "Les modes de livraison disponibles s’afficheront selon le contenu de votre panier.";

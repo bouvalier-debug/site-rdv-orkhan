@@ -253,7 +253,7 @@ test("le checkout navigateur ne transmet aucun montant stocké", async () => {
   }, "123e4567-e89b-42d3-a456-426614174000");
   assert.doesNotMatch(JSON.stringify(payload), /priceCents|totalCents/);
   assert.equal(payload.items[0].options.chipNumber, "250123456789012");
-  assert.deepEqual(payload.legalAcceptance, { version: "cgv-2026-10-05", accepted: true });
+  assert.deepEqual(payload.legalAcceptance, { version: "cgv-2026-10-07", accepted: true });
 
   let request;
   const result = await requestCheckout(payload, { fetch: async (url, options) => {

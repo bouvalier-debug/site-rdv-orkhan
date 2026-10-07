@@ -2,7 +2,7 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
-const document = require("../legal/cgv-2026-10-05.json");
+const document = require("../legal/cgv-2026-10-07.json");
 
 function inline(value) {
   const escaped = String(value).replace(/[&<>]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[character]);
@@ -30,14 +30,18 @@ function renderBlocks(blocks) {
   }).join("\n");
 }
 
-function pageHtml() {
-  const articles = document.blocks.filter((block) => block.type === "h3" && /^Article /.test(block.text));
+function pageHtml(source = document) {
+  const articles = source.blocks.filter((block) => block.type === "h3" && /^Article /.test(block.text));
   const summary = articles.map((block) => { const number = /^Article (\d+)/.exec(block.text)[1]; return `<li><a href="#article-${number}">${inline(block.text)}</a></li>`; }).join("");
-  return `<!doctype html>\n<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Conditions générales de vente | Dynastie d'Orkhan</title><meta name="description" content="Conditions générales de vente de la Boutique de l'Élevage de la Dynastie d'Orkhan."><link rel="stylesheet" href="/assets/orkhan-design.css"><style>.legal{max-width:920px;margin:auto;padding:32px 20px}.legal h1,.legal h2,.legal h3{color:var(--bordeaux)}.legal-nav{padding:18px 24px;background:#fff;border:1px solid var(--line);border-radius:8px}.legal-nav ol{columns:2}.legal blockquote{margin:18px 0;padding:14px 18px;border-left:4px solid var(--or);background:#fff}.legal-table{overflow:auto}.legal table{width:100%;border-collapse:collapse}.legal th,.legal td{padding:10px;border:1px solid var(--line);vertical-align:top}.site-footer{text-align:center;padding:24px;border-top:1px solid var(--line)}</style></head><body><main class="legal"><p><a href="/">← Retour à la boutique</a></p><h1>${inline(document.title)}</h1><nav class="legal-nav" aria-label="Sommaire"><h2>Sommaire</h2><ol>${summary}</ol></nav>${renderBlocks(document.blocks)}</main><footer class="site-footer"><a href="/conditions-generales-de-vente/">Conditions générales de vente</a> · <a href="/confidentialite/">Politique de confidentialité</a> · <a href="/mentions-legales/">Mentions légales</a> · <a href="/renoncer-au-contrat/">Renoncer au contrat ici</a></footer></body></html>\n`;
+  return `<!doctype html>\n<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Conditions générales de vente | Dynastie d'Orkhan</title><meta name="description" content="Conditions générales de vente de la Boutique de l'Élevage de la Dynastie d'Orkhan."><link rel="stylesheet" href="/assets/orkhan-design.css"><style>.legal{max-width:920px;margin:auto;padding:32px 20px}.legal h1,.legal h2,.legal h3{color:var(--bordeaux)}.legal-nav{padding:18px 24px;background:#fff;border:1px solid var(--line);border-radius:8px}.legal-nav ol{columns:2}.legal blockquote{margin:18px 0;padding:14px 18px;border-left:4px solid var(--or);background:#fff}.legal-table{overflow:auto}.legal table{width:100%;border-collapse:collapse}.legal th,.legal td{padding:10px;border:1px solid var(--line);vertical-align:top}.site-footer{text-align:center;padding:24px;border-top:1px solid var(--line)}</style></head><body><main class="legal"><p><a href="/">← Retour à la boutique</a></p><h1>${inline(source.title)}</h1><nav class="legal-nav" aria-label="Sommaire"><h2>Sommaire</h2><ol>${summary}</ol></nav>${renderBlocks(source.blocks)}</main><footer class="site-footer"><a href="/conditions-generales-de-vente/">Conditions générales de vente</a> · <a href="/confidentialite/">Politique de confidentialité</a> · <a href="/mentions-legales/">Mentions légales</a> · <a href="/renoncer-au-contrat/">Renoncer au contrat ici</a></footer></body></html>\n`;
 }
 
 const output = path.join(process.cwd(), "conditions-generales-de-vente", "index.html");
 fs.mkdirSync(path.dirname(output), { recursive: true });
 fs.writeFileSync(output, pageHtml(), "utf8");
+const archive = require("../legal/cgv-2026-10-05.json");
+const archiveOutput = path.join(process.cwd(), "conditions-generales-de-vente", "cgv-2026-10-05", "index.html");
+fs.mkdirSync(path.dirname(archiveOutput), { recursive: true });
+fs.writeFileSync(archiveOutput, pageHtml(archive), "utf8");
 
 module.exports = { inline, renderBlocks, pageHtml };

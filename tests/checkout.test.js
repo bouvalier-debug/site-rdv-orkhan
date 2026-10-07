@@ -17,7 +17,7 @@ function checkoutInput(overrides = {}) {
     items: [{ productId: "animoco", quantity: 1, unitPriceCents: 1, totalCents: 1 }],
     shipping: { mode: "animoco-light-fr", priceCents: 1 },
     customer: CUSTOMER,
-    legalAcceptance: { version: "cgv-2026-10-05", accepted: true },
+    legalAcceptance: { version: "cgv-2026-10-07", accepted: true },
     totalCents: 1,
     ...overrides
   };
@@ -55,7 +55,7 @@ test("recalcule le prix serveur et crée la commande Manager avant Stripe", asyn
   assert.equal(deps.calls[0][1].lines[0].unitPriceCents, 1999);
   assert.equal(deps.calls[0][1].shippingCents, 350);
   assert.equal(deps.calls[0][1].totalCents, 2349);
-  assert.equal(deps.calls[0][1].legalVersion, "cgv-2026-10-05");
+  assert.equal(deps.calls[0][1].legalVersion, "cgv-2026-10-07");
   assert.match(deps.calls[0][1].legalAcceptedAt, /^\d{4}-\d{2}-\d{2}T/);
   assert.equal(deps.calls[1][1].lines[0].unitPriceCents, 1999);
   assert.equal(deps.calls[1][1].shippingCents, 350);
@@ -180,7 +180,7 @@ test("refuse un consentement juridique absent ou d'une version obsolète", async
 
 test("ignore tout horodatage juridique envoyé par le navigateur", async () => {
   const deps = dependencies({ now: () => new Date("2026-10-06T12:00:00.000Z") });
-  await executeCheckout(checkoutInput({ legalAcceptedAt: "2000-01-01T00:00:00.000Z", legalAcceptance: { version: "cgv-2026-10-05", accepted: true, acceptedAt: "2000-01-01T00:00:00.000Z" } }), deps);
+  await executeCheckout(checkoutInput({ legalAcceptedAt: "2000-01-01T00:00:00.000Z", legalAcceptance: { version: "cgv-2026-10-07", accepted: true, acceptedAt: "2000-01-01T00:00:00.000Z" } }), deps);
   assert.equal(deps.calls[0][1].legalAcceptedAt, "2026-10-06T12:00:00.000Z");
 });
 

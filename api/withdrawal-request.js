@@ -2,11 +2,25 @@
 
 const { randomUUID } = require("node:crypto");
 const { createManagerClient } = require("./_orkhan-shop-orders");
-const { clientIp, consumeRequest } = require("./_family-eligibility");
+const { clientIp } = require("./_family-eligibility");
 
 const MAX_BODY_BYTES = 16 * 1024;
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const WITHDRAWAL_WINDOW_MS = 10 * 60_000;
+const WITHDRAWAL_MAX_REQUESTS = 5;
+const withdrawalBuckets = new Map();
+
+function consumeWithdrawalRequest(ip, now = Date.now()) {
+  const current = withdrawalBuckets.get(ip);
+  if (!current || current.resetAt <= now) {
+    withdrawalBuckets.set(ip, { count: 1, resetAt: now + WITHDRAWAL_WINDOW_MS });
+    return true;
+  }
+  if (current.count >= WITHDRAWAL_MAX_REQUESTS) return false;
+  current.count += 1;
+  return true;
+}
 
 function text(value, field, max, required, multiline = false) {
   if (typeof value !== "string") value = "";
@@ -40,7 +54,7 @@ async function handler(req, res, options = {}) {
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
   const length = Number(req.headers?.["content-length"] || 0);
   if (length > MAX_BODY_BYTES) return res.status(413).json({ error: "payload_too_large" });
-  if (!(options.consumeRequest || consumeRequest)(clientIp(req))) return res.status(429).json({ error: "rate_limited" });
+  if (!(options.consumeRequest || consumeWithdrawalRequest)(clientIp(req))) return res.status(429).json({ error: "rate_limited" });
   if (req.body?.website) return res.status(200).json({ ok: true, requestId: randomUUID(), recordedAt: new Date().toISOString() });
   const key = req.headers?.["idempotency-key"];
   if (typeof key !== "string" || !UUID_V4.test(key)) return res.status(400).json({ error: "invalid_idempotency_key" });
@@ -57,3 +71,4 @@ async function handler(req, res, options = {}) {
 module.exports = handler;
 module.exports.validateWithdrawalPayload = validateWithdrawalPayload;
 module.exports.normalizeReference = normalizeReference;
+module.exports.consumeWithdrawalRequest = consumeWithdrawalRequest;
