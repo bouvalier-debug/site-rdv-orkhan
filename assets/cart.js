@@ -220,10 +220,9 @@
     };
   }
 
-  function buildQuotePayload(items, shipping, benefits) {
+  function buildQuotePayload(items, shipping) {
     const payload = { items: items.map(quoteItem).filter(Boolean) };
     if (shipping && typeof shipping.mode === "string") payload.shipping = safeOptionValue(shipping);
-    if (benefits && benefits.dynastieFamily === true) payload.benefits = { dynastieFamily: true };
     return payload;
   }
 
@@ -259,6 +258,9 @@
     if (code === "shipping_unavailable") {
       return "Pour cette commande, seul le retrait à l’élevage est proposé.";
     }
+    if (code === "family_verification_unavailable") {
+      return "Le service de vérification du tarif Famille est momentanément indisponible. Réessayez dans quelques instants, ou retirez le numéro de puce pour commander au tarif public.";
+    }
     if (code === "shipping_weight_missing") return "Le poids nécessaire au calcul de livraison est indisponible.";
     if (code === "invalid_relay_point") return "Choisissez un Point Relais ou Locker valide.";
     if (code === "invalid_home_address") return "Complétez l’adresse de livraison à domicile.";
@@ -272,7 +274,7 @@
     const response = await fetchImpl(options.url || "/api/cart-quote", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(buildQuotePayload(items, shipping, options.benefits))
+      body: JSON.stringify(buildQuotePayload(items, shipping))
     });
     let result;
     try { result = await response.json(); } catch { result = { error: "invalid_server_response" }; }
@@ -298,6 +300,15 @@
       backLines: "Gravure verso", recto: "Gravure recto", verso: "Gravure verso", reference: "Référence"
     };
     return labels[key] || key.replace(/([A-Z])/g, " $1").replace(/^./, (letter) => letter.toUpperCase());
+  }
+
+  function displayOptionRows(item) {
+    if (item?.productId === "animoco") {
+      return item?.options?.chipNumber
+        ? [["Tarif Famille Dynastie", "numéro de puce vérifié au moment du paiement"]]
+        : [];
+    }
+    return optionRows(item?.options).map(([key, value]) => [humanizeOption(key), value]);
   }
 
   function element(document, tag, className, text) {
@@ -405,8 +416,8 @@
         const info = element(document, "div", "cart-line__info");
         info.append(element(document, "h2", "cart-line__title", serverLine?.name || "Article du panier"));
         const optionsList = element(document, "dl", "cart-line__options");
-        optionRows(item.options).forEach(([key, value]) => {
-          optionsList.append(element(document, "dt", "", humanizeOption(key)), element(document, "dd", "", value));
+        displayOptionRows(item).forEach(([label, value]) => {
+          optionsList.append(element(document, "dt", "", label), element(document, "dd", "", value));
         });
         if (optionsList.children.length) info.append(optionsList);
         if (/^red-dingo:/i.test(item.productId)) info.append(element(document, "p", "engraving-warning", "Produit personnalisé : pas de droit de rétractation. Vérifiez le texte de gravure, il sera reproduit exactement."));
@@ -462,6 +473,7 @@
       subtotalNode.textContent = money(quote?.subtotalCents);
       shippingNode.textContent = quote?.shipping ? money(quote.shipping.priceCents) : "À choisir";
       totalNode.textContent = money(quote?.totalCents);
+      if (checkoutButton) checkoutButton.disabled = result?.error === "family_verification_unavailable";
       const message = quoteStatusMessage(result);
       statusNode.textContent = message;
       statusNode.hidden = !message;
@@ -595,6 +607,7 @@
     createCartStore,
     createCustomerStore,
     deliveryDelayLines,
+    displayOptionRows,
     validStoredDate,
     money,
     mountCartPage,

@@ -6,6 +6,7 @@ const { buildCatalog, redDingoProduct } = require("../api/_catalog");
 const { quoteCart } = require("../api/_cart");
 const { SHIPPING_CONFIG, SHIPPING_MODES } = require("../api/_shipping");
 const cartQuoteHandler = require("../api/cart-quote");
+const { quoteCartRequest } = cartQuoteHandler;
 
 const TEST_SHIPPING_CONFIG = {
   ...SHIPPING_CONFIG,
@@ -218,14 +219,14 @@ function responseRecorder() {
   };
 }
 
-test("cart-quote expose uniquement POST, sans cache", () => {
+test("cart-quote expose uniquement POST, sans cache", async () => {
   const methodResponse = responseRecorder();
-  cartQuoteHandler({ method: "GET" }, methodResponse);
+  await cartQuoteHandler({ method: "GET" }, methodResponse);
   assert.equal(methodResponse.statusCode, 405);
   assert.equal(methodResponse.headers["Cache-Control"], "no-store");
 
   const quoteResponse = responseRecorder();
-  cartQuoteHandler({
+  await cartQuoteHandler({
     method: "POST",
     body: { items: [{ productId: "animoco", quantity: 1 }], shipping: { mode: "animoco-light-fr" } }
   }, quoteResponse);
@@ -233,9 +234,9 @@ test("cart-quote expose uniquement POST, sans cache", () => {
   assert.equal(quoteResponse.body.quote.totalCents, 2349);
 });
 
-test("cart-quote répond 503 quand Mondial Relay réel est indisponible", () => {
+test("cart-quote répond 503 quand Mondial Relay réel est indisponible", async () => {
   const response = responseRecorder();
-  cartQuoteHandler({
+  await cartQuoteHandler({
     method: "POST",
     body: {
       items: [{ productId: "animoco", quantity: 3 }],
@@ -245,4 +246,50 @@ test("cart-quote répond 503 quand Mondial Relay réel est indisponible", () => 
   assert.equal(response.statusCode, 503);
   assert.equal(response.body.error, "shipping_unavailable");
   assert.deepEqual(response.body.availableModes, ["pickup"]);
+});
+
+test("cart-quote applique le tarif Famille uniquement après vérification serveur", async () => {
+  const input = {
+    items: [{ productId: "animoco", quantity: 1, options: { chipNumber: "250123456789012" } }],
+    shipping: { mode: "animoco-light-fr" }
+  };
+  const recognized = await quoteCartRequest(input, {
+    verifyFamilyChip: async () => ({ status: "ok", recognized: true }),
+    quoteOptions: { catalog: TEST_CATALOG, shippingConfig: TEST_SHIPPING_CONFIG }
+  });
+  const unknown = await quoteCartRequest(input, {
+    verifyFamilyChip: async () => ({ status: "ok", recognized: false }),
+    quoteOptions: { catalog: TEST_CATALOG, shippingConfig: TEST_SHIPPING_CONFIG }
+  });
+  assert.equal(recognized.quote.lines[0].unitPriceCents, 1799);
+  assert.equal(recognized.quote.totalCents, 2149);
+  assert.equal(unknown.quote.lines[0].unitPriceCents, 1999);
+  assert.equal(unknown.quote.totalCents, 2349);
+});
+
+test("cart-quote ignore un bénéfice Famille forgé sans puce", async () => {
+  const result = await quoteCartRequest({
+    items: [{ productId: "animoco", quantity: 1 }],
+    shipping: { mode: "pickup" },
+    benefits: { dynastieFamily: true }
+  }, { quoteOptions: { catalog: TEST_CATALOG, shippingConfig: TEST_SHIPPING_CONFIG } });
+  assert.equal(result.quote.lines[0].unitPriceCents, 1999);
+});
+
+test("cart-quote propage les erreurs de vérification Famille sans appel multiple", async () => {
+  let calls = 0;
+  const item = (chipNumber) => ({ productId: "animoco", quantity: 1, options: { chipNumber } });
+  const invalid = await quoteCartRequest({ items: [item("invalide")] }, {
+    verifyFamilyChip: async () => { calls += 1; return { status: "invalid" }; }
+  });
+  const multiple = await quoteCartRequest({ items: [item("250123456789012"), item("250123456789013")] }, {
+    verifyFamilyChip: async () => { calls += 1; return { status: "ok", recognized: true }; }
+  });
+  const unavailable = await quoteCartRequest({ items: [item("250123456789012")] }, {
+    verifyFamilyChip: async () => { calls += 1; return { status: "unavailable" }; }
+  });
+  assert.deepEqual(invalid, { error: "invalid_chip", status: 400 });
+  assert.deepEqual(multiple, { error: "multiple_family_chips", status: 400 });
+  assert.deepEqual(unavailable, { error: "family_verification_unavailable", status: 503 });
+  assert.equal(calls, 2);
 });

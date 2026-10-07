@@ -1,5 +1,5 @@
 const { quoteCart } = require("./_cart");
-const { verifyFamilyChip } = require("./_family-eligibility");
+const { chipNumbers, resolveFamilyEligibility } = require("./_family-benefit");
 const { createManagerClient } = require("./_orkhan-shop-orders");
 const { createPaymentProvider } = require("./_payment");
 
@@ -31,13 +31,6 @@ function validateCustomer(value, shippingMode) {
   }
   if (customer.country && !["FR", "BE"].includes(customer.country)) return { error: "invalid_customer" };
   return { customer };
-}
-
-function chipNumbers(items) {
-  return [...new Set((Array.isArray(items) ? items : [])
-    .filter((item) => item?.productId === "animoco")
-    .map((item) => cleanString(item?.options?.chipNumber, 32))
-    .filter(Boolean))];
 }
 
 function orderLines(lines) {
@@ -79,15 +72,9 @@ async function executeCheckout(input, options = {}) {
   const customerResult = validateCustomer(input.customer, input.shipping.mode);
   if (customerResult.error) return { ...customerResult, status: 400 };
 
-  const chips = chipNumbers(input.items);
-  if (chips.length > 1) return { error: "multiple_family_chips", status: 400 };
-  let familyEligible = false;
-  if (chips.length === 1) {
-    const verification = await (options.verifyFamilyChip || verifyFamilyChip)(chips[0], options.familyOptions);
-    if (verification.status === "invalid") return { error: "invalid_chip", status: 400 };
-    if (verification.status !== "ok") return { error: "family_verification_unavailable", status: 503 };
-    familyEligible = verification.recognized === true;
-  }
+  const eligibility = await resolveFamilyEligibility(input.items, options);
+  if (eligibility.error) return eligibility;
+  const familyEligible = eligibility.familyEligible;
 
   const quoteResult = (options.quoteCart || quoteCart)({
     items: input.items,

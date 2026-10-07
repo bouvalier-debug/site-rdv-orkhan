@@ -11,6 +11,7 @@ const {
   buildQuotePayload,
   createCartStore,
   createCustomerStore,
+  displayOptionRows,
   parseStoredCart,
   parseStoredCustomer,
   quoteStatusMessage,
@@ -142,8 +143,7 @@ test("aucun prix navigateur n'entre dans le payload de devis", () => {
   }], { mode: "animoco-light-fr", priceCents: 1 }, { dynastieFamily: true, totalCents: 1 });
   assert.deepEqual(payload, {
     items: [{ productId: "animoco", quantity: 1, options: { engraving: "ORKHAN", nested: {} } }],
-    shipping: { mode: "animoco-light-fr" },
-    benefits: { dynastieFamily: true }
+    shipping: { mode: "animoco-light-fr" }
   });
   assert.doesNotMatch(JSON.stringify(payload), /price|subtotal|total/i);
 });
@@ -161,6 +161,27 @@ test("requestQuote envoie uniquement le payload assaini à cart-quote", async ()
   assert.equal(request.url, "/api/cart-quote");
   assert.deepEqual(JSON.parse(request.options.body), { items: [{ productId: "animoco", quantity: 1 }] });
   assert.equal(result.quote.totalCents, 1999);
+});
+
+test("le rendu Animoco masque les options techniques et le numéro de puce", () => {
+  const rows = displayOptionRows({
+    productId: "animoco",
+    options: { chipNumber: "250123456789012", familyEligible: true }
+  });
+  assert.deepEqual(rows, [["Tarif Famille Dynastie", "numéro de puce vérifié au moment du paiement"]]);
+  const rendered = JSON.stringify(rows);
+  assert.doesNotMatch(rendered, /Chip Number|Family Eligible|250123456789012|true/);
+  assert.deepEqual(displayOptionRows({
+    productId: "red-dingo:01-BN",
+    options: { size: "S", colour: "Black", frontLines: ["NALA"] }
+  }), [["Taille", "S"], ["Couleur", "Black"], ["Gravure recto", "NALA"]]);
+});
+
+test("une indisponibilité Famille bloque le total et le paiement avec le message prévu", () => {
+  const result = { error: "family_verification_unavailable", status: 503 };
+  assert.equal(quoteStatusMessage(result), "Le service de vérification du tarif Famille est momentanément indisponible. Réessayez dans quelques instants, ou retirez le numéro de puce pour commander au tarif public.");
+  const source = fs.readFileSync(path.join(__dirname, "..", "assets", "cart.js"), "utf8");
+  assert.match(source, /checkoutButton\.disabled = result\?\.error === "family_verification_unavailable"/);
 });
 
 test("les coordonnées ne sont conservées qu'après consentement explicite", () => {

@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const { executeCheckout } = require("../api/_checkout");
 const { checkoutParameters, createStripeAdapter } = require("../api/_payment/stripe");
 const { createManagerClient } = require("../api/_orkhan-shop-orders");
+const { quoteCartRequest } = require("../api/cart-quote");
 
 const ATTEMPT = "123e4567-e89b-42d3-a456-426614174000";
 const CUSTOMER = {
@@ -76,6 +77,15 @@ test("recalcule l’éligibilité Famille et ne transmet jamais la puce", async 
   assert.equal(deps.calls[0][1].dynastieFamilyEligible, true);
   assert.equal(deps.calls[0][1].totalCents, 2149);
   assert.doesNotMatch(JSON.stringify(deps.calls), /250 123 456 789 012|chipNumber/);
+});
+
+test("cart-quote et checkout partagent exactement la résolution Famille", async () => {
+  const verifyFamilyChip = async () => ({ status: "ok", recognized: true });
+  const items = [{ productId: "animoco", quantity: 1, options: { chipNumber: "250123456789012" } }];
+  const quote = await quoteCartRequest({ items, shipping: { mode: "animoco-light-fr" } }, { verifyFamilyChip });
+  const deps = dependencies({ verifyFamilyChip });
+  await executeCheckout(checkoutInput({ items }), deps);
+  assert.equal(quote.quote.totalCents, deps.calls[0][1].totalCents);
 });
 
 test("refuse une livraison indisponible avant toute création externe", async () => {

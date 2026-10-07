@@ -122,3 +122,12 @@ test("les anciens parcours directs ont été retirés au profit du panier commun
   assert.match(animoco, /Ajouter au panier/);
   assert.match(cosmetics, /Ajouter au panier/);
 });
+
+test("le bouton de vérification de puce garde un texte avant, pendant et après", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "medailles-connectees", "index.html"), "utf8");
+  const script = fs.readFileSync(path.join(__dirname, "..", "medailles-connectees", "order.js"), "utf8");
+  assert.match(html, /id="verify-family-chip"[^>]*>Vérifier la puce<\/button><p class="family-status/);
+  assert.match(script, /verifyButton\.textContent="Vérification…"/);
+  assert.match(script, /finally\{verifyButton\.disabled=false;verifyButton\.textContent="Vérifier la puce"\}/);
+  assert.doesNotMatch(script, /verifyButton\.textContent=""/);
+});
