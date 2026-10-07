@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
-const { pageHtml } = require("../scripts/build-legal-pages");
+const { inline, pageHtml } = require("../scripts/build-legal-pages");
 const { deliveryDelayLines, MODE_LABELS } = require("../assets/cart");
 
 const root = path.join(__dirname, "..");
@@ -20,6 +20,14 @@ test("la source CGV canonique conserve la version et l'empreinte validées", () 
 
 test("la page CGV générée correspond exactement au fichier commité", () => {
   assert.equal(read("conditions-generales-de-vente/index.html"), pageHtml());
+});
+
+test("le formulaire officiel conserve littéralement les sept marqueurs (*)", () => {
+  const html = pageHtml();
+  assert.equal((html.match(/\(\*\)/g) || []).length, 7);
+  assert.doesNotMatch(html, /<em>/);
+  assert.match(html, /<strong>Formulaire de rétractation<\/strong>/);
+  assert.equal(inline("*texte officiel* et **gras**"), "*texte officiel* et <strong>gras</strong>");
 });
 
 test("les pages légales et les pieds de page exposent les trois liens canoniques", () => {

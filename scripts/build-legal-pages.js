@@ -8,7 +8,6 @@ function inline(value) {
   const escaped = String(value).replace(/[&<>]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[character]);
   return escaped
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*([^*]+)\*/g, "<em>$1</em>")
     .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1">$1</a>');
 }
 
@@ -38,4 +37,3 @@ fs.mkdirSync(path.dirname(output), { recursive: true });
 fs.writeFileSync(output, pageHtml(), "utf8");
 
 module.exports = { inline, renderBlocks, pageHtml };
-
