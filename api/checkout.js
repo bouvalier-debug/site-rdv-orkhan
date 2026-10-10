@@ -18,7 +18,8 @@ async function handler(req, res) {
     if (result.error) return send(res, result.status || 400, { error: result.error });
     if (result.orderReference) res.setHeader("Set-Cookie", checkoutMarkerCookie(result.orderReference));
     return send(res, 200, result);
-  } catch {
+  } catch (error) {
+    console.error("checkout_unavailable", JSON.stringify({ step: error?.message || "unknown", status: error?.status ?? null, stripe: error?.stripeCode ?? null }));
     return send(res, 502, { error: "checkout_unavailable" });
   }
 }
