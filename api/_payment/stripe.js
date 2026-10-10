@@ -32,7 +32,7 @@ function checkoutParameters(input) {
 }
 
 function createStripeAdapter(options = {}) {
-  const secretKey = options.secretKey || process.env.STRIPE_SECRET_KEY;
+  const secretKey = (options.secretKey || process.env.STRIPE_SECRET_KEY || "").trim();
   const fetchImpl = options.fetch || fetch;
   if (!secretKey) throw new Error("stripe_not_configured");
   return {
@@ -52,6 +52,7 @@ function createStripeAdapter(options = {}) {
       if (!response.ok || typeof body.id !== "string" || typeof body.url !== "string") {
         const error = new Error("stripe_checkout_failed");
         error.status = response.status;
+        error.stripeCode = [body?.error?.type, body?.error?.code].filter(Boolean).join(":") || null;
         throw error;
       }
       return { providerRef: body.id, checkoutUrl: body.url };
