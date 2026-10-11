@@ -28,7 +28,8 @@
 }
 
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+/* La gouttière stable fait exclure la barre de défilement des unités vw : les bannières en 100vw ne dépassent plus. */
+html{scroll-behavior:smooth;scrollbar-gutter:stable}
 body{margin:0;overflow-x:clip;color:var(--ink);background:var(--paper);font-family:"Manrope",Arial,sans-serif;font-size:16px;line-height:1.65}
 a{color:var(--wine);text-underline-offset:3px}
 h1,h2,h3,.nom,.marque,.signature{font-family:"Lora",Georgia,serif;line-height:1.15}
@@ -55,6 +56,7 @@ main{width:min(1180px,calc(100% - 40px));max-width:none;margin-inline:auto;paddi
 .shop-nav a{order:0!important}
 .shop-return{display:inline-flex;align-items:center;margin:0 0 18px;color:var(--muted);font-size:.84rem;font-weight:800;text-decoration:none}
 .shop-return:hover{color:var(--wine)}
+body>.shop-return{display:flex;width:min(1180px,calc(100% - 40px));margin:14px auto}
 
 /* CTA Rendez-vous : taille verrouillée à l'identique */
 body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-de-rdv/"],body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:auto!important;height:48px!important;min-height:48px!important;max-height:48px!important;margin-left:6px!important;padding:0 18px!important;border:1px solid var(--wine)!important;border-radius:999px!important;color:#fff!important;background:var(--wine)!important;font-family:"Manrope",Arial,sans-serif!important;font-size:.84rem!important;font-weight:800!important;line-height:1!important;white-space:nowrap!important;align-self:center!important;flex:0 0 auto!important}
@@ -69,6 +71,11 @@ body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-d
   body:has(> .ecosystem-nav)>header{position:static!important}
   body:has(> .ecosystem-nav)>header .site-logo{position:absolute!important;top:18px!important;left:max(20px,calc(50% - 590px))!important;z-index:31!important;width:76px!important;height:76px!important;margin:0!important;object-fit:contain!important}
   body:has(> .ecosystem-nav)>header .marque{position:absolute!important;top:43px!important;left:max(108px,calc(50% - 502px))!important;z-index:31!important;margin:0!important;color:var(--wine)!important}
+}
+
+/* Tablette : la navigation Boutique ne tient pas sur une ligne, elle peut aller à la ligne */
+@media(min-width:701px) and (max-width:959px){
+  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type{display:flex;height:auto;max-width:100%;flex-wrap:wrap;row-gap:4px;margin:18px 0 14px}
 }
 
 /* Bannière : mêmes largeur, hauteur, cadrage et voile */
@@ -106,6 +113,7 @@ input,select,textarea,.toolbar input,.toolbar select,.customer input,.customer t
 /* Mobile */
 @media(max-width:700px){
   main{width:calc(100% - 28px);max-width:1180px;padding:14px 0 56px}
+  body>.shop-return{width:calc(100% - 28px)}
   .brand{min-width:0;margin-bottom:12px}
   .brand img{width:60px;height:60px}
   .brand-name{min-width:0;overflow-wrap:anywhere;white-space:normal!important}
