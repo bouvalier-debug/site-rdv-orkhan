@@ -75,7 +75,7 @@ body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-d
 
 /* Tablette : la navigation Boutique ne tient pas sur une ligne, elle peut aller à la ligne */
 @media(min-width:701px) and (max-width:959px){
-  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type{display:flex;height:auto;max-width:100%;flex-wrap:wrap;row-gap:4px;margin:18px 0 14px}
+  body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type{display:flex;height:auto;max-width:100%;flex-wrap:wrap;row-gap:4px;padding:18px 0 14px}
 }
 
 /* Bannière : mêmes largeur, hauteur, cadrage et voile */
