@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /panier/
+
+Sitemap: https://rdv.dynastiedorkhan.com/sitemap.xml

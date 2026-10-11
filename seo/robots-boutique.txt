@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /panier/
+
+Sitemap: https://boutique.dynastiedorkhan.com/sitemap.xml

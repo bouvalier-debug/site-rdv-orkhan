@@ -6,6 +6,38 @@
   ],
   "redirects": [
     {
+      "source": "/medailles-gravees",
+      "has": [
+        {
+          "type": "host",
+          "value": "rdv.dynastiedorkhan.com"
+        }
+      ],
+      "destination": "https://boutique.dynastiedorkhan.com/",
+      "permanent": true
+    },
+    {
+      "source": "/medailles-gravees/",
+      "has": [
+        {
+          "type": "host",
+          "value": "rdv.dynastiedorkhan.com"
+        }
+      ],
+      "destination": "https://boutique.dynastiedorkhan.com/",
+      "permanent": true
+    },
+    {
+      "source": "/medailles-gravees",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/medailles-gravees/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
       "source": "/medailles-gravees/conditions-vente.html",
       "destination": "/conditions-generales-de-vente/",
       "permanent": true
@@ -68,6 +100,36 @@
       ],
       "destination": "https://rdv.dynastiedorkhan.com/demande-de-rdv/",
       "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "has": [
+        {
+          "type": "host",
+          "value": "rdv.dynastiedorkhan.com"
+        }
+      ],
+      "destination": "/seo/sitemap-rdv.xml"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/seo/sitemap-boutique.xml"
+    },
+    {
+      "source": "/robots.txt",
+      "has": [
+        {
+          "type": "host",
+          "value": "rdv.dynastiedorkhan.com"
+        }
+      ],
+      "destination": "/seo/robots-rdv.txt"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/seo/robots-boutique.txt"
     }
   ]
 }
