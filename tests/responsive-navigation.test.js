@@ -29,3 +29,9 @@ test("la page Cosmétiques renvoie aussi vers la boutique, comme la médaille co
     assert.match(read(file), /<p><a href="\/">Retour à la boutique<\/a><\/p>/, file);
   }
 });
+
+test("les caractéristiques des médailles connectées passent sur une colonne entre 851 et 1023 px", () => {
+  const styles = read("medailles-connectees/styles.css");
+  assert.match(styles, /@media\(min-width:851px\) and \(max-width:1023px\)\{\.specs\{grid-template-columns:1fr\}\}/);
+  assert.match(styles, /\.specs\{grid-template-columns:repeat\(2,1fr\)/, "deux colonnes conservées au-delà");
+});
