@@ -230,3 +230,10 @@ body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]::after{cont
 }
 
 @media print{.facebook-fab,#to-top{display:none!important}}
+/* A11Y-001 : zones tactiles d’au moins 44 px sur les liens et commandes isolés (retours, FAQ, navigation mobile, pied de page). */
+.shop-return,.cart-nav>a{display:inline-flex;align-items:center;min-height:44px}
+.warranty summary{padding-block:9px}
+@media(max-width:700px){
+  .site-nav a,.ecosystem-nav a{min-height:44px}
+  .site-footer p a,body>footer p a{display:inline-block;padding-block:11px}
+}

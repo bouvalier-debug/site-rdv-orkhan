@@ -678,19 +678,19 @@
         <!-- Nom et prénom -->
         <div class="champ">
           <label class="intitule" for="nom">Nom et prénom <span class="obligatoire">*</span></label>
-          <input type="text" id="nom" name="nom-prenom" required />
+          <input type="text" id="nom" name="nom-prenom" autocomplete="name" required />
         </div>
 
         <!-- Téléphone -->
         <div class="champ">
           <label class="intitule" for="telephone">Téléphone <span class="obligatoire">*</span></label>
-          <input type="tel" id="telephone" name="telephone" required />
+          <input type="tel" id="telephone" name="telephone" autocomplete="tel" required />
         </div>
 
         <!-- Email (nommé "email" => prêt pour la réponse automatique Netlify) -->
         <div class="champ">
           <label class="intitule" for="email">Adresse e-mail <span class="obligatoire">*</span></label>
-          <input type="email" id="email" name="email" required />
+          <input type="email" id="email" name="email" autocomplete="email" required />
         </div>
 
         <!-- Type de rendez-vous -->
