@@ -14,3 +14,11 @@ test("les pages Boutique affichent un seul bouton Facebook partagé", () => {
     assert.match(html, /href="\/assets\/orkhan-design\.css"/, `${file} charge le style partagé`);
   }
 });
+
+test("le générateur des CGV conserve le bouton Facebook, sans le placer dans la version archivée", () => {
+  const { pageHtml } = require("../scripts/build-legal-pages");
+  const archive = require("../legal/cgv-2026-10-05.json");
+  assert.equal((pageHtml().match(fab) || []).length, 1);
+  assert.match(pageHtml(), /<\/footer><a class="facebook-fab"[^\n]*<\/a><\/body><\/html>\n$/, "bouton placé après le pied de page, comme sur la page publiée");
+  assert.doesNotMatch(pageHtml(archive), /facebook-fab/);
+});
