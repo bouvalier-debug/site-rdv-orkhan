@@ -35,3 +35,15 @@ test("les caractéristiques des médailles connectées passent sur une colonne e
   assert.match(styles, /@media\(min-width:851px\) and \(max-width:1023px\)\{\.specs\{grid-template-columns:1fr\}\}/);
   assert.match(styles, /\.specs\{grid-template-columns:repeat\(2,1fr\)/, "deux colonnes conservées au-delà");
 });
+
+test("le menu Boutique propose « Nouveautés » après « Cosmétiques », actif seulement sur /nouveautes/", () => {
+  const pages = { "index.html": false, "cosmetiques/index.html": false, "medailles-connectees/index.html": false, "nouveautes/index.html": true };
+  for (const [file, active] of Object.entries(pages)) {
+    const nav = read(file).match(/<nav class="site-nav shop-nav"[^>]*>.*?<\/nav>/s)[0];
+    assert.equal((nav.match(/href="\/nouveautes\/"/g) || []).length, 1, file);
+    assert.ok(nav.indexOf('href="/nouveautes/"') > nav.indexOf('href="/cosmetiques/"'), `${file} : après Cosmétiques`);
+    assert.ok(nav.indexOf('href="/nouveautes/"') < nav.indexOf('href="/panier/"'), `${file} : avant le panier`);
+    assert.equal(/class="active" aria-current="page" href="\/nouveautes\/"/.test(nav), active, `${file} : état actif`);
+  }
+  assert.match(read("nouveautes/index.html"), /<meta name="robots" content="noindex">/, "page toujours non indexée pendant le lot 1");
+});
