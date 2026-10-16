@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&amp;family=Manrope:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/orkhan-design.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Nouveautés - bientôt disponibles | Dynastie d'Orkhan</title>
+  <meta name="description" content="Découvrez les prochains produits de la boutique de l'Élevage de la Dynastie d'Orkhan. Ils ne sont pas encore disponibles à l'achat.">
+  <style>
+    :root{--bordeaux:#7B1D2E;--or:#b88a31;--ink:#281f20;--cream:#fcfaf6;--line:#e8e0d6;--sand:#f6ead8;--muted:#655a59}*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.55 Arial,sans-serif}main{max-width:1200px;margin:auto;padding:24px}a{color:var(--bordeaux)}
+    .new-products-intro{margin:24px 0;padding:18px 20px;background:var(--sand);border:1px solid var(--line);border-radius:14px}.new-products-intro h1{margin:0 0 8px;color:var(--bordeaux);font-family:"Lora",Georgia,serif}.new-products-intro p{margin:0}
+    .new-products-status{margin:18px 0;padding:14px 16px;background:#fff;border:1px solid var(--line);border-radius:12px}
+    .new-products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+    .new-product-card{background:#fff;border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;overflow:hidden}
+    .new-product-photo{width:100%;height:230px;object-fit:contain;background:#fff}
+    .new-product-thumbnails{display:flex;gap:6px;padding:6px 12px 0;flex-wrap:wrap}.new-product-thumbnails img{width:56px;height:56px;object-fit:cover;border:1px solid var(--line);border-radius:8px}
+    .new-product-card .card-body{padding:14px 16px 18px}.new-product-card h2{margin:6px 0 8px;color:var(--bordeaux);font-size:1.3rem;line-height:1.2}
+    .new-product-description{white-space:pre-line;margin:0 0 10px}.new-product-card .price{margin:0;font-weight:700}.new-product-card .family-price{margin:4px 0 0;color:var(--muted)}
+    .not-for-sale{display:inline-block;margin:0;padding:4px 10px;border-radius:999px;background:var(--sand);color:var(--bordeaux);font-size:.82rem;font-weight:700}
+    .cart-nav-link{gap:7px}.cart-badge{display:inline-flex;min-width:1.55rem;height:1.55rem;padding:0 .4rem;align-items:center;justify-content:center;border-radius:999px;background:var(--bordeaux);color:#fff;font-size:.78rem}
+  </style>
+</head>
+<body>
+<main>
+  <div class="brand"><img src="/medailles-gravees/assets/logo-dynastie-orkhan.png" alt="Logo de l'Élevage de la Dynastie d'Orkhan"><p class="brand-name">Élevage de la Dynastie d'Orkhan</p></div>
+  <nav class="site-nav shop-nav" aria-label="Navigation principale"><a href="/">Boutique</a><a href="/">Médailles gravées</a><a href="/medailles-connectees/">Médaille connectée</a><a href="/cosmetiques/">Cosmétiques</a><a class="cart-nav-link" href="/panier/">Panier <span class="cart-badge" data-cart-count>0</span></a><a href="/demande-de-rdv/">Rendez-vous</a><a href="https://www.dynastiedorkhan.com/contact/">Contact</a></nav>
+  <a class="shop-return" href="https://www.dynastiedorkhan.com/">← Retour au site de l’élevage</a>
+
+  <section class="new-products-intro">
+    <h1>Nouveautés</h1>
+    <p>Voici les produits qui arrivent bientôt dans la boutique. <strong>Ils ne sont pas encore disponibles à l’achat</strong> : aucune commande n’est possible pour le moment.</p>
+  </section>
+
+  <p class="new-products-status" id="nouveautes-statut" role="status" aria-live="polite">Chargement des nouveautés…</p>
+  <section class="new-products-grid" id="nouveautes-produits" aria-label="Nouveaux produits, pas encore en vente"></section>
+
+  <footer class="site-footer"><strong>Élevage de la Dynastie d'Orkhan</strong><p><a href="https://www.dynastiedorkhan.com/">www.dynastiedorkhan.com</a></p><p><a href="tel:+33327990364">03 27 99 03 64</a> · <a href="mailto:contact@dynastiedorkhan.com">contact@dynastiedorkhan.com</a></p><p><a href="/">Retour à la boutique</a></p><p>SIRET : 421 173 824 00028</p><p><a href="/conditions-generales-de-vente/">Conditions générales de vente</a> · <a href="/confidentialite/">Politique de confidentialité</a> · <a href="/mentions-legales/">Mentions légales</a> · <a href="/renoncer-au-contrat/">Renoncer au contrat ici</a></p></footer>
+</main>
+<script src="/assets/cart.js"></script>
+<script src="/assets/nouveautes.js"></script>
+<a class="facebook-fab" href="https://www.facebook.com/dynastiedorkhan" target="_blank" rel="noopener noreferrer" aria-label="Suivre l’Élevage de la Dynastie d’Orkhan sur Facebook"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06H297V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg></a>
+</body>
+</html>
