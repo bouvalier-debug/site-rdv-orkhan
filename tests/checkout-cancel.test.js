@@ -25,7 +25,8 @@ function deps({ state = {}, expire, retrieve } = {}) {
       env: ENV, now: () => NOW,
       manager: {
         async getCheckoutState(reference) { calls.push(["state", reference]); return { reference, status: "PENDING_PAYMENT", provider: "STRIPE", providerRef: SESSION, checkoutExpired: false, hasStockReservations: true, ...state }; },
-        async markCheckoutExpired(reference, payload) { calls.push(["expired", reference, payload]); return { operation: "recorded", released: 1 }; }
+        async markCheckoutExpired(reference, payload) { calls.push(["expired", reference, payload]); return { operation: "recorded", released: 1 }; },
+        async flagCheckoutCancelUncertain(reference, payload) { calls.push(["flag", reference, payload]); return { operation: "flagged" }; }
       },
       stripe: {
         async expireCheckout(id) { calls.push(["stripe-expire", id]); if (expire instanceof Error) throw expire; return expire || stripeSession(); },
@@ -99,6 +100,7 @@ test("échec ou incertitude : la réservation est conservée, rien n’est libé
       const { calls, options } = deps(scenario);
       assert.deepEqual(await processCheckoutCancel(input(), options), { status: 200, body: { ok: true, outcome: "uncertain" } });
       assert.equal(calls.some((call) => call[0] === "expired"), false);
+      assert.deepEqual(calls.filter((call) => call[0] === "flag"), [["flag", REFERENCE, { provider: "STRIPE", providerRef: SESSION }]]);
     }
     for (const state of [{ providerRef: null }, { hasStockReservations: false }]) {
       const { calls, options } = deps({ state });
@@ -206,4 +208,21 @@ test("page panier : un retour sans lien signé (paniers historiques) n’affiche
     assert.equal(await handleCheckoutCancel(page.root), null);
     assert.deepEqual([page.messages, page.requests, page.replaced], [[], [], []]);
   }
+});
+
+test("annulation incertaine : signalement immédiat au Manager, une seule demande, sans effet sur l'issue en cas d'échec", async () => {
+  const warn = console.warn; const error = console.error; console.warn = () => {}; console.error = () => {};
+  try {
+    const unattached = deps({ state: { providerRef: null } });
+    assert.equal((await processCheckoutCancel(input(), unattached.options)).body.outcome, "uncertain");
+    assert.deepEqual(unattached.calls.filter((call) => call[0] === "flag"), [["flag", REFERENCE, { provider: "STRIPE", providerRef: null }]]);
+    const failing = deps({ expire: new Error("refus"), retrieve: new Error("réseau") });
+    failing.options.manager.flagCheckoutCancelUncertain = async () => { throw Object.assign(new Error("SHOP_ORDER_UNAVAILABLE"), { status: 503 }); };
+    assert.deepEqual(await processCheckoutCancel(input(), failing.options), { status: 200, body: { ok: true, outcome: "uncertain" } });
+    for (const scenario of [{}, { state: { status: "PAID" } }, { state: { checkoutExpired: true } }, { state: { hasStockReservations: false } }, { expire: stripeSession({ status: "complete", payment_status: "paid" }) }]) {
+      const { calls, options } = deps(scenario);
+      await processCheckoutCancel(input(), options);
+      assert.equal(calls.some((call) => call[0] === "flag"), false);
+    }
+  } finally { console.warn = warn; console.error = error; }
 });

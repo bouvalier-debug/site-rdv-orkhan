@@ -66,6 +66,12 @@ function createManagerClient(options = {}) {
     getCheckoutState(reference) {
       return request(`/api/shop-orders/${encodeURIComponent(reference)}/payment-reference`, { method: "GET" });
     },
+    flagCheckoutCancelUncertain(reference, payload) {
+      return request(`/api/shop-orders/${encodeURIComponent(reference)}/checkout-cancel-uncertain`, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    },
     markCheckoutExpired(reference, payload) {
       return request(`/api/shop-orders/${encodeURIComponent(reference)}/checkout-expired`, {
         method: "POST",

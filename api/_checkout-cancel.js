@@ -52,6 +52,18 @@ function outcome(value, extra = {}) {
   return { status: 200, body: { ok: true, outcome: value, ...extra } };
 }
 
+// Annulation non confirmée : la commande est signalée tout de suite « À vérifier » dans le Manager, sans toucher au
+// stock. Le signalement est un complément : s'il échoue, la réservation reste de toute façon bloquée et la commande
+// apparaît « À vérifier » à l'échéance de la réservation.
+async function uncertain(manager, reference, providerRef) {
+  try {
+    await manager.flagCheckoutCancelUncertain(reference, { provider: "STRIPE", providerRef: providerRef || null });
+  } catch (error) {
+    console.error("checkout_cancel_flag_failed", JSON.stringify({ reference, status: error?.status ?? null }));
+  }
+  return outcome("uncertain");
+}
+
 async function processCheckoutCancel(input, options = {}) {
   const env = options.env || process.env;
   const reference = input?.order;
@@ -62,7 +74,7 @@ async function processCheckoutCancel(input, options = {}) {
   // Seules les commandes du catalogue avec stock réservé sont concernées ; les parcours historiques ne changent pas.
   if (!state?.hasStockReservations || !RELEASABLE_STATUSES.has(state.status)) return outcome("uncertain");
   if (state.checkoutExpired) return outcome("cancelled", { operation: "already_recorded" });
-  if (state.provider !== "STRIPE" || typeof state.providerRef !== "string" || !state.providerRef) return outcome("uncertain");
+  if (state.provider !== "STRIPE" || typeof state.providerRef !== "string" || !state.providerRef) return uncertain(manager, reference, null);
   const stripe = options.stripe || createStripeAdapter(options.stripeOptions);
   let session = null;
   try { session = await stripe.expireCheckout(state.providerRef); } catch {
@@ -72,7 +84,7 @@ async function processCheckoutCancel(input, options = {}) {
   if (session?.id === state.providerRef && session.payment_status === "paid") return outcome("payment_received");
   if (!confirmedExpired(session, reference, state.providerRef)) {
     console.warn("checkout_cancel_uncertain", JSON.stringify({ reference, status: session?.status ?? null, paymentStatus: session?.payment_status ?? null }));
-    return outcome("uncertain");
+    return uncertain(manager, reference, state.providerRef);
   }
   const result = await manager.markCheckoutExpired(reference, {
     provider: "STRIPE",
@@ -82,7 +94,7 @@ async function processCheckoutCancel(input, options = {}) {
   });
   if (CONFIRMED_OPERATIONS.has(result.operation)) return outcome("cancelled", { operation: result.operation });
   if (result.operation === "ignored_paid") return outcome("payment_received");
-  return outcome("uncertain");
+  return uncertain(manager, reference, state.providerRef);
 }
 
 module.exports = { cancelUrl, checkoutCancelToken, confirmedExpired, processCheckoutCancel, validCancelToken };
