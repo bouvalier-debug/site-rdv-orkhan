@@ -6,7 +6,7 @@ const { fetchCataloguePhoto, listCatalogue, publicProduct } = require("../api/_o
 const productsHandler = require("../api/catalogue-produits");
 const photoHandler = require("../api/catalogue-photo");
 const { validateCart } = require("../api/_cart");
-const { describeProducts, renderCatalogue, statusMessage, MESSAGES, NOT_FOR_SALE } = require("../assets/nouveautes");
+const { describeProducts, renderCatalogue, saleState, statusMessage, MESSAGES, NOT_FOR_SALE, OUT_OF_STOCK, PICKUP_ONLY } = require("../assets/nouveautes");
 
 const SECRET = "secret-boutique-de-test-0123456789";
 const BYPASS = "bypass-preview-de-test";
@@ -17,7 +17,7 @@ const MANAGER_BODY = {
   ok: true, purchaseLocked: true,
   products: [{
     reference: "test-photos-001", name: "Pack hiver", family: "COLIS", description: "Soins d'hiver\nPour chiens", displayOrder: 0, currency: "EUR",
-    publicPriceCents: 3490, familyPriceCents: 2990, weightGrams: 900, purchasable: true,
+    publicPriceCents: 3490, familyPriceCents: 2990, weightGrams: 900, purchasable: false, maxOrderQuantity: 0,
     id: "uuid-interne", status: "DRAFT", priceChanges: [{ changedBy: "Administrateur Orkhan" }], storageKey: "products/x/y.webp",
     photos: [
       { url: `/api/shop-catalog/photos/${PHOTO}`, width: 640, height: 480, altText: "Pack ouvert", main: true },
@@ -67,19 +67,28 @@ test("lit le catalogue côté serveur avec le secret et le bypass Preview, en GE
   assert.equal(calls[0].options.headers["x-vercel-protection-bypass"], BYPASS);
 });
 
-test("ne garde que les champs publics, force le statut non achetable et relaie les photos par la Boutique", async () => {
+test("ne garde que les champs publics et relaie les photos par la Boutique", async () => {
   const { fetchImpl } = managerFetch();
   const result = await listCatalogue({ ...MANAGER, fetch: fetchImpl });
   assert.equal(result.available, true);
-  assert.equal(result.purchasable, false);
   assert.deepEqual(result.products, [{
     reference: "test-photos-001", name: "Pack hiver", family: "COLIS", description: "Soins d'hiver\nPour chiens",
-    publicPriceCents: 3490, familyPriceCents: 2990, purchasable: false,
+    publicPriceCents: 3490, familyPriceCents: 2990, weightGrams: 900, purchasable: false, maxOrderQuantity: 0,
     photos: [{ url: `/api/catalogue-photo?id=${PHOTO}`, width: 640, height: 480, altText: "Pack ouvert" }]
   }]);
   const serialized = JSON.stringify(result);
   for (const forbidden of [SECRET, BYPASS, "supabase", "storage", "priceChanges", "uuid-interne", "manager-preview", "DRAFT"]) assert.equal(serialized.includes(forbidden), false, forbidden);
-  assert.equal(publicProduct({ ...MANAGER_BODY.products[0], purchasable: true }).purchasable, false);
+});
+
+test("lot 2 : un produit n'est achetable que sur indication explicite du Manager, quantité plafonnée", () => {
+  const base = MANAGER_BODY.products[0];
+  assert.deepEqual([publicProduct({ ...base, purchasable: true, maxOrderQuantity: 3 })].map((p) => [p.purchasable, p.maxOrderQuantity]), [[true, 3]]);
+  assert.equal(publicProduct({ ...base, purchasable: true, maxOrderQuantity: 50 }).maxOrderQuantity, 20);
+  assert.equal(publicProduct({ ...base, purchasable: "true", maxOrderQuantity: 3 }).purchasable, false);
+  assert.equal(publicProduct({ ...base, purchasable: true, family: "RED_DINGO", maxOrderQuantity: 3 }).purchasable, false);
+  assert.equal(publicProduct({ ...base, purchasable: true, family: "CROQUETTES", maxOrderQuantity: 3 }).purchasable, false);
+  assert.equal(publicProduct({ ...base, purchasable: true, publicPriceCents: 0, maxOrderQuantity: 3 }).purchasable, false);
+  assert.equal(publicProduct({ ...base, purchasable: false, maxOrderQuantity: 3 }).maxOrderQuantity, 0);
 });
 
 test("bascule sur un état indisponible sûr si le Manager est absent, lent, en erreur ou non configuré, sans journaliser le secret", async () => {
@@ -90,7 +99,7 @@ test("bascule sur un état indisponible sûr si le Manager est absent, lent, en 
       managerFetch(MANAGER_BODY, { status: 503 }).fetchImpl,
       managerFetch(MANAGER_BODY, { throws: Object.assign(new Error(`timeout ${SECRET}`), { name: "AbortError" }) }).fetchImpl
     ];
-    for (const fetchImpl of cases) assert.deepEqual(await listCatalogue({ ...MANAGER, fetch: fetchImpl }), { available: false, purchasable: false, products: [] });
+    for (const fetchImpl of cases) assert.deepEqual(await listCatalogue({ ...MANAGER, fetch: fetchImpl }), { available: false, products: [] });
     await withEnv({ ORKHAN_MANAGER_URL: undefined, ORKHAN_SHOP_ORDERS_SECRET: undefined }, async () => {
       assert.equal((await listCatalogue()).available, false);
     });
@@ -141,12 +150,12 @@ test("relaie une photo publiée sans exposer le Manager, et refuse les identifia
 });
 
 function fakeDocument() {
-  const make = (tag) => ({ tag, children: [], className: "", textContent: "", append(...nodes) { this.children.push(...nodes); }, replaceChildren(...nodes) { this.children = nodes; } });
+  const make = (tag) => ({ tag, children: [], dataset: {}, className: "", textContent: "", append(...nodes) { this.children.push(...nodes); }, replaceChildren(...nodes) { this.children = nodes; } });
   return { createElement: make };
 }
 function flatten(node) { return [node, ...node.children.flatMap(flatten)]; }
 
-test("la page affiche nom, description, prix et photos, sans aucun moyen d'acheter", () => {
+test("la page affiche nom, description, prix et photos, sans moyen d'acheter un produit non achetable", () => {
   const data = { available: true, products: [{ name: "<img src=x onerror=alert(1)>", description: "Texte", publicPriceCents: 3490, familyPriceCents: 2990, photos: [{ url: `/api/catalogue-photo?id=${PHOTO}`, altText: "Pack", width: 640, height: 480 }, { url: "https://evil.example/x.png" }] }] };
   const document = fakeDocument(); const container = document.createElement("section"); const status = document.createElement("p");
   assert.equal(renderCatalogue(document, container, status, data), 1);
@@ -171,16 +180,31 @@ test("la page affiche un message adapté si le catalogue est indisponible ou vid
   assert.equal(status.textContent, MESSAGES.unavailable); assert.equal(status.hidden, false); assert.equal(container.children.length, 0);
 });
 
-test("la page /nouveautes/ n'a ni panier d'ajout, ni paiement, et n'est pas indexée", () => {
+test("lot 2 : seul un produit achetable avec du stock affiche le bouton d'ajout au panier", () => {
+  const document = fakeDocument(); const container = document.createElement("section"); const status = document.createElement("p");
+  const product = (extra) => ({ reference: "shampoing-test", name: "Shampoing", publicPriceCents: 1500, photos: [], ...extra });
+  renderCatalogue(document, container, status, { available: true, products: [
+    product({ purchasable: true, maxOrderQuantity: 2 }), product({ reference: "brosse-test", purchasable: true, maxOrderQuantity: 0 }), product({ reference: "gamelle-test", purchasable: false, maxOrderQuantity: 5 })
+  ] });
+  const nodes = flatten(container);
+  const buttons = nodes.filter((node) => node.tag === "button");
+  assert.equal(buttons.length, 1);
+  assert.equal(buttons[0].dataset.catalogueReference, "shampoing-test");
+  const texts = nodes.map((node) => node.textContent);
+  for (const label of [PICKUP_ONLY, OUT_OF_STOCK, NOT_FOR_SALE]) assert.ok(texts.includes(label), label);
+  assert.deepEqual(saleState({ reference: "x", purchasable: true }), { reference: "x", buyable: false, availability: OUT_OF_STOCK });
+});
+
+test("la page /nouveautes/ n'a pas de paiement direct et n'est pas indexée", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "nouveautes", "index.html"), "utf8");
   assert.match(html, /<meta name="robots" content="noindex">/);
-  assert.match(html, /pas encore disponibles à l’achat/);
-  assert.equal(html.includes("product-cart.js"), false);
-  assert.equal(/data-add-to-cart|add-to-cart|checkout|stripe/i.test(html), false);
+  assert.match(html, /retrait sur place à l’élevage/);
+  assert.match(html, /<script src="\/assets\/product-cart\.js"><\/script>/);
+  assert.equal(/checkout|stripe/i.test(html), false);
   assert.equal(/ORKHAN_|SECRET|supabase/i.test(html + fs.readFileSync(path.join(__dirname, "..", "assets", "nouveautes.js"), "utf8")), false);
 });
 
-test("un produit du nouveau catalogue ne peut pas entrer dans le panier serveur, donc ni dans Stripe", () => {
+test("sans catalogue Manager, un produit du nouveau catalogue ne peut pas entrer dans le panier serveur", () => {
   assert.deepEqual(validateCart({ items: [{ productId: "test-photos-001", quantity: 1 }] }), { error: "unknown_product" });
   assert.deepEqual(validateCart({ items: [{ productId: "animoco", quantity: 1 }, { productId: "test-photos-001", quantity: 1 }] }), { error: "unknown_product" });
   assert.equal(validateCart({ items: [{ productId: "animoco", quantity: 1 }] }).lines[0].unitPriceCents, 1999);

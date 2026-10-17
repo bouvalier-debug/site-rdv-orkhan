@@ -1,4 +1,5 @@
 const { quoteCart } = require("./_cart");
+const { cartCatalog } = require("./_cart-catalogue");
 const { chipNumbers, resolveFamilyEligibility } = require("./_family-benefit");
 const { createManagerClient } = require("./_orkhan-shop-orders");
 const { createPaymentProvider } = require("./_payment");
@@ -7,6 +8,16 @@ const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DELIVERY_FIELDS = ["address", "postalCode", "city", "country"];
 const SHOP_LEGAL_CURRENT_VERSION = "cgv-2026-10-07";
+// Lot 2, décision 3 : la session de paiement d'une commande avec des produits du catalogue expire après 30 minutes
+// (minimum imposé par Stripe), plus une minute de tolérance d'horloge ; la réservation du Manager dure 40 minutes.
+const CATALOGUE_CHECKOUT_EXPIRY_SECONDS = 31 * 60;
+// Refus du Manager à la création de la commande, traduits pour le panier sans détail technique.
+const MANAGER_ORDER_REFUSALS = {
+  OUT_OF_STOCK: { error: "out_of_stock", status: 409 },
+  PRODUCT_NOT_PURCHASABLE: { error: "product_not_purchasable", status: 409 },
+  PRICE_MISMATCH: { error: "price_changed", status: 409 },
+  UNKNOWN_PRODUCT: { error: "unknown_product", status: 400 }
+};
 
 function cleanString(value, maximum = 300) {
   return typeof value === "string" ? value.trim().slice(0, maximum) : "";
@@ -86,13 +97,17 @@ async function executeCheckout(input, options = {}) {
   if (eligibility.error) return eligibility;
   const familyEligible = eligibility.familyEligible;
 
+  const catalogue = await (options.cartCatalog || cartCatalog)(input.items, options);
+  if (catalogue.error) return catalogue;
   const quoteResult = (options.quoteCart || quoteCart)({
     items: input.items,
     shipping: input.shipping,
     benefits: { dynastieFamily: familyEligible }
-  }, options.quoteOptions);
+  }, { ...options.quoteOptions, ...(catalogue.catalog ? { catalog: catalogue.catalog } : {}) });
   if (quoteResult.error) {
-    return { error: quoteResult.error, status: quoteResult.error === "shipping_unavailable" ? 503 : 400 };
+    const status = quoteResult.error === "shipping_unavailable" ? 503
+      : quoteResult.error === "out_of_stock" || quoteResult.error === "product_not_purchasable" ? 409 : 400;
+    return { error: quoteResult.error, status };
   }
   const quote = quoteResult.quote;
   if (!quote.shipping || !Number.isInteger(quote.totalCents)) return { error: "shipping_required", status: 400 };
@@ -114,7 +129,14 @@ async function executeCheckout(input, options = {}) {
     legalAcceptedAt: (options.now ? options.now() : new Date()).toISOString()
   };
   const manager = options.manager || createManagerClient(options.managerOptions);
-  const created = await manager.createOrder(orderPayload, attemptId);
+  let created;
+  try {
+    created = await manager.createOrder(orderPayload, attemptId);
+  } catch (error) {
+    const refusal = MANAGER_ORDER_REFUSALS[error?.response?.error];
+    if (refusal) return { ...refusal };
+    throw error;
+  }
   const orderReference = created.reference || created.order?.reference;
   if (!orderReference) throw new Error("invalid_manager_order_response");
 
@@ -128,6 +150,8 @@ async function executeCheckout(input, options = {}) {
     lines,
     shippingCents: quote.shipping.priceCents,
     customerEmail: customerResult.customer.email,
+    ...(quote.lines.some((line) => line.family === "catalogue")
+      ? { expiresAt: Math.floor((options.now ? options.now() : new Date()).getTime() / 1000) + CATALOGUE_CHECKOUT_EXPIRY_SECONDS } : {}),
     successUrl: `${origin}/panier/confirmation/?session_id={CHECKOUT_SESSION_ID}`,
     cancelUrl: `${origin}/panier/?payment=cancelled`
   });
@@ -139,6 +163,7 @@ async function executeCheckout(input, options = {}) {
 }
 
 module.exports = {
+  CATALOGUE_CHECKOUT_EXPIRY_SECONDS,
   UUID_V4,
   chipNumbers,
   executeCheckout,

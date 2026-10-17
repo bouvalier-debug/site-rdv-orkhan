@@ -1,4 +1,5 @@
 const { quoteCart } = require("./_cart");
+const { cartCatalog } = require("./_cart-catalogue");
 const { chipNumbers, resolveFamilyEligibility } = require("./_family-benefit");
 const { clientIp, consumeRequest } = require("./_family-eligibility");
 
@@ -10,11 +11,13 @@ function send(res, status, body) {
 async function quoteCartRequest(input, options = {}) {
   const eligibility = await resolveFamilyEligibility(input?.items, options);
   if (eligibility.error) return eligibility;
+  const catalogue = await (options.cartCatalog || cartCatalog)(input?.items, options);
+  if (catalogue.error) return catalogue;
   return (options.quoteCart || quoteCart)({
     items: input?.items,
     shipping: input?.shipping,
     benefits: { dynastieFamily: eligibility.familyEligible }
-  }, options.quoteOptions);
+  }, { ...options.quoteOptions, ...(catalogue.catalog ? { catalog: catalogue.catalog } : {}) });
 }
 
 async function handler(req, res) {
@@ -23,7 +26,7 @@ async function handler(req, res) {
     return send(res, 429, { error: "rate_limited" });
   }
   const result = await quoteCartRequest(req.body);
-  if (result.error) return send(res, result.status || (result.error === "shipping_unavailable" ? 503 : 400), result);
+  if (result.error) return send(res, result.status || (result.error === "shipping_unavailable" ? 503 : result.error === "out_of_stock" || result.error === "product_not_purchasable" ? 409 : 400), result);
   return send(res, 200, result);
 }
 

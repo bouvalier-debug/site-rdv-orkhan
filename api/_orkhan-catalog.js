@@ -1,14 +1,17 @@
 const { endpoint } = require("./_orkhan-shop-orders");
 
-// Lecture du nouveau catalogue administré dans Orkhan Manager (lot 1), uniquement côté serveur.
+// Lecture du catalogue administré dans Orkhan Manager, uniquement côté serveur.
 // Le secret Boutique ne quitte jamais ce module : il n'est ni renvoyé au navigateur, ni journalisé.
-// Ces produits ne sont jamais achetables ici : ils ne passent ni par _catalog.js, ni par le panier, ni par Stripe.
+// Lot 2 : un produit n'est achetable que si le Manager l'indique (verrou levé, produit ouvert à l'achat). Le Manager
+// reste seul juge des prix et du stock : il recontrôle tout à la création de la commande.
 
 const REQUEST_TIMEOUT_MS = 5000;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MANAGER_PHOTO_PATH = /^\/api\/shop-catalog\/photos\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
 const FAMILIES = new Set(["ANIMOCO", "RED_DINGO", "COLIS", "CROQUETTES"]);
 const MAX_PRICE_CENTS = 10_000_000;
+const MAX_ORDER_QUANTITY = 20;
+const MAX_WEIGHT_GRAMS = 100_000;
 
 function configuration(options = {}) {
   const baseUrl = options.baseUrl || process.env.ORKHAN_MANAGER_URL;
@@ -50,6 +53,9 @@ function publicProduct(raw) {
   const name = text(raw.name, 200);
   const publicPriceCents = cents(raw.publicPriceCents);
   if (!reference || !name || publicPriceCents === null) return null;
+  // Achetable uniquement sur indication explicite du Manager, pour une famille vendable et un prix non nul.
+  const maxOrderQuantity = Number.isSafeInteger(raw.maxOrderQuantity) ? Math.min(Math.max(raw.maxOrderQuantity, 0), MAX_ORDER_QUANTITY) : 0;
+  const purchasable = raw.purchasable === true && ["COLIS", "ANIMOCO"].includes(raw.family) && publicPriceCents > 0;
   const photos = (Array.isArray(raw.photos) ? raw.photos : []).map((photo) => {
     const match = typeof photo?.url === "string" ? photo.url.match(MANAGER_PHOTO_PATH) : null;
     if (!match) return null;
@@ -67,7 +73,9 @@ function publicProduct(raw) {
     description: text(raw.description, 5000),
     publicPriceCents,
     familyPriceCents: raw.familyPriceCents === null || raw.familyPriceCents === undefined ? null : cents(raw.familyPriceCents),
-    purchasable: false,
+    weightGrams: Number.isSafeInteger(raw.weightGrams) && raw.weightGrams > 0 && raw.weightGrams <= MAX_WEIGHT_GRAMS ? raw.weightGrams : null,
+    purchasable,
+    maxOrderQuantity: purchasable ? maxOrderQuantity : 0,
     photos
   };
 }
@@ -83,10 +91,10 @@ async function listCatalogue(options = {}) {
     if (!response.ok) throw Object.assign(new Error("orkhan_catalog_error"), { status: response.status });
     const body = await response.json();
     const products = (Array.isArray(body?.products) ? body.products : []).map(publicProduct).filter(Boolean);
-    return { available: true, purchasable: false, products };
+    return { available: true, products };
   } catch (error) {
     logFailure("liste", error);
-    return { available: false, purchasable: false, products: [] };
+    return { available: false, products: [] };
   }
 }
 

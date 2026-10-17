@@ -12,10 +12,13 @@
 }(typeof globalThis !== "undefined" ? globalThis : this, function createNouveautesModule() {
   "use strict";
 
-  // Nouveaux produits du catalogue Manager (lot 1) : affichage informatif uniquement.
-  // Aucun ajout au panier, aucun lien vers le paiement : ces produits ne sont pas encore en vente.
+  // Nouveaux produits du catalogue Manager. Lot 2 : un produit que le Manager indique achetable peut être ajouté au
+  // panier ; le prix, la disponibilité et le stock sont recontrôlés côté serveur au devis puis à la commande.
+  // Les autres restent affichés à titre informatif.
 
   const NOT_FOR_SALE = "Bientôt disponible — pas encore en vente";
+  const OUT_OF_STOCK = "Rupture de stock";
+  const PICKUP_ONLY = "Retrait sur place à l’élevage";
   const MESSAGES = {
     loading: "Chargement des nouveautés…",
     unavailable: "Les nouveautés sont momentanément indisponibles. Les autres produits de la boutique restent disponibles à la commande.",
@@ -31,7 +34,16 @@
     return Array.isArray(data.products) && data.products.length ? "" : MESSAGES.empty;
   }
 
-  // Modèle d'affichage : ne garde que des champs publics et ne propose jamais l'achat.
+  function saleState(product) {
+    const reference = typeof product.reference === "string" ? product.reference : "";
+    if (product.purchasable !== true || !reference) return { reference, buyable: false, availability: NOT_FOR_SALE };
+    const maxQuantity = Number.isInteger(product.maxOrderQuantity) ? product.maxOrderQuantity : 0;
+    return maxQuantity > 0
+      ? { reference, buyable: true, maxQuantity, availability: PICKUP_ONLY }
+      : { reference, buyable: false, availability: OUT_OF_STOCK };
+  }
+
+  // Modèle d'affichage : ne garde que des champs publics ; l'achat n'est proposé que sur indication du Manager.
   function describeProducts(data) {
     if (!data || data.available !== true || !Array.isArray(data.products)) return [];
     return data.products.filter((product) => product && typeof product.name === "string" && Number.isInteger(product.publicPriceCents)).map((product) => ({
@@ -42,7 +54,7 @@
       photos: (Array.isArray(product.photos) ? product.photos : [])
         .filter((photo) => typeof photo?.url === "string" && photo.url.startsWith("/api/catalogue-photo?id="))
         .map((photo) => ({ url: photo.url, alt: typeof photo.altText === "string" ? photo.altText : product.name, width: photo.width, height: photo.height })),
-      availability: NOT_FOR_SALE
+      ...saleState(product)
     }));
   }
 
@@ -78,6 +90,12 @@
       if (product.description) body.append(element(document, "p", "new-product-description", product.description));
       body.append(element(document, "p", "price", `Prix : ${product.price}`));
       if (product.familyPrice) body.append(element(document, "p", "family-price", `Prix famille Dynastie : ${product.familyPrice}`));
+      if (product.buyable) {
+        const button = element(document, "button", "btn-primary add-to-cart", "Ajouter au panier");
+        button.type = "button";
+        button.dataset.catalogueReference = product.reference;
+        body.append(button);
+      }
       card.append(body);
       return card;
     }));
@@ -94,6 +112,23 @@
     }
   }
 
+  // Ajout au panier partagé de la Boutique (mêmes composants que les autres pages produits).
+  function addToCart(root, button) {
+    const cart = root.OrkhanCart; const productCart = root.OrkhanProductCart;
+    if (!cart || !productCart) return false;
+    try {
+      const store = cart.createCartStore();
+      productCart.addLine(store, productCart.catalogueLine(button.dataset.catalogueReference, 1));
+      cart.updateCounters(root.document, store.count());
+      const name = button.closest("article")?.querySelector("h2")?.textContent || "Produit";
+      productCart.showAddConfirmation(button, `${name} ajouté au panier.`);
+      return true;
+    } catch {
+      productCart.showAddConfirmation(button, "Ce produit n’a pas pu être ajouté au panier.");
+      return false;
+    }
+  }
+
   async function autoInit(root) {
     const container = root.document.getElementById("nouveautes-produits");
     const status = root.document.getElementById("nouveautes-statut");
@@ -101,7 +136,11 @@
     status.textContent = MESSAGES.loading;
     status.hidden = false;
     renderCatalogue(root.document, container, status, await loadCatalogue(root.fetch.bind(root)));
+    container.addEventListener("click", (event) => {
+      const button = event.target?.closest?.("[data-catalogue-reference]");
+      if (button) addToCart(root, button);
+    });
   }
 
-  return { MESSAGES, NOT_FOR_SALE, autoInit, describeProducts, formatPrice, loadCatalogue, renderCatalogue, statusMessage };
+  return { MESSAGES, NOT_FOR_SALE, OUT_OF_STOCK, PICKUP_ONLY, addToCart, autoInit, describeProducts, formatPrice, loadCatalogue, renderCatalogue, saleState, statusMessage };
 }));

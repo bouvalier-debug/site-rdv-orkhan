@@ -69,10 +69,21 @@ function validateCart(input, options = {}) {
     if (!product) return { error: "unknown_product" };
     if (product.family === "croquettes") return { error: "kibble_not_available_v1" };
 
+    // Produit du catalogue Manager : achetable seulement si le Manager l'indique, dans la limite du stock disponible.
+    if (product.catalogue) {
+      if (!product.purchasable) return { error: "product_not_purchasable" };
+      if (combinedQuantity > product.maxOrderQuantity) return { error: "out_of_stock", productId: product.id };
+    }
+
     let unitPriceCents = product.priceCents;
     let validatedOptions;
     if (product.family === "animoco") {
       unitPriceCents = input.benefits && input.benefits.dynastieFamily
+        ? product.familyPriceCents : product.publicPriceCents;
+    }
+    // Même règle que le Manager (expectedCatalogUnitPrice) : prix famille s'il existe et si le panier y a droit.
+    if (product.catalogue) {
+      unitPriceCents = input.benefits && input.benefits.dynastieFamily && Number.isInteger(product.familyPriceCents)
         ? product.familyPriceCents : product.publicPriceCents;
     }
     if (product.family === "red-dingo") {

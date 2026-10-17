@@ -268,6 +268,10 @@
     if (code === "invalid_relay_point") return "Choisissez un Point Relais ou Locker valide.";
     if (code === "invalid_home_address") return "Complétez l’adresse de livraison à domicile.";
     if (code === "unsupported_shipping_country") return "Ce pays n’est pas desservi pour ce mode de livraison.";
+    if (code === "out_of_stock") return "Un produit de votre panier n’est plus disponible dans la quantité demandée. Réduisez la quantité ou retirez-le du panier.";
+    if (code === "product_not_purchasable") return "Un produit de votre panier n’est plus en vente. Retirez-le du panier pour continuer.";
+    if (code === "catalogue_unavailable") return "Les nouveaux produits sont momentanément indisponibles. Réessayez dans quelques instants ou retirez-les du panier.";
+    if (code === "price_changed") return "Le prix d’un produit a changé. Vérifiez votre panier avant de continuer.";
     if (result?.error) return "Le devis n’a pas pu être calculé. Vérifiez votre panier puis réessayez.";
     return "";
   }
@@ -594,6 +598,9 @@
           legalCheckbox.checked = false;
           checkoutStatus.innerHTML = 'Les conditions générales de vente ont été mises à jour. Merci de les relire et de les accepter à nouveau. <button type="button" data-reload>Recharger la page</button>';
           checkoutStatus.querySelector("[data-reload]")?.addEventListener("click", () => root.location.reload());
+        } else if (["out_of_stock", "product_not_purchasable", "catalogue_unavailable", "price_changed", "unknown_product"].includes(error.message)) {
+          checkoutStatus.textContent = quoteStatusMessage({ error: error.message }) || "Votre panier a changé. Vérifiez-le avant de continuer.";
+          refresh();
         } else checkoutStatus.textContent = "Le paiement ne peut pas être préparé pour le moment. Réessayez dans quelques instants.";
         checkoutButton.disabled = false;
       }

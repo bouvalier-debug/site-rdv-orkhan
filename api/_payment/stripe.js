@@ -20,6 +20,7 @@ function checkoutParameters(input) {
   params.set("customer_email", input.customerEmail);
   params.set("success_url", input.successUrl);
   params.set("cancel_url", input.cancelUrl);
+  if (Number.isSafeInteger(input.expiresAt)) params.set("expires_at", String(input.expiresAt));
   input.lines.forEach((line, index) => appendLineItem(params, index, line, input.currency));
   if (input.shippingCents > 0) {
     appendLineItem(params, input.lines.length, {
@@ -35,6 +36,9 @@ function createStripeAdapter(options = {}) {
   const secretKey = (options.secretKey || process.env.STRIPE_SECRET_KEY || "").trim();
   const fetchImpl = options.fetch || fetch;
   if (!secretKey) throw new Error("stripe_not_configured");
+  // Isolation des environnements : hors Production, seule une clé Stripe de test est acceptée.
+  const environment = options.environment || process.env.VERCEL_ENV || "development";
+  if (environment !== "production" && /^(sk|rk)_live_/.test(secretKey)) throw new Error("stripe_live_key_outside_production");
   return {
     provider: "STRIPE",
     async createCheckout(input) {
