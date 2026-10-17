@@ -601,6 +601,10 @@
         } else if (["out_of_stock", "product_not_purchasable", "catalogue_unavailable", "price_changed", "unknown_product"].includes(error.message)) {
           checkoutStatus.textContent = quoteStatusMessage({ error: error.message }) || "Votre panier a changé. Vérifiez-le avant de continuer.";
           refresh();
+        } else if (error.message === "payment_unavailable") {
+          // Session de paiement refusée : la commande précédente est abandonnée, un nouvel essai crée une nouvelle tentative.
+          checkoutAttempt = null;
+          checkoutStatus.textContent = "Le paiement n’a pas pu être préparé ; aucun montant n’a été débité. Réessayez dans quelques instants.";
         } else checkoutStatus.textContent = "Le paiement ne peut pas être préparé pour le moment. Réessayez dans quelques instants.";
         checkoutButton.disabled = false;
       }

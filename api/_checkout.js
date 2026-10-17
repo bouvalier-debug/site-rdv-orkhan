@@ -13,6 +13,35 @@ const SHOP_LEGAL_CURRENT_VERSION = "cgv-2026-10-07";
 // (minimum imposé par Stripe), plus une minute de tolérance d'horloge ; la réservation du Manager dure 40 minutes.
 const CATALOGUE_CHECKOUT_EXPIRY_SECONDS = 31 * 60;
 // Refus du Manager à la création de la commande, traduits pour le panier sans détail technique.
+// Lot 2, correctif de l'étape 7 : échec de création de la session de paiement d'un panier avec des produits du catalogue.
+// - Échec DÉFINITIF : la requête n'a pas pu partir (clé absente ou Live hors Production) ou Stripe l'a explicitement
+//   refusée (réponse 4xx, sauf 409 : une requête concurrente avec la même clé d'idempotence peut être en cours). Aucune
+//   session n'existe : le Manager libère la réservation, et le panier repart d'une nouvelle tentative.
+// - Résultat INCERTAIN (délai dépassé, coupure, réponse 5xx, illisible ou incomplète) : une session a pu être créée. Le
+//   stock reste réservé et la commande est signalée « À vérifier » ; l'expiration de la session, si elle existe, la
+//   libérera automatiquement.
+function definitiveCheckoutFailure(error) {
+  if (error?.message === "stripe_not_configured" || error?.message === "stripe_live_key_outside_production") return true;
+  return error?.message === "stripe_checkout_failed" && Number.isInteger(error.status) && error.status >= 400 && error.status < 500 && error.status !== 409;
+}
+
+async function checkoutCreationFailed(manager, reference, error) {
+  if (definitiveCheckoutFailure(error)) {
+    try {
+      await manager.releaseFailedCheckout(reference, { provider: "STRIPE", outcome: "definitive", providerStatus: Number.isInteger(error?.status) ? error.status : null });
+    } catch (releaseError) {
+      console.error("checkout_failure_release_failed", JSON.stringify({ reference, status: releaseError?.status ?? null }));
+    }
+    return { error: "payment_unavailable", status: 503 };
+  }
+  try {
+    await manager.flagCheckoutCancelUncertain(reference, { provider: "STRIPE", stage: "creation" });
+  } catch (flagError) {
+    console.error("checkout_creation_flag_failed", JSON.stringify({ reference, status: flagError?.status ?? null }));
+  }
+  throw error;
+}
+
 const MANAGER_ORDER_REFUSALS = {
   OUT_OF_STOCK: { error: "out_of_stock", status: 409 },
   PRODUCT_NOT_PURCHASABLE: { error: "product_not_purchasable", status: 409 },
@@ -143,9 +172,12 @@ async function executeCheckout(input, options = {}) {
 
   const origin = options.origin;
   if (!origin) throw new Error("boutique_origin_unavailable");
-  const payment = options.payment || createPaymentProvider("STRIPE", options.paymentOptions);
   const hasCatalogueLines = quote.lines.some((line) => line.family === "catalogue");
-  const session = await payment.createCheckout({
+  let payment;
+  let session;
+  try {
+    payment = options.payment || createPaymentProvider("STRIPE", options.paymentOptions);
+    session = await payment.createCheckout({
     idempotencyKey: attemptId,
     orderReference,
     currency: quote.currency,
@@ -158,11 +190,22 @@ async function executeCheckout(input, options = {}) {
     // Lot 2, étape 6 : seul un panier avec des produits du catalogue reçoit un lien d'annulation signé, qui libère son
     // stock réservé ; le lien des paniers historiques ne change pas.
     cancelUrl: hasCatalogueLines ? cancelUrl(origin, orderReference, options.env || process.env) : `${origin}/panier/?payment=cancelled`
-  });
-  await manager.attachPaymentReference(orderReference, {
-    provider: payment.provider,
-    providerRef: session.providerRef
-  });
+    });
+  } catch (error) {
+    // Paniers historiques : comportement inchangé.
+    if (!hasCatalogueLines) throw error;
+    return checkoutCreationFailed(manager, orderReference, error);
+  }
+  try {
+    await manager.attachPaymentReference(orderReference, {
+      provider: payment.provider,
+      providerRef: session.providerRef
+    });
+  } catch (error) {
+    // Commande dont la réservation a été libérée faute de session (tentative rejouée) : le panier repart à zéro.
+    if (error?.response?.error === "CHECKOUT_FAILED") return { error: "payment_unavailable", status: 503 };
+    throw error;
+  }
   return { ok: true, orderReference, checkoutUrl: session.checkoutUrl };
 }
 

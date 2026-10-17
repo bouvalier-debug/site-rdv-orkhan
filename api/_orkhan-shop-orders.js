@@ -72,6 +72,12 @@ function createManagerClient(options = {}) {
         body: JSON.stringify(payload)
       });
     },
+    releaseFailedCheckout(reference, payload) {
+      return request(`/api/shop-orders/${encodeURIComponent(reference)}/checkout-failed`, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    },
     markCheckoutExpired(reference, payload) {
       return request(`/api/shop-orders/${encodeURIComponent(reference)}/checkout-expired`, {
         method: "POST",
