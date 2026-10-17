@@ -1,0 +1,107 @@
+(function nouveautesModule(root, factory) {
+  const api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  if (root) root.OrkhanNouveautes = api;
+  if (root && root.document && root.fetch) {
+    if (root.document.readyState === "loading") {
+      root.document.addEventListener("DOMContentLoaded", () => api.autoInit(root));
+    } else {
+      api.autoInit(root);
+    }
+  }
+}(typeof globalThis !== "undefined" ? globalThis : this, function createNouveautesModule() {
+  "use strict";
+
+  // Nouveaux produits du catalogue Manager (lot 1) : affichage informatif uniquement.
+  // Aucun ajout au panier, aucun lien vers le paiement : ces produits ne sont pas encore en vente.
+
+  const NOT_FOR_SALE = "Bientôt disponible — pas encore en vente";
+  const MESSAGES = {
+    loading: "Chargement des nouveautés…",
+    unavailable: "Les nouveautés sont momentanément indisponibles. Les autres produits de la boutique restent disponibles à la commande.",
+    empty: "Aucune nouveauté pour le moment. Revenez bientôt !"
+  };
+
+  function formatPrice(cents) {
+    return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(cents / 100);
+  }
+
+  function statusMessage(data) {
+    if (!data || data.available !== true) return MESSAGES.unavailable;
+    return Array.isArray(data.products) && data.products.length ? "" : MESSAGES.empty;
+  }
+
+  // Modèle d'affichage : ne garde que des champs publics et ne propose jamais l'achat.
+  function describeProducts(data) {
+    if (!data || data.available !== true || !Array.isArray(data.products)) return [];
+    return data.products.filter((product) => product && typeof product.name === "string" && Number.isInteger(product.publicPriceCents)).map((product) => ({
+      name: product.name,
+      description: typeof product.description === "string" ? product.description : "",
+      price: formatPrice(product.publicPriceCents),
+      familyPrice: Number.isInteger(product.familyPriceCents) ? formatPrice(product.familyPriceCents) : null,
+      photos: (Array.isArray(product.photos) ? product.photos : [])
+        .filter((photo) => typeof photo?.url === "string" && photo.url.startsWith("/api/catalogue-photo?id="))
+        .map((photo) => ({ url: photo.url, alt: typeof photo.altText === "string" ? photo.altText : product.name, width: photo.width, height: photo.height })),
+      availability: NOT_FOR_SALE
+    }));
+  }
+
+  function element(document, tag, className, textValue) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (textValue !== undefined && textValue !== null) node.textContent = textValue;
+    return node;
+  }
+
+  function renderCatalogue(document, container, status, data) {
+    const products = describeProducts(data);
+    const message = statusMessage(data);
+    status.textContent = message;
+    status.hidden = !message;
+    container.replaceChildren(...products.map((product) => {
+      const card = element(document, "article", "product-card new-product-card");
+      if (product.photos.length) {
+        const [main, ...others] = product.photos;
+        const image = element(document, "img", "new-product-photo");
+        image.src = main.url; image.alt = main.alt; image.loading = "lazy";
+        if (main.width && main.height) { image.width = main.width; image.height = main.height; }
+        card.append(image);
+        if (others.length) {
+          const thumbnails = element(document, "div", "new-product-thumbnails");
+          thumbnails.append(...others.map((photo) => { const thumb = element(document, "img"); thumb.src = photo.url; thumb.alt = photo.alt; thumb.loading = "lazy"; return thumb; }));
+          card.append(thumbnails);
+        }
+      }
+      const body = element(document, "div", "card-body");
+      body.append(element(document, "p", "not-for-sale", product.availability));
+      body.append(element(document, "h2", null, product.name));
+      if (product.description) body.append(element(document, "p", "new-product-description", product.description));
+      body.append(element(document, "p", "price", `Prix : ${product.price}`));
+      if (product.familyPrice) body.append(element(document, "p", "family-price", `Prix famille Dynastie : ${product.familyPrice}`));
+      card.append(body);
+      return card;
+    }));
+    return products.length;
+  }
+
+  async function loadCatalogue(fetchImpl) {
+    try {
+      const response = await fetchImpl("/api/catalogue-produits", { headers: { Accept: "application/json" }, cache: "no-store" });
+      if (!response.ok) return { available: false, products: [] };
+      return await response.json();
+    } catch {
+      return { available: false, products: [] };
+    }
+  }
+
+  async function autoInit(root) {
+    const container = root.document.getElementById("nouveautes-produits");
+    const status = root.document.getElementById("nouveautes-statut");
+    if (!container || !status) return;
+    status.textContent = MESSAGES.loading;
+    status.hidden = false;
+    renderCatalogue(root.document, container, status, await loadCatalogue(root.fetch.bind(root)));
+  }
+
+  return { MESSAGES, NOT_FOR_SALE, autoInit, describeProducts, formatPrice, loadCatalogue, renderCatalogue, statusMessage };
+}));
