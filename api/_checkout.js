@@ -3,6 +3,7 @@ const { cartCatalog } = require("./_cart-catalogue");
 const { chipNumbers, resolveFamilyEligibility } = require("./_family-benefit");
 const { createManagerClient } = require("./_orkhan-shop-orders");
 const { createPaymentProvider } = require("./_payment");
+const { cancelUrl } = require("./_checkout-cancel");
 
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -143,6 +144,7 @@ async function executeCheckout(input, options = {}) {
   const origin = options.origin;
   if (!origin) throw new Error("boutique_origin_unavailable");
   const payment = options.payment || createPaymentProvider("STRIPE", options.paymentOptions);
+  const hasCatalogueLines = quote.lines.some((line) => line.family === "catalogue");
   const session = await payment.createCheckout({
     idempotencyKey: attemptId,
     orderReference,
@@ -150,10 +152,12 @@ async function executeCheckout(input, options = {}) {
     lines,
     shippingCents: quote.shipping.priceCents,
     customerEmail: customerResult.customer.email,
-    ...(quote.lines.some((line) => line.family === "catalogue")
+    ...(hasCatalogueLines
       ? { expiresAt: Math.floor((options.now ? options.now() : new Date()).getTime() / 1000) + CATALOGUE_CHECKOUT_EXPIRY_SECONDS } : {}),
     successUrl: `${origin}/panier/confirmation/?session_id={CHECKOUT_SESSION_ID}`,
-    cancelUrl: `${origin}/panier/?payment=cancelled`
+    // Lot 2, étape 6 : seul un panier avec des produits du catalogue reçoit un lien d'annulation signé, qui libère son
+    // stock réservé ; le lien des paniers historiques ne change pas.
+    cancelUrl: hasCatalogueLines ? cancelUrl(origin, orderReference, options.env || process.env) : `${origin}/panier/?payment=cancelled`
   });
   await manager.attachPaymentReference(orderReference, {
     provider: payment.provider,

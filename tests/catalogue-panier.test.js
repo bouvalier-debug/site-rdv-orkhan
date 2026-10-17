@@ -89,6 +89,7 @@ function checkoutDeps(managerError) {
     listCatalogue: catalogueSource().listCatalogue,
     now: () => new Date("2026-10-17T10:00:00.000Z"),
     origin: "https://boutique.test",
+    env: { ORKHAN_SHOP_ORDERS_SECRET: "secret-boutique-test" },
     manager: {
       async createOrder(payload) { calls.push(["create", payload]); if (managerError) throw Object.assign(new Error(managerError), { status: 409, response: { error: managerError } }); return { reference: "BOUT-TEST" }; },
       async attachPaymentReference(reference, payload) { calls.push(["attach", reference, payload]); return {}; }

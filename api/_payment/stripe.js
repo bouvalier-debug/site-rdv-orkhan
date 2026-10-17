@@ -60,8 +60,34 @@ function createStripeAdapter(options = {}) {
         throw error;
       }
       return { providerRef: body.id, checkoutUrl: body.url };
+    },
+    // Lot 2, étape 6 : expiration d'une session ouverte (annulation par le client), et relecture d'une session.
+    // Une réponse en erreur ou incomplète est levée : l'appelant ne libère alors rien.
+    async expireCheckout(sessionId) {
+      return sessionRequest(`${sessionPath(sessionId)}/expire`, "POST");
+    },
+    async retrieveCheckout(sessionId) {
+      return sessionRequest(sessionPath(sessionId), "GET");
     }
   };
+
+  function sessionPath(sessionId) {
+    if (typeof sessionId !== "string" || !/^cs_[A-Za-z0-9_]{8,255}$/.test(sessionId)) throw new Error("invalid_checkout_session");
+    return `${options.apiUrl || STRIPE_API_URL}/${encodeURIComponent(sessionId)}`;
+  }
+
+  async function sessionRequest(url, method) {
+    const response = await fetchImpl(url, { method, headers: { Authorization: `Bearer ${secretKey}` } });
+    let body;
+    try { body = await response.json(); } catch { body = {}; }
+    if (!response.ok || typeof body.id !== "string") {
+      const error = new Error("stripe_session_request_failed");
+      error.status = response.status;
+      error.stripeCode = [body?.error?.type, body?.error?.code].filter(Boolean).join(":") || null;
+      throw error;
+    }
+    return body;
+  }
 }
 
 async function findCheckoutSessionByPaymentIntent(paymentIntent, options = {}) {

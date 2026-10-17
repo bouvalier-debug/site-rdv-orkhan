@@ -612,10 +612,56 @@
     return { customerStore, refresh, store, getLastResult: () => lastResult };
   }
 
+  // Lot 2, étape 6 : retour de Stripe après annulation du paiement. Le panier est toujours conservé. Si le lien porte une
+  // annulation signée (panier avec des produits du catalogue), le serveur demande à Stripe d’expirer la session et ne
+  // libère le stock réservé qu’après confirmation. Le message ne dit « annulé » que sur cette confirmation. Le jeton est
+  // retiré de l’adresse aussitôt. Un retour sans lien signé (paniers historiques) n’affiche rien, comme avant.
+  const CHECKOUT_CANCEL_MESSAGES = {
+    pending: "Vérification de l’annulation de votre paiement en cours…",
+    cancelled: "Paiement annulé : aucun montant n’a été débité. Votre panier est conservé.",
+    payment_received: "Votre paiement a déjà été reçu : cette commande n’est pas annulée. Vous recevrez une confirmation par e-mail ; pour toute question, contactez l’élevage.",
+    uncertain: "Nous n’avons pas pu confirmer l’état de votre paiement. Avant tout nouveau paiement, vérifiez vos e-mails et votre relevé bancaire, ou contactez l’élevage. Votre panier est conservé."
+  };
+
+  function checkoutCancelOutcome(outcome) {
+    return outcome === "cancelled" || outcome === "payment_received" ? outcome : "uncertain";
+  }
+
+  function checkoutCancelMessage(outcome) {
+    return CHECKOUT_CANCEL_MESSAGES[checkoutCancelOutcome(outcome)];
+  }
+
+  async function handleCheckoutCancel(root) {
+    const location = root.location;
+    if (!location || typeof URLSearchParams !== "function") return null;
+    const params = new URLSearchParams(location.search || "");
+    if (params.get("payment") !== "cancelled") return null;
+    const order = params.get("order");
+    const cancel = params.get("cancel");
+    if (!order || !cancel || typeof root.fetch !== "function") return null;
+    try { root.history?.replaceState(null, "", `${location.pathname}?payment=cancelled`); } catch { /* adresse inchangée */ }
+    const status = root.document.querySelector("[data-checkout-status]");
+    const show = (text) => { if (status) { status.textContent = text; status.hidden = false; } };
+    show(CHECKOUT_CANCEL_MESSAGES.pending);
+    let outcome = "uncertain";
+    try {
+      const response = await root.fetch("/api/checkout-cancel", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ order, cancel })
+      });
+      const body = await response.json();
+      if (response.ok && body?.ok === true) outcome = checkoutCancelOutcome(body.outcome);
+    } catch { outcome = "uncertain"; }
+    show(checkoutCancelMessage(outcome));
+    return outcome;
+  }
+
   function autoInit(root) {
     const store = createCartStore({ storage: root.localStorage });
     updateCounters(root.document, store.count());
-    if (root.document.querySelector("[data-cart-page]")) mountCartPage(root, { store });
+    if (root.document.querySelector("[data-cart-page]")) {
+      mountCartPage(root, { store });
+      handleCheckoutCancel(root);
+    }
     if (typeof root.addEventListener === "function") {
       root.addEventListener("storage", (event) => {
         if (event.key !== STORAGE_KEY && event.key !== null) return;
@@ -643,6 +689,8 @@
     createCustomerStore,
     deliveryDelayLines,
     displayOptionRows,
+    checkoutCancelMessage,
+    handleCheckoutCancel,
     validStoredDate,
     money,
     mountCartPage,
