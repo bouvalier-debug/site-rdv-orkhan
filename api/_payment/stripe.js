@@ -32,13 +32,19 @@ function checkoutParameters(input) {
   return params;
 }
 
-function createStripeAdapter(options = {}) {
+// Isolation des environnements : hors Production (VERCEL_ENV côté serveur), seule une clé Stripe de test est acceptée.
+// Toutes les opérations Stripe de la Boutique, écritures comme lectures, obtiennent leur clé par cette fonction.
+function stripeSecretKey(options = {}) {
   const secretKey = (options.secretKey || process.env.STRIPE_SECRET_KEY || "").trim();
-  const fetchImpl = options.fetch || fetch;
   if (!secretKey) throw new Error("stripe_not_configured");
-  // Isolation des environnements : hors Production, seule une clé Stripe de test est acceptée.
   const environment = options.environment || process.env.VERCEL_ENV || "development";
   if (environment !== "production" && /^(sk|rk)_live_/.test(secretKey)) throw new Error("stripe_live_key_outside_production");
+  return secretKey;
+}
+
+function createStripeAdapter(options = {}) {
+  const secretKey = stripeSecretKey(options);
+  const fetchImpl = options.fetch || fetch;
   return {
     provider: "STRIPE",
     async createCheckout(input) {
@@ -91,9 +97,8 @@ function createStripeAdapter(options = {}) {
 }
 
 async function findCheckoutSessionByPaymentIntent(paymentIntent, options = {}) {
-  const secretKey = options.secretKey || process.env.STRIPE_SECRET_KEY;
+  const secretKey = stripeSecretKey(options);
   const fetchImpl = options.fetch || fetch;
-  if (!secretKey) throw new Error("stripe_not_configured");
   const url = new URL(options.apiUrl || STRIPE_API_URL);
   url.searchParams.set("payment_intent", paymentIntent);
   url.searchParams.set("limit", "2");
@@ -148,5 +153,6 @@ module.exports = {
   createStripeAdapter,
   findCheckoutSessionByPaymentIntent,
   parseSignatureHeader,
+  stripeSecretKey,
   verifyStripeSignature
 };

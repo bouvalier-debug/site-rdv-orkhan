@@ -7,8 +7,11 @@ const root = path.join(__dirname, "..");
 const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 
 test("les en-têtes de sécurité s'appliquent à toutes les routes, CSP en mode Report-Only", () => {
-  const { headers } = JSON.parse(read("vercel.json"));
+  const { headers: rules } = JSON.parse(read("vercel.json"));
+  // Une seule règle globale ; toute autre règle est limitée au sous-domaine de test (noindex du lot 2).
+  const headers = rules.filter((rule) => !rule.has);
   assert.equal(headers.length, 1);
+  assert.ok(rules.every((rule) => !rule.has || rule.has.every((item) => item.type === "host" && item.value === "test-boutique.dynastiedorkhan.com")));
   assert.equal(headers[0].source, "/(.*)");
   const byKey = Object.fromEntries(headers[0].headers.map((h) => [h.key, h.value]));
   assert.equal(byKey["Content-Security-Policy"], undefined, "pas de CSP bloquante");
