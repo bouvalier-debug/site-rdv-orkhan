@@ -123,7 +123,7 @@ async function executeCheckout(input, options = {}) {
     return { error: "shipping_country_mismatch", status: 400 };
   }
 
-  const eligibility = await resolveFamilyEligibility(input.items, options);
+  const eligibility = await resolveFamilyEligibility(input.items, { ...options, familyChipNumber: input.familyChipNumber });
   if (eligibility.error) return eligibility;
   const familyEligible = eligibility.familyEligible;
 

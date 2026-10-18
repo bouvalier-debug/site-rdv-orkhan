@@ -4,15 +4,26 @@ function cleanString(value, maximum = 32) {
   return typeof value === "string" ? value.trim().slice(0, maximum) : "";
 }
 
-function chipNumbers(items) {
-  return [...new Set((Array.isArray(items) ? items : [])
+// Même numéro écrit avec ou sans espaces, points ou tirets : une seule puce.
+function chipKey(value) {
+  return cleanString(value).replace(/[\s.-]/g, "");
+}
+
+// Vérification Familles Dynastie unique, au niveau du panier commun (familyChipNumber), quels que soient les articles.
+// Compatibilité : une puce encore rangée sur une ligne Animoco (paniers enregistrés avant ce changement) est reprise
+// comme puce du panier. Deux puces différentes restent refusées : un panier correspond à une seule famille.
+function chipNumbers(items, familyChipNumber) {
+  const chips = new Map();
+  const add = (value) => { const key = chipKey(value); if (key && !chips.has(key)) chips.set(key, cleanString(value)); };
+  add(familyChipNumber);
+  (Array.isArray(items) ? items : [])
     .filter((item) => item?.productId === "animoco")
-    .map((item) => cleanString(item?.options?.chipNumber))
-    .filter(Boolean))];
+    .forEach((item) => add(item?.options?.chipNumber));
+  return [...chips.values()];
 }
 
 async function resolveFamilyEligibility(items, options = {}) {
-  const chips = chipNumbers(items);
+  const chips = chipNumbers(items, options.familyChipNumber);
   if (chips.length > 1) return { error: "multiple_family_chips", status: 400 };
   if (chips.length === 0) return { familyEligible: false };
   const verification = await (options.verifyFamilyChip || verifyFamilyChip)(chips[0], options.familyOptions);
