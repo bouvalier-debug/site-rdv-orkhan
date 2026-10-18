@@ -612,7 +612,12 @@
 
     store.subscribe(() => updateCounters(document, store.count()));
     restoreCustomer();
-    refresh();
+    if (options.deferInitialQuote) {
+      // Retour d'une annulation signée : le devis attend que l'annulation soit traitée (voir initCartPage).
+      renderLines(store.getItems(), null);
+      statusNode.hidden = false;
+      statusNode.textContent = "Calcul du devis serveur…";
+    } else refresh();
     return { customerStore, refresh, store, getLastResult: () => lastResult };
   }
 
@@ -659,13 +664,32 @@
     return outcome;
   }
 
+  // Lot 2, correctif A1 : au retour d'une annulation signée, le stock réservé n'est libéré par le serveur qu'au terme de
+  // l'annulation. Un devis demandé avant serait calculé sur un stock encore réservé et afficherait à tort « plus
+  // disponible ». Le premier devis attend donc la fin de l'annulation, quelle qu'en soit l'issue.
+  function hasSignedCheckoutCancel(root) {
+    const location = root.location;
+    if (!location || typeof URLSearchParams !== "function" || typeof root.fetch !== "function") return false;
+    const params = new URLSearchParams(location.search || "");
+    return params.get("payment") === "cancelled" && Boolean(params.get("order")) && Boolean(params.get("cancel"));
+  }
+
+  async function initCartPage(root, { store, mount = mountCartPage, cancel = handleCheckoutCancel } = {}) {
+    const deferInitialQuote = hasSignedCheckoutCancel(root);
+    const page = mount(root, { store, deferInitialQuote });
+    let outcome = null;
+    try {
+      outcome = await cancel(root);
+    } finally {
+      if (deferInitialQuote) await page.refresh();
+    }
+    return outcome;
+  }
+
   function autoInit(root) {
     const store = createCartStore({ storage: root.localStorage });
     updateCounters(root.document, store.count());
-    if (root.document.querySelector("[data-cart-page]")) {
-      mountCartPage(root, { store });
-      handleCheckoutCancel(root);
-    }
+    if (root.document.querySelector("[data-cart-page]")) initCartPage(root, { store });
     if (typeof root.addEventListener === "function") {
       root.addEventListener("storage", (event) => {
         if (event.key !== STORAGE_KEY && event.key !== null) return;
@@ -695,6 +719,8 @@
     displayOptionRows,
     checkoutCancelMessage,
     handleCheckoutCancel,
+    hasSignedCheckoutCancel,
+    initCartPage,
     validStoredDate,
     money,
     mountCartPage,

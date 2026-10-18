@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const { cancelUrl, checkoutCancelToken, processCheckoutCancel, validCancelToken } = require("../api/_checkout-cancel");
 const { createStripeAdapter } = require("../api/_payment/stripe");
 const { executeCheckout } = require("../api/_checkout");
-const { checkoutCancelMessage, handleCheckoutCancel } = require("../assets/cart");
+const { checkoutCancelMessage, handleCheckoutCancel, hasSignedCheckoutCancel, initCartPage } = require("../assets/cart");
 const CHECKOUT_PENDING = "Vérification de l’annulation de votre paiement en cours…";
 
 // Lot 2, étape 6 : annulation du paiement par le client. Le stock n'est libéré qu'après confirmation par Stripe que la
@@ -225,4 +225,55 @@ test("annulation incertaine : signalement immédiat au Manager, une seule demand
       assert.equal(calls.some((call) => call[0] === "flag"), false);
     }
   } finally { console.warn = warn; console.error = error; }
+});
+
+// Correctif A1 : au retour d'une annulation signée, le premier devis est demandé seulement après l'annulation (stock
+// libéré côté serveur). Sans annulation signée, le devis est demandé tout de suite, comme avant.
+function cartInit(search, respond) {
+  const page = cartPage(search, respond);
+  const events = [];
+  const mount = (root, options) => {
+    events.push(["mount", options.deferInitialQuote]);
+    if (!options.deferInitialQuote) events.push(["quote"]);
+    return { refresh: async () => { events.push(["quote"]); } };
+  };
+  const cancel = async (root) => { events.push(["cancel:start"]); const outcome = await handleCheckoutCancel(root); events.push(["cancel:" + outcome]); return outcome; };
+  return { page, events, run: () => initCartPage(page.root, { store: {}, mount, cancel }) };
+}
+
+test("A1 : annulation confirmée, le devis est recalculé une seule fois, après la libération du stock", async () => {
+  const { events, run } = cartInit(SIGNED, reply(200, { ok: true, outcome: "cancelled", operation: "recorded" }));
+  assert.equal(await run(), "cancelled");
+  assert.deepEqual(events, [["mount", true], ["cancel:start"], ["cancel:cancelled"], ["quote"]]);
+});
+
+test("A1 : issue incertaine ou paiement reçu, le devis est tout de même recalculé après la réponse du serveur", async () => {
+  for (const [respond, outcome] of [[reply(200, { ok: true, outcome: "payment_received" }), "payment_received"], [reply(503, { error: "x" }), "uncertain"], [() => { throw new Error("réseau"); }, "uncertain"]]) {
+    const { events, run } = cartInit(SIGNED, respond);
+    assert.equal(await run(), outcome);
+    assert.deepEqual(events.map((event) => event[0]), ["mount", "cancel:start", "cancel:" + outcome, "quote"]);
+  }
+});
+
+test("A1 : sans annulation signée (paniers historiques, visite normale), le devis part tout de suite, une seule fois", async () => {
+  for (const search of ["", "?payment=cancelled", "?order=x&cancel=y", "?payment=cancelled&order=x"]) {
+    const { events, run } = cartInit(search, reply(200, {}));
+    assert.equal(await run(), null);
+    assert.deepEqual(events, [["mount", false], ["quote"], ["cancel:start"], ["cancel:null"]]);
+  }
+});
+
+test("A1 : détection de l'annulation signée", () => {
+  const root = (search, fetch = async () => ({})) => ({ location: { search }, fetch });
+  assert.equal(hasSignedCheckoutCancel(root(SIGNED)), true);
+  assert.equal(hasSignedCheckoutCancel(root("?payment=cancelled")), false);
+  assert.equal(hasSignedCheckoutCancel(root(SIGNED, null)), false);
+  assert.equal(hasSignedCheckoutCancel({ fetch: async () => ({}) }), false);
+});
+
+test("A1 : la page panier diffère son premier devis seulement sur demande", () => {
+  const source = require("node:fs").readFileSync(require("node:path").join(__dirname, "..", "assets", "cart.js"), "utf8");
+  const end = source.slice(source.indexOf("restoreCustomer();"), source.indexOf("return { customerStore, refresh"));
+  assert.match(end, /if \(options\.deferInitialQuote\) \{[\s\S]*renderLines\(store\.getItems\(\), null\);[\s\S]*\} else refresh\(\);/);
+  assert.match(source, /if \(root\.document\.querySelector\("\[data-cart-page\]"\)\) initCartPage\(root, \{ store \}\);/);
 });
