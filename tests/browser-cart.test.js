@@ -273,6 +273,14 @@ test("la page panier propose un consentement explicite avant paiement sans expos
   assert.doesNotMatch(cartPage, /STRIPE_SECRET_KEY|ORKHAN_SHOP_ORDERS_SECRET/);
 });
 
+test("récapitulatif : informations avant commande consultables, case CGV juste avant le bouton pleine largeur", () => {
+  const precontract = cartPage.match(/<details class="precontract">([\s\S]*?)<\/details>/)[1];
+  for (const term of ["Vendeur :", "Rétractation :", "Garanties :", "Médiation :", "Paiement :", "/conditions-generales-de-vente/", "/mentions-legales/", "/renoncer-au-contrat/"]) assert.ok(precontract.includes(term), term);
+  assert.match(cartPage, /<p class="summary-delays">[\s\S]*?data-delivery-delays/);
+  assert.match(cartPage, /data-legal-acceptance[\s\S]*?<\/div>\s*<button class="customer-submit checkout-submit" type="button" data-checkout-button>/);
+  assert.ok(cartPage.indexOf("data-cart-total") < cartPage.indexOf("class=\"precontract\""));
+});
+
 test("le panier et les coordonnées expirés sont supprimés", () => {
   const oldCart = JSON.stringify({ version: 1, updatedAt: "2026-09-01T00:00:00.000Z", items: [{ lineId: "1", productId: "animoco", quantity: 1 }] });
   assert.deepEqual(parseStoredCart(oldCart, NOW), []);
