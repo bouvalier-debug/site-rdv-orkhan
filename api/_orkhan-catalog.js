@@ -54,8 +54,9 @@ function publicProduct(raw) {
   const publicPriceCents = cents(raw.publicPriceCents);
   if (!reference || !name || publicPriceCents === null) return null;
   // Achetable uniquement sur indication explicite du Manager, pour une famille vendable et un prix non nul.
+  // Familles vendables : les mêmes que dans le Manager (CATALOG_SELLABLE_FAMILIES) ; Red Dingo reste exclu.
   const maxOrderQuantity = Number.isSafeInteger(raw.maxOrderQuantity) ? Math.min(Math.max(raw.maxOrderQuantity, 0), MAX_ORDER_QUANTITY) : 0;
-  const purchasable = raw.purchasable === true && ["COLIS", "ANIMOCO"].includes(raw.family) && publicPriceCents > 0;
+  const purchasable = raw.purchasable === true && ["COLIS", "ANIMOCO", "CROQUETTES"].includes(raw.family) && publicPriceCents > 0;
   const photos = (Array.isArray(raw.photos) ? raw.photos : []).map((photo) => {
     const match = typeof photo?.url === "string" ? photo.url.match(MANAGER_PHOTO_PATH) : null;
     if (!match) return null;

@@ -86,7 +86,9 @@ test("lot 2 : un produit n'est achetable que sur indication explicite du Manager
   assert.equal(publicProduct({ ...base, purchasable: true, maxOrderQuantity: 50 }).maxOrderQuantity, 20);
   assert.equal(publicProduct({ ...base, purchasable: "true", maxOrderQuantity: 3 }).purchasable, false);
   assert.equal(publicProduct({ ...base, purchasable: true, family: "RED_DINGO", maxOrderQuantity: 3 }).purchasable, false);
-  assert.equal(publicProduct({ ...base, purchasable: true, family: "CROQUETTES", maxOrderQuantity: 3 }).purchasable, false);
+  // Croquettes vendables (retrait à l'élevage) dès que le Manager les indique achetables ; Red Dingo reste exclu.
+  assert.deepEqual([publicProduct({ ...base, purchasable: true, family: "CROQUETTES", maxOrderQuantity: 3 })].map((p) => [p.purchasable, p.maxOrderQuantity]), [[true, 3]]);
+  assert.equal(publicProduct({ ...base, purchasable: false, family: "CROQUETTES", maxOrderQuantity: 3 }).purchasable, false);
   assert.equal(publicProduct({ ...base, purchasable: true, publicPriceCents: 0, maxOrderQuantity: 3 }).purchasable, false);
   assert.equal(publicProduct({ ...base, purchasable: false, maxOrderQuantity: 3 }).maxOrderQuantity, 0);
 });

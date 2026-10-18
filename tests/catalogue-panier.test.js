@@ -140,3 +140,23 @@ test("Stripe : expiration transmise, et clé live refusée hors Production", () 
   }
   assert.equal(createStripeAdapter({ secretKey: "sk_live_fake", environment: "production" }).provider, "STRIPE");
 });
+
+// Croquettes : vendables dès que le Manager les indique achetables, comme les autres produits du catalogue
+// (retrait à l'élevage uniquement, prix du Manager) ; les modes des autres familles ne changent pas.
+test("croquettes achetables : retrait seul au prix du Manager, livraison refusée, panier mixte en retrait", async () => {
+  const { publicProduct } = require("../api/_orkhan-catalog");
+  const croquettes = publicProduct({ reference: "croquettes-test", name: "Croquettes chiot 1,5 kg", family: "CROQUETTES", publicPriceCents: 1490,
+    familyPriceCents: 1290, weightGrams: 1500, purchasable: true, maxOrderQuantity: 12, photos: [] });
+  assert.equal(croquettes.purchasable, true);
+  const source = catalogueSource([croquettes]);
+  const seul = await quote([{ productId: "croquettes-test", quantity: 2 }], { source, shipping: { mode: "pickup" } });
+  assert.equal(seul.quote.subtotalCents, 2980);
+  assert.deepEqual(seul.quote.availableShippingModes, ["pickup"]);
+  assert.equal(seul.quote.shipping.priceCents, 0);
+  const livraison = await quote([{ productId: "croquettes-test", quantity: 1 }], { source, shipping: { mode: "mondial-relay-home" } });
+  assert.equal(livraison.error, "invalid_shipping_mode");
+  const mixte = await quote([{ productId: "croquettes-test", quantity: 1 }, { productId: "animoco", quantity: 1 }], { source });
+  assert.deepEqual(mixte.quote.availableShippingModes, ["pickup"]);
+  const animocoSeul = await quote([{ productId: "animoco", quantity: 1 }], { source });
+  assert.deepEqual(animocoSeul.quote.availableShippingModes, ["pickup", "animoco-light-fr", "animoco-light-be"]);
+});
