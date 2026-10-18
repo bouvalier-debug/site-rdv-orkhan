@@ -1,7 +1,9 @@
 const { clientIp, consumeRequest, verifyFamilyChip } = require("./_family-eligibility");
 const { calculateShopOrder } = require("./_shop-order");
+const { FORMS_DISABLED_OUTSIDE_PRODUCTION, formsForwardingAllowed } = require("./_forms-environment");
 
-const URL = process.env.ORKHAN_MANAGER_MEDAILLE_WEBHOOK_URL || "https://orkhan-manager.vercel.app/api/medaille-webhook";
+// Adresse par défaut du Manager Production : utilisée uniquement par le déploiement Production de la Boutique.
+const DEFAULT_WEBHOOK_URL = "https://orkhan-manager.vercel.app/api/medaille-webhook";
 async function buildConnectedMedalPayload(body, options = {}) {
   const safeBody = body && typeof body === "object" && !Array.isArray(body) ? body : {};
   let familyEligible = false;
@@ -33,6 +35,8 @@ async function buildConnectedMedalPayload(body, options = {}) {
 module.exports = async (req, res) => {
   res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") return res.status(405).json({ ok: false });
+  // Hors Production : refus avant toute vérification de puce et tout envoi vers le Manager.
+  if (!formsForwardingAllowed()) return res.status(503).json({ ok: false, error: FORMS_DISABLED_OUTSIDE_PRODUCTION });
   const token = process.env.RDV_WEBHOOK_TOKEN;
   if (!token) return res.status(500).json({ ok: false });
   if (req.body?.type === "medaille-connectee" && req.body?.chipNumber && !consumeRequest(clientIp(req))) {
@@ -46,7 +50,7 @@ module.exports = async (req, res) => {
     return res.status(status).json({ ok: false, error: built.error });
   }
   try {
-    const response = await fetch(URL, {
+    const response = await fetch(process.env.ORKHAN_MANAGER_MEDAILLE_WEBHOOK_URL || DEFAULT_WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-rdv-token": token },
       body: JSON.stringify(built.payload)

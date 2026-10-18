@@ -63,6 +63,12 @@ function getProduct(productId, catalog = buildCatalog()) {
   return null;
 }
 
+// Identifiants historiques servis par ce fichier ; tout autre identifiant est une référence du catalogue Manager.
+function isLegacyProductId(productId) {
+  if (productId === "animoco") return true;
+  return ["cosmetics:", "red-dingo:"].some((prefix) => typeof productId === "string" && productId.startsWith(prefix) && productId.slice(prefix.length).trim());
+}
+
 function allowedRedDingoColours(models) {
   if (models.some((model) => model.elevenColours)) return redDingoColours.enamel;
   if (models.some((model) => model.glitterColours)) return redDingoColours.glitter;
@@ -76,6 +82,7 @@ module.exports = {
   allowedRedDingoColours,
   buildCatalog,
   getProduct,
+  isLegacyProductId,
   modelsForReference,
   normalizeReference,
   redDingoModels,

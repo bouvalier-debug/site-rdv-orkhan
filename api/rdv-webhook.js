@@ -1,3 +1,6 @@
+const { FORMS_DISABLED_OUTSIDE_PRODUCTION, formsForwardingAllowed } = require('./_forms-environment');
+
+// Adresse par défaut du Manager Production : utilisée uniquement par le déploiement Production de la Boutique.
 const DEFAULT_WEBHOOK_URL = 'https://orkhan-manager.vercel.app/api/rdv-webhook';
 
 function sendJson(res, statusCode, payload) {
@@ -24,6 +27,11 @@ async function lireBodyJson(req) {
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+  }
+
+  // Hors Production : refus avant toute lecture du corps et tout envoi vers le Manager.
+  if (!formsForwardingAllowed()) {
+    return sendJson(res, 503, { ok: false, error: FORMS_DISABLED_OUTSIDE_PRODUCTION });
   }
 
   const webhookUrl = process.env.ORKHAN_MANAGER_WEBHOOK_URL || DEFAULT_WEBHOOK_URL;

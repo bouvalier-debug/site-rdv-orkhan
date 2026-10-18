@@ -63,6 +63,27 @@ function createManagerClient(options = {}) {
         body: JSON.stringify(payload)
       });
     },
+    getCheckoutState(reference) {
+      return request(`/api/shop-orders/${encodeURIComponent(reference)}/payment-reference`, { method: "GET" });
+    },
+    flagCheckoutCancelUncertain(reference, payload) {
+      return request(`/api/shop-orders/${encodeURIComponent(reference)}/checkout-cancel-uncertain`, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    },
+    releaseFailedCheckout(reference, payload) {
+      return request(`/api/shop-orders/${encodeURIComponent(reference)}/checkout-failed`, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    },
+    markCheckoutExpired(reference, payload) {
+      return request(`/api/shop-orders/${encodeURIComponent(reference)}/checkout-expired`, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    },
     markRefunded(reference, payload) {
       return request(`/api/shop-orders/${encodeURIComponent(reference)}/refund`, {
         method: "POST",

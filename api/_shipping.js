@@ -38,8 +38,13 @@ function shippingProfile(lines) {
   let hasRedDingo = false;
   let parcelWeightGrams = 0;
   let missingWeight = false;
+  let hasCatalogue = false;
 
   for (const line of lines) {
+    if (line.family === "catalogue") {
+      hasCatalogue = true;
+      continue;
+    }
     if (line.family === "red-dingo") {
       hasRedDingo = true;
       continue;
@@ -52,10 +57,14 @@ function shippingProfile(lines) {
     }
   }
 
-  const kind = hasParcelProduct || animocoQuantity >= 3
-    ? "parcel"
-    : animocoQuantity > 0 ? "animoco-light" : hasRedDingo ? "red-dingo-only" : "empty";
-  return { kind, animocoQuantity, hasParcelProduct, hasRedDingo, parcelWeightGrams, missingWeight };
+  // Lot 2 : un panier contenant un produit du catalogue Manager est proposé en retrait sur place uniquement,
+  // sans frais inventés, jusqu'à l'activation de Mondial Relay avec les tarifs réels.
+  const kind = hasCatalogue
+    ? "pickup-only"
+    : hasParcelProduct || animocoQuantity >= 3
+      ? "parcel"
+      : animocoQuantity > 0 ? "animoco-light" : hasRedDingo ? "red-dingo-only" : "empty";
+  return { kind, animocoQuantity, hasParcelProduct, hasRedDingo, hasCatalogue, parcelWeightGrams, missingWeight };
 }
 
 function mondialRelayConfigured(profile, config = SHIPPING_CONFIG) {
@@ -65,6 +74,7 @@ function mondialRelayConfigured(profile, config = SHIPPING_CONFIG) {
 }
 
 function availableShippingModes(profile, config = SHIPPING_CONFIG) {
+  if (profile.kind === "pickup-only") return [SHIPPING_MODES.PICKUP];
   if (profile.kind === "parcel") {
     return mondialRelayConfigured(profile, config)
       ? [SHIPPING_MODES.PICKUP, SHIPPING_MODES.MONDIAL_RELAY_PICKUP, SHIPPING_MODES.MONDIAL_RELAY_HOME]

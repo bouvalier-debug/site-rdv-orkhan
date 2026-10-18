@@ -60,6 +60,35 @@ function validRefund(event, refund) {
     && (refund.payment_intent === null || typeof refund.payment_intent === "string");
 }
 
+function expiredPayload(event, session) {
+  return {
+    provider: "STRIPE",
+    providerRef: session.id,
+    eventId: event.id,
+    expiredAt: new Date(event.created * 1000).toISOString()
+  };
+}
+
+// Lot 2 : session de paiement expirée, relayée au Manager (signature déjà vérifiée par l'appelant). Le Manager
+// enregistre la preuve puis libère le stock réservé, seulement si aucun paiement n'est connu pour la commande.
+// Une session expirée ne peut plus être payée ; par prudence, un statut de paiement autre que « unpaid » n'est jamais
+// relayé : le stock reste alors bloqué et la réservation apparaît « À vérifier » dans le Manager.
+async function processCheckoutExpired(event, options) {
+  const session = event?.data?.object;
+  const reference = session?.client_reference_id;
+  if (!reference || session.metadata?.orderReference !== reference) {
+    return { status: 200, body: { ok: true, outcome: "ignored_foreign" } };
+  }
+  if (typeof event.id !== "string" || !event.id.trim() || !Number.isInteger(event.created)
+    || typeof session.id !== "string" || !session.id.trim() || session.status !== "expired") {
+    return { status: 400, body: { error: "invalid_expired_event" } };
+  }
+  if (session.payment_status !== "unpaid") return { status: 200, body: { ok: true, outcome: "ignored_uncertain" } };
+  const manager = options.manager || createManagerClient(options.managerOptions);
+  const result = await manager.markCheckoutExpired(reference, expiredPayload(event, session));
+  return { status: 200, body: { ok: true, outcome: result.operation || "expiry_recorded" } };
+}
+
 async function processPaymentWebhook(rawBody, signature, options = {}) {
   const webhookSecret = options.webhookSecret || process.env.STRIPE_WEBHOOK_SECRET;
   const verified = (options.verifySignature || verifyStripeSignature)(
@@ -92,6 +121,7 @@ async function processPaymentWebhook(rawBody, signature, options = {}) {
     const result = await manager.markRefunded(reference, refundPayload(event, refund, session));
     return { status: 200, body: { ok: true, outcome: result.outcome || "refund_recorded" } };
   }
+  if (event?.type === "checkout.session.expired") return processCheckoutExpired(event, options);
   if (event?.type !== "checkout.session.completed") {
     return { status: 200, body: { ok: true, outcome: "ignored" } };
   }
@@ -118,4 +148,4 @@ async function processPaymentWebhook(rawBody, signature, options = {}) {
   };
 }
 
-module.exports = { paidPayload, processPaymentWebhook, readRawBody, refundPayload };
+module.exports = { expiredPayload, paidPayload, processPaymentWebhook, readRawBody, refundPayload };

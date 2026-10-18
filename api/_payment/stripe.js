@@ -20,6 +20,7 @@ function checkoutParameters(input) {
   params.set("customer_email", input.customerEmail);
   params.set("success_url", input.successUrl);
   params.set("cancel_url", input.cancelUrl);
+  if (Number.isSafeInteger(input.expiresAt)) params.set("expires_at", String(input.expiresAt));
   input.lines.forEach((line, index) => appendLineItem(params, index, line, input.currency));
   if (input.shippingCents > 0) {
     appendLineItem(params, input.lines.length, {
@@ -31,10 +32,19 @@ function checkoutParameters(input) {
   return params;
 }
 
-function createStripeAdapter(options = {}) {
+// Isolation des environnements : hors Production (VERCEL_ENV côté serveur), seule une clé Stripe de test est acceptée.
+// Toutes les opérations Stripe de la Boutique, écritures comme lectures, obtiennent leur clé par cette fonction.
+function stripeSecretKey(options = {}) {
   const secretKey = (options.secretKey || process.env.STRIPE_SECRET_KEY || "").trim();
-  const fetchImpl = options.fetch || fetch;
   if (!secretKey) throw new Error("stripe_not_configured");
+  const environment = options.environment || process.env.VERCEL_ENV || "development";
+  if (environment !== "production" && /^(sk|rk)_live_/.test(secretKey)) throw new Error("stripe_live_key_outside_production");
+  return secretKey;
+}
+
+function createStripeAdapter(options = {}) {
+  const secretKey = stripeSecretKey(options);
+  const fetchImpl = options.fetch || fetch;
   return {
     provider: "STRIPE",
     async createCheckout(input) {
@@ -56,14 +66,39 @@ function createStripeAdapter(options = {}) {
         throw error;
       }
       return { providerRef: body.id, checkoutUrl: body.url };
+    },
+    // Lot 2, étape 6 : expiration d'une session ouverte (annulation par le client), et relecture d'une session.
+    // Une réponse en erreur ou incomplète est levée : l'appelant ne libère alors rien.
+    async expireCheckout(sessionId) {
+      return sessionRequest(`${sessionPath(sessionId)}/expire`, "POST");
+    },
+    async retrieveCheckout(sessionId) {
+      return sessionRequest(sessionPath(sessionId), "GET");
     }
   };
+
+  function sessionPath(sessionId) {
+    if (typeof sessionId !== "string" || !/^cs_[A-Za-z0-9_]{8,255}$/.test(sessionId)) throw new Error("invalid_checkout_session");
+    return `${options.apiUrl || STRIPE_API_URL}/${encodeURIComponent(sessionId)}`;
+  }
+
+  async function sessionRequest(url, method) {
+    const response = await fetchImpl(url, { method, headers: { Authorization: `Bearer ${secretKey}` } });
+    let body;
+    try { body = await response.json(); } catch { body = {}; }
+    if (!response.ok || typeof body.id !== "string") {
+      const error = new Error("stripe_session_request_failed");
+      error.status = response.status;
+      error.stripeCode = [body?.error?.type, body?.error?.code].filter(Boolean).join(":") || null;
+      throw error;
+    }
+    return body;
+  }
 }
 
 async function findCheckoutSessionByPaymentIntent(paymentIntent, options = {}) {
-  const secretKey = options.secretKey || process.env.STRIPE_SECRET_KEY;
+  const secretKey = stripeSecretKey(options);
   const fetchImpl = options.fetch || fetch;
-  if (!secretKey) throw new Error("stripe_not_configured");
   const url = new URL(options.apiUrl || STRIPE_API_URL);
   url.searchParams.set("payment_intent", paymentIntent);
   url.searchParams.set("limit", "2");
@@ -118,5 +153,6 @@ module.exports = {
   createStripeAdapter,
   findCheckoutSessionByPaymentIntent,
   parseSignatureHeader,
+  stripeSecretKey,
   verifyStripeSignature
 };

@@ -268,6 +268,10 @@
     if (code === "invalid_relay_point") return "Choisissez un Point Relais ou Locker valide.";
     if (code === "invalid_home_address") return "Complétez l’adresse de livraison à domicile.";
     if (code === "unsupported_shipping_country") return "Ce pays n’est pas desservi pour ce mode de livraison.";
+    if (code === "out_of_stock") return "Un produit de votre panier n’est plus disponible dans la quantité demandée. Réduisez la quantité ou retirez-le du panier.";
+    if (code === "product_not_purchasable") return "Un produit de votre panier n’est plus en vente. Retirez-le du panier pour continuer.";
+    if (code === "catalogue_unavailable") return "Les nouveaux produits sont momentanément indisponibles. Réessayez dans quelques instants ou retirez-les du panier.";
+    if (code === "price_changed") return "Le prix d’un produit a changé. Vérifiez votre panier avant de continuer.";
     if (result?.error) return "Le devis n’a pas pu être calculé. Vérifiez votre panier puis réessayez.";
     return "";
   }
@@ -594,6 +598,13 @@
           legalCheckbox.checked = false;
           checkoutStatus.innerHTML = 'Les conditions générales de vente ont été mises à jour. Merci de les relire et de les accepter à nouveau. <button type="button" data-reload>Recharger la page</button>';
           checkoutStatus.querySelector("[data-reload]")?.addEventListener("click", () => root.location.reload());
+        } else if (["out_of_stock", "product_not_purchasable", "catalogue_unavailable", "price_changed", "unknown_product"].includes(error.message)) {
+          checkoutStatus.textContent = quoteStatusMessage({ error: error.message }) || "Votre panier a changé. Vérifiez-le avant de continuer.";
+          refresh();
+        } else if (error.message === "payment_unavailable") {
+          // Session de paiement refusée : la commande précédente est abandonnée, un nouvel essai crée une nouvelle tentative.
+          checkoutAttempt = null;
+          checkoutStatus.textContent = "Le paiement n’a pas pu être préparé ; aucun montant n’a été débité. Réessayez dans quelques instants.";
         } else checkoutStatus.textContent = "Le paiement ne peut pas être préparé pour le moment. Réessayez dans quelques instants.";
         checkoutButton.disabled = false;
       }
@@ -601,14 +612,84 @@
 
     store.subscribe(() => updateCounters(document, store.count()));
     restoreCustomer();
-    refresh();
+    if (options.deferInitialQuote) {
+      // Retour d'une annulation signée : le devis attend que l'annulation soit traitée (voir initCartPage).
+      renderLines(store.getItems(), null);
+      statusNode.hidden = false;
+      statusNode.textContent = "Calcul du devis serveur…";
+    } else refresh();
     return { customerStore, refresh, store, getLastResult: () => lastResult };
+  }
+
+  // Lot 2, étape 6 : retour de Stripe après annulation du paiement. Le panier est toujours conservé. Si le lien porte une
+  // annulation signée (panier avec des produits du catalogue), le serveur demande à Stripe d’expirer la session et ne
+  // libère le stock réservé qu’après confirmation. Le message ne dit « annulé » que sur cette confirmation. Le jeton est
+  // retiré de l’adresse aussitôt. Un retour sans lien signé (paniers historiques) n’affiche rien, comme avant.
+  const CHECKOUT_CANCEL_MESSAGES = {
+    pending: "Vérification de l’annulation de votre paiement en cours…",
+    cancelled: "Paiement annulé : aucun montant n’a été débité. Votre panier est conservé.",
+    payment_received: "Votre paiement a déjà été reçu : cette commande n’est pas annulée. Vous recevrez une confirmation par e-mail ; pour toute question, contactez l’élevage.",
+    uncertain: "Nous n’avons pas pu confirmer l’état de votre paiement. Avant tout nouveau paiement, vérifiez vos e-mails et votre relevé bancaire, ou contactez l’élevage. Votre panier est conservé."
+  };
+
+  function checkoutCancelOutcome(outcome) {
+    return outcome === "cancelled" || outcome === "payment_received" ? outcome : "uncertain";
+  }
+
+  function checkoutCancelMessage(outcome) {
+    return CHECKOUT_CANCEL_MESSAGES[checkoutCancelOutcome(outcome)];
+  }
+
+  async function handleCheckoutCancel(root) {
+    const location = root.location;
+    if (!location || typeof URLSearchParams !== "function") return null;
+    const params = new URLSearchParams(location.search || "");
+    if (params.get("payment") !== "cancelled") return null;
+    const order = params.get("order");
+    const cancel = params.get("cancel");
+    if (!order || !cancel || typeof root.fetch !== "function") return null;
+    try { root.history?.replaceState(null, "", `${location.pathname}?payment=cancelled`); } catch { /* adresse inchangée */ }
+    const status = root.document.querySelector("[data-checkout-status]");
+    const show = (text) => { if (status) { status.textContent = text; status.hidden = false; } };
+    show(CHECKOUT_CANCEL_MESSAGES.pending);
+    let outcome = "uncertain";
+    try {
+      const response = await root.fetch("/api/checkout-cancel", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ order, cancel })
+      });
+      const body = await response.json();
+      if (response.ok && body?.ok === true) outcome = checkoutCancelOutcome(body.outcome);
+    } catch { outcome = "uncertain"; }
+    show(checkoutCancelMessage(outcome));
+    return outcome;
+  }
+
+  // Lot 2, correctif A1 : au retour d'une annulation signée, le stock réservé n'est libéré par le serveur qu'au terme de
+  // l'annulation. Un devis demandé avant serait calculé sur un stock encore réservé et afficherait à tort « plus
+  // disponible ». Le premier devis attend donc la fin de l'annulation, quelle qu'en soit l'issue.
+  function hasSignedCheckoutCancel(root) {
+    const location = root.location;
+    if (!location || typeof URLSearchParams !== "function" || typeof root.fetch !== "function") return false;
+    const params = new URLSearchParams(location.search || "");
+    return params.get("payment") === "cancelled" && Boolean(params.get("order")) && Boolean(params.get("cancel"));
+  }
+
+  async function initCartPage(root, { store, mount = mountCartPage, cancel = handleCheckoutCancel } = {}) {
+    const deferInitialQuote = hasSignedCheckoutCancel(root);
+    const page = mount(root, { store, deferInitialQuote });
+    let outcome = null;
+    try {
+      outcome = await cancel(root);
+    } finally {
+      if (deferInitialQuote) await page.refresh();
+    }
+    return outcome;
   }
 
   function autoInit(root) {
     const store = createCartStore({ storage: root.localStorage });
     updateCounters(root.document, store.count());
-    if (root.document.querySelector("[data-cart-page]")) mountCartPage(root, { store });
+    if (root.document.querySelector("[data-cart-page]")) initCartPage(root, { store });
     if (typeof root.addEventListener === "function") {
       root.addEventListener("storage", (event) => {
         if (event.key !== STORAGE_KEY && event.key !== null) return;
@@ -636,6 +717,10 @@
     createCustomerStore,
     deliveryDelayLines,
     displayOptionRows,
+    checkoutCancelMessage,
+    handleCheckoutCancel,
+    hasSignedCheckoutCancel,
+    initCartPage,
     validStoredDate,
     money,
     mountCartPage,

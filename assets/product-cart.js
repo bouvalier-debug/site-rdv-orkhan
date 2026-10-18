@@ -54,6 +54,15 @@
     return { productId: normalized.startsWith("cosmetics:") ? normalized : `cosmetics:${normalized}`, quantity: quantity(value) };
   }
 
+  // Produit du catalogue Manager (lot 2) : seule la référence et la quantité sont stockées ; le prix vient du devis.
+  function catalogueLine(reference, value = 1) {
+    const normalized = typeof reference === "string" ? reference.trim() : "";
+    if (!/^[a-z0-9]+([-:][a-z0-9]+)*$/.test(normalized) || normalized === "animoco" || /^(cosmetics|red-dingo):/.test(normalized)) {
+      throw new TypeError("invalid_catalogue_product");
+    }
+    return { productId: normalized, quantity: quantity(value) };
+  }
+
   function addLine(store, line) {
     if (!store || typeof store.add !== "function") throw new TypeError("cart_unavailable");
     store.add(line);
@@ -76,5 +85,5 @@
     return node;
   }
 
-  return { addLine, animocoLine, cosmeticLine, engravingLines, quantity, redDingoLine, showAddConfirmation };
+  return { addLine, animocoLine, catalogueLine, cosmeticLine, engravingLines, quantity, redDingoLine, showAddConfirmation };
 }));

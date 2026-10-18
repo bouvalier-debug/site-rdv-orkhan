@@ -1,3 +1,5 @@
+const { stripeSecretKey } = require("./_payment/stripe");
+
 const STRIPE_SESSIONS_URL = "https://api.stripe.com/v1/checkout/sessions";
 const SESSION_ID = /^cs_(?:test|live)_[A-Za-z0-9_]+$/;
 const ORDER_REFERENCE = /^BOUT-\d{4}-[A-Z0-9]{10}$/;
@@ -29,9 +31,8 @@ function clearMarkerCookie() {
 }
 
 async function retrieveCheckoutSession(sessionId, options = {}) {
-  const secretKey = options.secretKey || process.env.STRIPE_SECRET_KEY;
+  const secretKey = stripeSecretKey(options);
   const fetchImpl = options.fetch || fetch;
-  if (!secretKey) throw new Error("stripe_not_configured");
   const response = await fetchImpl(`${options.apiUrl || STRIPE_SESSIONS_URL}/${encodeURIComponent(sessionId)}`, {
     method: "GET",
     headers: { Authorization: `Bearer ${secretKey}` }
