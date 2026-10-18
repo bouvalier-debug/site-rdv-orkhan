@@ -273,12 +273,13 @@ test("la page panier propose un consentement explicite avant paiement sans expos
   assert.doesNotMatch(cartPage, /STRIPE_SECRET_KEY|ORKHAN_SHOP_ORDERS_SECRET/);
 });
 
-test("récapitulatif : informations avant commande consultables, case CGV juste avant le bouton pleine largeur", () => {
-  const precontract = cartPage.match(/<details class="precontract">([\s\S]*?)<\/details>/)[1];
-  for (const term of ["Vendeur :", "Rétractation :", "Garanties :", "Médiation :", "Paiement :", "/conditions-generales-de-vente/", "/mentions-legales/", "/renoncer-au-contrat/"]) assert.ok(precontract.includes(term), term);
+test("récapitulatif : sans encadré, case CGV non précochée juste avant le bouton, informations légales accessibles par lien", () => {
+  assert.doesNotMatch(cartPage, /<details|Avant de commander/);
   assert.match(cartPage, /<p class="summary-delays">[\s\S]*?data-delivery-delays/);
+  assert.match(cartPage, /<input type="checkbox" data-legal-acceptance autocomplete="off">/);
   assert.match(cartPage, /data-legal-acceptance[\s\S]*?<\/div>\s*<button class="customer-submit checkout-submit" type="button" data-checkout-button>/);
-  assert.ok(cartPage.indexOf("data-cart-total") < cartPage.indexOf("class=\"precontract\""));
+  const reminder = cartPage.match(/<p class="legal-reminder">([\s\S]*?)<\/p>/)[1];
+  for (const term of ["rétractation", "Red Dingo gravées", "/conditions-generales-de-vente/", "/mentions-legales/", "/renoncer-au-contrat/"]) assert.ok(reminder.includes(term), term);
 });
 
 test("le panier et les coordonnées expirés sont supprimés", () => {
