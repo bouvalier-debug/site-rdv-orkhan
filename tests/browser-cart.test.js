@@ -170,7 +170,8 @@ test("le rendu Animoco masque les options techniques et le numéro de puce", () 
     productId: "animoco",
     options: { chipNumber: "250123456789012", familyEligible: true }
   });
-  assert.deepEqual(rows, [["Tarif Famille Dynastie", "numéro de puce vérifié au moment du paiement"]]);
+  // Vérification Familles Dynastie au niveau du panier : la ligne Animoco n'affiche plus rien de la puce.
+  assert.deepEqual(rows, []);
   const rendered = JSON.stringify(rows);
   assert.doesNotMatch(rendered, /Chip Number|Family Eligible|250123456789012|true/);
   assert.deepEqual(displayOptionRows({

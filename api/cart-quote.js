@@ -9,7 +9,7 @@ function send(res, status, body) {
 }
 
 async function quoteCartRequest(input, options = {}) {
-  const eligibility = await resolveFamilyEligibility(input?.items, options);
+  const eligibility = await resolveFamilyEligibility(input?.items, { ...options, familyChipNumber: input?.familyChipNumber });
   if (eligibility.error) return eligibility;
   const catalogue = await (options.cartCatalog || cartCatalog)(input?.items, options);
   if (catalogue.error) return catalogue;
@@ -22,7 +22,7 @@ async function quoteCartRequest(input, options = {}) {
 
 async function handler(req, res) {
   if (req.method !== "POST") return send(res, 405, { error: "method_not_allowed" });
-  if (chipNumbers(req.body?.items).length && !consumeRequest(clientIp(req))) {
+  if (chipNumbers(req.body?.items, req.body?.familyChipNumber).length && !consumeRequest(clientIp(req))) {
     return send(res, 429, { error: "rate_limited" });
   }
   const result = await quoteCartRequest(req.body);

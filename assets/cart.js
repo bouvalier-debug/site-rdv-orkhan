@@ -85,12 +85,65 @@
     return `line-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
   }
 
+  // Vérification Familles Dynastie unique, au niveau du panier commun : un seul numéro de puce, conservé dans ce
+  // navigateur au plus 30 jours, envoyé seulement au calcul du devis et au paiement (jamais dans les lignes de commande).
+  const FAMILY_CHIP_STORAGE_KEY = "orkhan-shop-family-chip-v1";
+  const FAMILY_CHIP_MAX_AGE_DAYS = 30;
+
+  function cleanFamilyChip(value) {
+    return typeof value === "string" ? value.trim().slice(0, 32) : "";
+  }
+
+  function createFamilyChipStore(options = {}) {
+    const storage = options.storage || (typeof localStorage !== "undefined" ? localStorage : null);
+    let chipNumber = "";
+    try {
+      const saved = storage ? JSON.parse(storage.getItem(FAMILY_CHIP_STORAGE_KEY) || "null") : null;
+      if (saved && saved.version === 1 && validStoredDate(saved.savedAt, FAMILY_CHIP_MAX_AGE_DAYS, options.now?.() || Date.now())) {
+        chipNumber = cleanFamilyChip(saved.chipNumber);
+      } else if (saved && storage) storage.removeItem(FAMILY_CHIP_STORAGE_KEY);
+    } catch { chipNumber = ""; }
+    function set(value) {
+      chipNumber = cleanFamilyChip(value);
+      try {
+        if (!storage) return chipNumber;
+        if (chipNumber) storage.setItem(FAMILY_CHIP_STORAGE_KEY, JSON.stringify({ version: 1, savedAt: new Date(options.now?.() || Date.now()).toISOString(), chipNumber }));
+        else storage.removeItem(FAMILY_CHIP_STORAGE_KEY);
+      } catch { /* stockage indisponible : la puce reste valable pour cette page */ }
+      return chipNumber;
+    }
+    return { get: () => chipNumber, set, clear: () => set("") };
+  }
+
+  // Paniers enregistrés avant la vérification commune : la puce rangée sur une ligne Animoco en est retirée et
+  // devient la puce du panier (si aucune n'est déjà enregistrée).
+  function extractLegacyFamilyChip(items) {
+    let chip = "";
+    let changed = false;
+    const cleaned = items.map((item) => {
+      if (item.productId !== "animoco" || !item.options || !("chipNumber" in item.options || "familyEligible" in item.options)) return item;
+      changed = true;
+      chip ||= cleanFamilyChip(item.options.chipNumber);
+      const { chipNumber: _chip, familyEligible: _eligible, ...rest } = item.options;
+      const { options: _options, ...line } = item;
+      return Object.keys(rest).length ? { ...line, options: rest } : line;
+    });
+    return { items: cleaned, chip, changed };
+  }
+
   function createCartStore(options = {}) {
     const storage = options.storage || (typeof localStorage !== "undefined" ? localStorage : null);
     const idFactory = options.idFactory || createLineId;
     const listeners = new Set();
     let items = storage ? parseStoredCart(storage.getItem(STORAGE_KEY), options.now?.() || Date.now()) : [];
     if (storage && !items.length && storage.getItem(STORAGE_KEY)) storage.removeItem(STORAGE_KEY);
+    let legacyFamilyChip = "";
+    const legacy = extractLegacyFamilyChip(items);
+    if (legacy.changed) {
+      items = legacy.items;
+      legacyFamilyChip = legacy.chip;
+      if (storage) storage.setItem(STORAGE_KEY, JSON.stringify({ version: STORAGE_VERSION, updatedAt: new Date(options.now?.() || Date.now()).toISOString(), items }));
+    }
 
     function snapshot() {
       return items.map((item) => ({ ...item, ...(item.options ? { options: safeOptionValue(item.options) } : {}) }));
@@ -104,14 +157,16 @@
     }
 
     function add(input) {
-      const candidate = sanitizeLine({
+      const sanitized = sanitizeLine({
         lineId: typeof input?.lineId === "string" ? input.lineId : idFactory(),
         productId: input?.productId,
         quantity: input?.quantity === undefined ? 1 : input.quantity,
         options: input?.options
       });
-      if (!candidate) throw new TypeError("invalid_cart_line");
-      items.push(candidate);
+      if (!sanitized) throw new TypeError("invalid_cart_line");
+      const legacyLine = extractLegacyFamilyChip([sanitized]);
+      if (legacyLine.chip) legacyFamilyChip ||= legacyLine.chip;
+      items.push(legacyLine.items[0]);
       return persist();
     }
 
@@ -147,6 +202,7 @@
       getItems: snapshot,
       remove,
       syncFromStorage,
+      takeLegacyFamilyChip() { const chip = legacyFamilyChip; legacyFamilyChip = ""; return chip; },
       subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
       updateQuantity
     };
@@ -220,14 +276,16 @@
     };
   }
 
-  function buildQuotePayload(items, shipping) {
+  function buildQuotePayload(items, shipping, familyChipNumber = "") {
     const payload = { items: items.map(quoteItem).filter(Boolean) };
     if (shipping && typeof shipping.mode === "string") payload.shipping = safeOptionValue(shipping);
+    const chip = cleanFamilyChip(familyChipNumber);
+    if (chip) payload.familyChipNumber = chip;
     return payload;
   }
 
-  function buildCheckoutPayload(items, shipping, customer, checkoutAttemptId) {
-    const payload = buildQuotePayload(items, shipping);
+  function buildCheckoutPayload(items, shipping, customer, checkoutAttemptId, familyChipNumber = "") {
+    const payload = buildQuotePayload(items, shipping, familyChipNumber);
     payload.customer = sanitizeCustomer(customer);
     payload.checkoutAttemptId = checkoutAttemptId;
     payload.legalAcceptance = { version: SHOP_LEGAL_CURRENT_VERSION, accepted: true };
@@ -261,6 +319,8 @@
     if (code === "family_verification_unavailable") {
       return "Le service de vérification du tarif Famille est momentanément indisponible. Réessayez dans quelques instants, ou retirez le numéro de puce pour commander au tarif public.";
     }
+    if (code === "invalid_chip") return "Le numéro de puce Famille Dynastie saisi est invalide. Corrigez-le ou retirez-le pour continuer.";
+    if (code === "multiple_family_chips") return "Un seul numéro de puce Famille Dynastie peut être utilisé par panier.";
     if (code === "shipping_country_mismatch") {
       return "Le pays de l’adresse ne correspond pas au mode de livraison choisi. Vérifiez le pays ou choisissez le mode de livraison correspondant.";
     }
@@ -281,7 +341,7 @@
     const response = await fetchImpl(options.url || "/api/cart-quote", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(buildQuotePayload(items, shipping))
+      body: JSON.stringify(buildQuotePayload(items, shipping, options.familyChipNumber))
     });
     let result;
     try { result = await response.json(); } catch { result = { error: "invalid_server_response" }; }
@@ -310,11 +370,7 @@
   }
 
   function displayOptionRows(item) {
-    if (item?.productId === "animoco") {
-      return item?.options?.chipNumber
-        ? [["Tarif Famille Dynastie", "numéro de puce vérifié au moment du paiement"]]
-        : [];
-    }
+    if (item?.productId === "animoco") return [];
     return optionRows(item?.options).map(([key, value]) => [humanizeOption(key), value]);
   }
 
@@ -378,6 +434,14 @@
     const legalCheckbox = container.querySelector("[data-legal-acceptance]");
     const engravingWrap = container.querySelector("[data-engraving-confirmation-wrap]");
     const engravingCheckbox = container.querySelector("[data-engraving-confirmation]");
+    const familyStore = options.familyStore || createFamilyChipStore({ storage: root.localStorage });
+    const legacyChip = store.takeLegacyFamilyChip?.();
+    if (legacyChip && !familyStore.get()) familyStore.set(legacyChip);
+    const familyInput = container.querySelector("[data-family-chip]");
+    const familyVerify = container.querySelector("[data-family-chip-verify]");
+    const familyRemove = container.querySelector("[data-family-chip-remove]");
+    const familyStatus = container.querySelector("[data-family-status]");
+    if (familyInput) familyInput.value = familyStore.get();
     const delaysNode = container.querySelector("[data-delivery-delays]");
     const countryField = customerForm.querySelector('[name="country"]');
     let selectedShipping = null;
@@ -494,6 +558,7 @@
       shippingNode.textContent = quote?.shipping ? money(quote.shipping.priceCents) : "À choisir";
       totalNode.textContent = money(quote?.totalCents);
       if (checkoutButton) checkoutButton.disabled = result?.error === "family_verification_unavailable";
+      renderFamilyStatus(result);
       const message = quoteStatusMessage(result);
       statusNode.textContent = message;
       statusNode.hidden = !message;
@@ -526,12 +591,39 @@
       statusNode.hidden = false;
       statusNode.textContent = "Calcul du devis serveur…";
       try {
-        const result = await requestQuote(items, selectedShipping, options);
+        const result = await requestQuote(items, selectedShipping, { ...options, familyChipNumber: familyStore.get() });
         if (sequence === requestSequence) renderResult(items, result);
       } catch {
         if (sequence === requestSequence) renderResult(items, { error: "quote_unavailable" });
       }
     }
+
+    function renderFamilyStatus(result) {
+      if (!familyStatus) return;
+      const chip = familyStore.get();
+      if (familyRemove) familyRemove.hidden = !chip;
+      let text = "Indiquez le numéro de puce d’un chien issu de l’élevage : les tarifs Famille s’appliquent aux articles qui en proposent un.";
+      let kind = "idle";
+      if (chip && result?.error === "invalid_chip") { text = "Numéro de puce invalide : saisissez les 15 chiffres, ou retirez-le."; kind = "error"; }
+      else if (chip && result?.error === "family_verification_unavailable") { text = "Vérification momentanément indisponible. Réessayez, ou retirez le numéro pour commander au tarif public."; kind = "error"; }
+      else if (chip && result?.quote?.benefits?.dynastieFamily === true) { text = "Famille Dynastie reconnue : tarifs Famille appliqués aux articles concernés."; kind = "ok"; }
+      else if (chip && result?.quote) { text = "Puce non reconnue : les tarifs publics s’appliquent."; kind = "warn"; }
+      familyStatus.textContent = text;
+      familyStatus.dataset.kind = kind;
+    }
+    if (familyVerify) familyVerify.addEventListener("click", () => {
+      familyStore.set(familyInput ? familyInput.value : "");
+      if (familyInput) familyInput.value = familyStore.get();
+      refresh();
+    });
+    if (familyRemove) familyRemove.addEventListener("click", () => {
+      familyStore.clear();
+      if (familyInput) familyInput.value = "";
+      refresh();
+    });
+    if (familyInput) familyInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") { event.preventDefault(); familyVerify?.click(); }
+    });
 
     linesNode.addEventListener("change", (event) => {
       const lineId = event.target.dataset.quantity;
@@ -584,7 +676,7 @@
       }
       if (!legalCheckbox?.checked) { checkoutStatus.textContent = "Veuillez accepter les conditions générales de vente pour continuer."; checkoutStatus.hidden = false; return; }
       if (!engravingWrap?.hidden && !engravingCheckbox?.checked) { checkoutStatus.textContent = "Veuillez confirmer avoir vérifié le texte de gravure de vos médailles Red Dingo."; checkoutStatus.hidden = false; return; }
-      const basePayload = buildCheckoutPayload(store.getItems(), selectedShipping, customerStore.get(), "");
+      const basePayload = buildCheckoutPayload(store.getItems(), selectedShipping, customerStore.get(), "", familyStore.get());
       basePayload.checkoutAttemptId = attemptFor(basePayload);
       checkoutButton.disabled = true;
       checkoutStatus.textContent = "Préparation du paiement sécurisé…";
@@ -714,6 +806,8 @@
     buildCheckoutPayload,
     countryForShippingMode,
     createCartStore,
+    createFamilyChipStore,
+    FAMILY_CHIP_STORAGE_KEY,
     createCustomerStore,
     deliveryDelayLines,
     displayOptionRows,
