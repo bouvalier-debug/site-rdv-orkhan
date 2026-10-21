@@ -130,7 +130,7 @@ test("gabarit commun : même en-tête sur toutes les pages Boutique, 404 statiqu
     assert.doesNotMatch(html, /class="site-nav shop-nav"|Retour au site de l’élevage/, file);
     assert.match(html, /<h1[\s>]/, file);
   }
-  assert.equal(read("404.html"), vitrine.renderNotFound());
+  assert.equal(read("404.html").replace(/\r\n/g, "\n"), vitrine.renderNotFound(), "404.html est régénérée depuis renderNotFound()");
   for (const archive of ["cgv-2026-10-05", "cgv-2026-10-07", "cgv-2026-10-21"]) {
     assert.equal(read(`conditions-generales-de-vente/${archive}/index.html`).includes(SHOP_HEADER), false, `${archive} reste telle que publiée`);
   }
