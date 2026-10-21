@@ -54,7 +54,7 @@ test("ajoute une Red Dingo double face quand le modèle l'autorise", () => {
 test("ajoute et chiffre un modèle Red Dingo sans couleur", () => {
   const line = redDingoLine({ reference: "01-DR", size: "M", colour: "", frontEngraving: "NALA", quantity: 2 });
   assert.equal(line.options.colour, "");
-  const result = quoteCart({ items: [line], shipping: { mode: "pickup" } });
+  const result = quoteCart({ items: [line], shipping: { mode: "red-dingo-free" } });
   assert.equal(result.quote.totalCents, 3390);
   assert.equal(result.quote.lines[0].options.colour, "");
 });

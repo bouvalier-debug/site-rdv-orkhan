@@ -12,7 +12,8 @@ const CHIP = "250269812345678";
 const CROQUETTES = { reference: "croquettes-test", name: "Croquettes", family: "CROQUETTES", publicPriceCents: 1490, familyPriceCents: 1290, weightGrams: 1500, purchasable: true, maxOrderQuantity: 12 };
 const SANS_PRIX_FAMILLE = { reference: "laisse-test", name: "Laisse", family: "COLIS", publicPriceCents: 900, familyPriceCents: null, weightGrams: 120, purchasable: true, maxOrderQuantity: 5 };
 const RD = { productId: "red-dingo:01-BN", quantity: 1, options: { size: "M", colour: "Black", frontLines: ["ORKHAN"] } };
-const ITEMS = [{ productId: "croquettes-test", quantity: 1 }, { productId: "laisse-test", quantity: 1 }, { productId: "animoco", quantity: 1 }, { productId: "cosmetics:samba", quantity: 1 }, RD];
+const ITEMS = [{ productId: "croquettes-test", quantity: 1 }, { productId: "laisse-test", quantity: 1 }, { productId: "animoco", quantity: 1 }, { productId: "cosmetics:samba", quantity: 1 }];
+// Phase 4 : Red Dingo se commande séparément ; son prix (sans tarif Famille) est vérifié sur un panier à part.
 const verifier = (recognized, calls = []) => async (chip) => { calls.push(chip); return { status: "ok", recognized }; };
 const quote = (input, verifyFamilyChip) => quoteCartRequest(input, {
   listCatalogue: async () => ({ available: true, products: [CROQUETTES, SANS_PRIX_FAMILLE] }), verifyFamilyChip
@@ -37,13 +38,14 @@ test("puce reconnue : tarif Famille sur les seuls articles qui en ont un, quelle
   const result = await quote({ items: ITEMS, familyChipNumber: CHIP }, verifier(true, calls));
   assert.deepEqual(calls, [CHIP]);
   assert.equal(result.quote.benefits.dynastieFamily, true);
-  assert.deepEqual(prices(result), { "croquettes-test": 1290, "laisse-test": 900, animoco: 1799, "cosmetics:samba": 1145, "red-dingo:01-BN": 1695 });
+  assert.deepEqual(prices(result), { "croquettes-test": 1290, "laisse-test": 900, animoco: 1799, "cosmetics:samba": 1145 });
+  assert.deepEqual(prices(await quote({ items: [RD], familyChipNumber: CHIP }, verifier(true))), { "red-dingo:01-BN": 1695 });
   const seules = await quote({ items: [{ productId: "croquettes-test", quantity: 2 }], familyChipNumber: CHIP }, verifier(true));
   assert.equal(seules.quote.subtotalCents, 2580);
 });
 
 test("sans puce, puce non reconnue ou invalide : aucun tarif préférentiel", async () => {
-  const publics = { "croquettes-test": 1490, "laisse-test": 900, animoco: 1999, "cosmetics:samba": 1145, "red-dingo:01-BN": 1695 };
+  const publics = { "croquettes-test": 1490, "laisse-test": 900, animoco: 1999, "cosmetics:samba": 1145 };
   const calls = [];
   const sans = await quote({ items: ITEMS }, verifier(true, calls));
   assert.deepEqual([prices(sans), calls.length], [publics, 0]);
@@ -57,10 +59,10 @@ test("paiement : la puce du panier est revérifiée côté serveur ; le Manager 
   const created = [];
   const calls = [];
   const result = await executeCheckout({
-    checkoutAttemptId: "123e4567-e89b-42d3-a456-426614174000", items: [{ productId: "croquettes-test", quantity: 1 }], shipping: { mode: "pickup" },
+    checkoutAttemptId: "123e4567-e89b-42d3-a456-426614174000", items: [{ productId: "croquettes-test", quantity: 1 }], shipping: { mode: "pickup", pickupTiming: "appointment" },
     familyChipNumber: CHIP,
     customer: { firstName: "Test", lastName: "Famille", email: "contact@dynastiedorkhan.com", phone: "0600000000", country: "FR" },
-    legalAcceptance: { version: "cgv-2026-10-07", accepted: true }
+    legalAcceptance: { version: "cgv-phase4-projet", accepted: true }
   }, {
     env: { ORKHAN_SHOP_ORDERS_SECRET: "secret-test" }, origin: "https://boutique.test",
     listCatalogue: async () => ({ available: true, products: [CROQUETTES] }), verifyFamilyChip: verifier(true, calls),

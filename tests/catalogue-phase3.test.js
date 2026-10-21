@@ -72,7 +72,7 @@ test("devis : Sur demande refusé côté serveur ; chaque variante garde sa réf
     product({ reference: "croquettes-10kg", name: "Croquettes", family: "CROQUETTES", publicPriceCents: 6490, maxOrderQuantity: 1, variantGroup: "croquettes", variantLabel: "10 kg", shelf: "ALIMENTATION", subcategory: "croquettes" }),
     product({ reference: "vitrine-test", purchasable: true, onRequest: true, maxOrderQuantity: 5 })
   ];
-  const quote = (items) => quoteCartRequest({ items, shipping: { mode: "pickup" } }, {
+  const quote = (items) => quoteCartRequest({ items, shipping: { mode: "pickup", pickupTiming: "appointment" } }, {
     listCatalogue: async () => ({ available: true, products: catalogue }),
     verifyFamilyChip: async () => ({ status: "ok", recognized: false })
   });

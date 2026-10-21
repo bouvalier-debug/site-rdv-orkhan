@@ -22,9 +22,17 @@ const SHIPPING_CONFIG = Object.freeze({
   }),
   redDingo: Object.freeze({
     priceCents: 0,
-    servedCountries: Object.freeze([])
+    // Phase 4 : livraison directe par le fabricant, frais compris, dans les 27 pays de l'Union européenne (CGV 7.3).
+    // Liste unique, reprise par le formulaire du panier et par la validation serveur de la commande.
+    servedCountries: Object.freeze([
+      "AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR", "HR", "HU",
+      "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO", "SE", "SI", "SK"
+    ])
   })
 });
+
+// Phase 4 : moment du retrait choisi au panier (CGV 7.5), sans date.
+const PICKUP_TIMINGS = Object.freeze(["puppy-departure", "appointment"]);
 
 function parcelRate(weightGrams, rates) {
   if (!Number.isFinite(weightGrams) || weightGrams <= 0) return null;
@@ -59,7 +67,10 @@ function shippingProfile(lines) {
 
   // Lot 2 : un panier contenant un produit du catalogue Manager est proposé en retrait sur place uniquement,
   // sans frais inventés, jusqu'à l'activation de Mondial Relay avec les tarifs réels.
-  const kind = hasCatalogue
+  // Phase 4 : les médailles Red Dingo se commandent séparément de tout autre produit (CGV 5.6).
+  const kind = hasRedDingo && (hasCatalogue || hasParcelProduct || animocoQuantity > 0)
+    ? "red-dingo-mixed"
+    : hasCatalogue
     ? "pickup-only"
     : hasParcelProduct || animocoQuantity >= 3
       ? "parcel"
@@ -80,11 +91,13 @@ function availableShippingModes(profile, config = SHIPPING_CONFIG) {
       ? [SHIPPING_MODES.PICKUP, SHIPPING_MODES.MONDIAL_RELAY_PICKUP, SHIPPING_MODES.MONDIAL_RELAY_HOME]
       : [SHIPPING_MODES.PICKUP];
   }
+  // Phase 4 : Animoco en France seulement (la Belgique reste lisible pour les commandes historiques) ; Red Dingo
+  // toujours livré par le fabricant, sans retrait.
   if (profile.kind === "animoco-light") {
-    return [SHIPPING_MODES.PICKUP, SHIPPING_MODES.ANIMOCO_LIGHT_FR, SHIPPING_MODES.ANIMOCO_LIGHT_BE];
+    return [SHIPPING_MODES.PICKUP, SHIPPING_MODES.ANIMOCO_LIGHT_FR];
   }
   if (profile.kind === "red-dingo-only") {
-    return [SHIPPING_MODES.PICKUP, SHIPPING_MODES.RED_DINGO_FREE];
+    return [SHIPPING_MODES.RED_DINGO_FREE];
   }
   return [];
 }
@@ -103,13 +116,20 @@ function validHomeAddress(address) {
 function calculateShipping(profile, selection = {}, config = SHIPPING_CONFIG) {
   const modes = availableShippingModes(profile, config);
   const mode = selection.mode;
+  if (profile.kind === "red-dingo-mixed") return { error: "red_dingo_separate_order", availableModes: modes };
   if (profile.kind === "parcel"
     && [SHIPPING_MODES.MONDIAL_RELAY_PICKUP, SHIPPING_MODES.MONDIAL_RELAY_HOME].includes(mode)
     && !mondialRelayConfigured(profile, config)) {
     return { error: "shipping_unavailable", availableModes: modes };
   }
   if (!modes.includes(mode)) return { error: "invalid_shipping_mode", availableModes: modes };
-  if (mode === SHIPPING_MODES.PICKUP) return { mode, priceCents: 0, availableModes: modes };
+  if (mode === SHIPPING_MODES.PICKUP) {
+    // Le moment du retrait est facultatif au devis et exigé au paiement (voir _checkout.js).
+    if (selection.pickupTiming !== undefined && !PICKUP_TIMINGS.includes(selection.pickupTiming)) {
+      return { error: "invalid_pickup_timing", availableModes: modes };
+    }
+    return { mode, priceCents: 0, ...(selection.pickupTiming ? { pickupTiming: selection.pickupTiming } : {}), availableModes: modes };
+  }
   if (mode === SHIPPING_MODES.ANIMOCO_LIGHT_FR || mode === SHIPPING_MODES.ANIMOCO_LIGHT_BE) {
     const country = mode.endsWith("-fr") ? "FR" : "BE";
     return { mode, country, priceCents: config.animocoLight.pricesCents[country], availableModes: modes };
@@ -138,6 +158,7 @@ function calculateShipping(profile, selection = {}, config = SHIPPING_CONFIG) {
 }
 
 module.exports = {
+  PICKUP_TIMINGS,
   SHIPPING_CONFIG,
   SHIPPING_MODES,
   availableShippingModes,

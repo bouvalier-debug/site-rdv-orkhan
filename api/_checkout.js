@@ -4,11 +4,16 @@ const { chipNumbers, resolveFamilyEligibility } = require("./_family-benefit");
 const { createManagerClient } = require("./_orkhan-shop-orders");
 const { createPaymentProvider } = require("./_payment");
 const { cancelUrl } = require("./_checkout-cancel");
+const { PICKUP_TIMINGS, SHIPPING_CONFIG } = require("./_shipping");
 
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DELIVERY_FIELDS = ["address", "postalCode", "city", "country"];
-const SHOP_LEGAL_CURRENT_VERSION = "cgv-2026-10-07";
+// Phase 4 : nouvelle version des CGV ; identifiant provisoire, fixé à la mise en application (à l'identique dans
+// legal/, assets/cart.js et orkhan-manager). Un panier ouvert sur l'ancienne version reçoit legal_version_outdated.
+const SHOP_LEGAL_CURRENT_VERSION = "cgv-phase4-projet";
+// Pays acceptés : ceux de la livraison Red Dingo (UE 27), qui contiennent la France des envois Animoco.
+const SHOP_COUNTRIES = SHIPPING_CONFIG.redDingo.servedCountries;
 // Lot 2, décision 3 : la session de paiement d'une commande avec des produits du catalogue expire après 30 minutes
 // (minimum imposé par Stripe), plus une minute de tolérance d'horloge ; la réservation du Manager dure 40 minutes.
 const CATALOGUE_CHECKOUT_EXPIRY_SECONDS = 31 * 60;
@@ -70,14 +75,14 @@ function validateCustomer(value, shippingMode) {
   if (shippingMode !== "pickup" && DELIVERY_FIELDS.some((field) => !customer[field])) {
     return { error: "invalid_customer" };
   }
-  if (customer.country && !["FR", "BE"].includes(customer.country)) return { error: "invalid_customer" };
+  if (customer.country && !SHOP_COUNTRIES.includes(customer.country)) return { error: "invalid_customer" };
   return { customer };
 }
 
 function shippingCountryMatches(mode, country) {
   if (mode === "animoco-light-fr") return country === "FR";
   if (mode === "animoco-light-be") return country === "BE";
-  if (mode === "red-dingo-free") return country === "FR" || country === "BE";
+  if (mode === "red-dingo-free") return SHIPPING_CONFIG.redDingo.servedCountries.includes(country);
   return true;
 }
 
@@ -98,6 +103,7 @@ function shippingSnapshot(selection, quoteShipping) {
     priceCents: quoteShipping.priceCents,
     ...(quoteShipping.country ? { country: quoteShipping.country } : {}),
     ...(quoteShipping.weightGrams ? { weightGrams: quoteShipping.weightGrams } : {}),
+    ...(quoteShipping.pickupTiming ? { pickupTiming: quoteShipping.pickupTiming } : {}),
     ...(selection?.relayPoint ? { relayPoint: selection.relayPoint } : {}),
     ...(selection?.address ? { address: selection.address } : {})
   };
@@ -117,6 +123,9 @@ async function executeCheckout(input, options = {}) {
   }
   if (input?.legalAcceptance?.accepted !== true) return { error: "legal_acceptance_required", status: 400 };
   if (input.legalAcceptance.version !== SHOP_LEGAL_CURRENT_VERSION) return { error: "legal_version_outdated", status: 409 };
+  if (input.shipping.mode === "pickup" && !PICKUP_TIMINGS.includes(input.shipping.pickupTiming)) {
+    return { error: "pickup_timing_required", status: 400 };
+  }
   const customerResult = validateCustomer(input.customer, input.shipping.mode);
   if (customerResult.error) return { ...customerResult, status: 400 };
   if (!shippingCountryMatches(input.shipping.mode, customerResult.customer.country)) {

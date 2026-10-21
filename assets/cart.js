@@ -15,7 +15,7 @@
   const STORAGE_KEY = "orkhan-shop-cart-v1";
   const LEGACY_CUSTOMER_STORAGE_KEY = "orkhan-shop-customer-v1";
   const CUSTOMER_STORAGE_KEY = "orkhan-shop-customer-v2";
-  const SHOP_LEGAL_CURRENT_VERSION = "cgv-2026-10-07";
+  const SHOP_LEGAL_CURRENT_VERSION = "cgv-phase4-projet"; // Phase 4 : identifiant provisoire, fixé à la mise en application.
   const STORAGE_VERSION = 1;
   const MAX_QUANTITY = 20;
   const EMPTY_SHIPPING_MESSAGE = "Les modes de livraison disponibles s’afficheront selon le contenu de votre panier.";
@@ -310,6 +310,9 @@
     if (code === "product_not_purchasable") return "Un produit de votre panier n’est plus en vente. Retirez-le du panier pour continuer.";
     if (code === "catalogue_unavailable") return "Les nouveaux produits sont momentanément indisponibles. Réessayez dans quelques instants ou retirez-les du panier.";
     if (code === "price_changed") return "Le prix d’un produit a changé. Vérifiez votre panier avant de continuer.";
+    // Phase 4 : commande Red Dingo séparée (CGV 5.6) et moment du retrait (CGV 7.5).
+    if (code === "red_dingo_separate_order") return "Les médailles Red Dingo se commandent séparément des autres articles. Retirez-les du panier pour commander les autres articles, puis passez une seconde commande pour les médailles.";
+    if (code === "pickup_timing_required" || code === "invalid_pickup_timing") return "Indiquez quand vous souhaitez retirer vos achats.";
     if (result?.error) return "Le devis n’a pas pu être calculé. Vérifiez votre panier puis réessayez.";
     return "";
   }
@@ -352,17 +355,21 @@
     return optionRows(item?.options).map(([key, value]) => [humanizeOption(key), value]);
   }
 
+  // Phase 4 : l'envoi Animoco est réservé à la France ; Red Dingo livre les 27 pays de l'UE choisis dans le formulaire.
   function countryForShippingMode(mode) {
-    if (mode === "animoco-light-fr") return "FR";
-    if (mode === "animoco-light-be") return "BE";
-    return null;
+    return mode === "animoco-light-fr" ? "FR" : null;
   }
 
   function shippingModesForCountry(modes, country) {
-    if (country === "FR") return modes.filter((mode) => mode !== "animoco-light-be");
-    if (country === "BE") return modes.filter((mode) => mode !== "animoco-light-fr");
-    return [...modes];
+    return country && country !== "FR" ? modes.filter((mode) => mode !== "animoco-light-fr") : [...modes];
   }
+
+  // Moment du retrait (CGV 7.5), libellés de la feuille de route V1.2.4.
+  const PICKUP_TIMING_QUESTION = "Quand souhaitez-vous retirer vos achats ?";
+  const PICKUP_TIMING_LABELS = Object.freeze({
+    "puppy-departure": "Lors du départ de mon chiot",
+    appointment: "À une autre date, sur rendez-vous"
+  });
 
   function element(document, tag, className, text) {
     const node = document.createElement(tag);
@@ -379,14 +386,12 @@
     });
   }
 
+  // Phase 4 : une commande Red Dingo ne contient que des médailles Red Dingo, livrées par le fabricant (CGV 7.3).
   function deliveryDelayLines({ hasRedDingo, hasOther, mode }) {
     const result = [];
-    if (hasRedDingo && mode === "pickup") result.push("Médailles gravées : transmission à Red Dingo sous 24 h ouvrées, fabrication sous 7 à 10 jours ouvrés (indicatif), puis retrait à l’élevage sur rendez-vous dès réception.");
-    else if (hasRedDingo && ["red-dingo-free", "animoco-light-fr", "animoco-light-be"].includes(mode)) result.push("Médailles gravées : transmission à Red Dingo sous 24 h ouvrées, puis fabrication et expédition par Red Dingo sous 7 à 10 jours ouvrés (indicatif). Livraison comprise.");
+    if (hasRedDingo && mode === "red-dingo-free") result.push("Médailles gravées : transmission à Red Dingo sous 24 h ouvrées, puis fabrication et expédition par Red Dingo sous 7 à 10 jours ouvrés (indicatif). Livraison comprise.");
     if (hasOther && mode === "animoco-light-fr") result.push("Préparation et expédition sous 48 h ouvrées, puis La Poste Lettre verte suivie : 3 à 5 jours ouvrés (indicatif).");
-    else if (hasOther && mode === "animoco-light-be") result.push("Pour une livraison en Belgique, le Point Relais ou Locker Mondial Relay est choisi avec le client par email après la commande. Préparation et expédition sous 48 h ouvrées après votre choix, puis Mondial Relay : 3 à 6 jours ouvrés (indicatif).");
     else if (hasOther && mode === "pickup") result.push("Disponible à l’élevage sous 24 h ouvrées, sur rendez-vous. Vous êtes prévenu par email.");
-    if (hasRedDingo && hasOther && mode !== "pickup" && result.length > 1) result.push("Les médailles Red Dingo sont expédiées séparément, directement par Red Dingo.");
     return result;
   }
 
@@ -420,6 +425,7 @@
     const delaysNode = container.querySelector("[data-delivery-delays]");
     const countryField = customerForm.querySelector('[name="country"]');
     let selectedShipping = null;
+    let pickupTiming = "";
     let lastResult = null;
     let requestSequence = 0;
     let checkoutAttempt = null;
@@ -501,6 +507,27 @@
       });
     }
 
+    // Phase 4 : le moment du retrait accompagne le mode « retrait » ; il est conservé d'un devis à l'autre.
+    function shippingSelection(mode) {
+      return mode === "pickup" && pickupTiming ? { mode, pickupTiming } : { mode };
+    }
+
+    function pickupTimingFieldset() {
+      const fieldset = element(document, "fieldset", "pickup-timing");
+      fieldset.append(element(document, "legend", "", PICKUP_TIMING_QUESTION));
+      for (const [value, text] of Object.entries(PICKUP_TIMING_LABELS)) {
+        const label = element(document, "label", "shipping-choice");
+        const input = element(document, "input");
+        input.type = "radio";
+        input.name = "pickup-timing";
+        input.value = value;
+        input.checked = pickupTiming === value;
+        label.append(input, element(document, "span", "", text));
+        fieldset.append(label);
+      }
+      return fieldset;
+    }
+
     function renderModes(result) {
       const quote = result?.quote;
       const modes = shippingModesForCountry(quote?.availableShippingModes || result?.availableModes || [], countryField?.value);
@@ -520,12 +547,14 @@
         modesNode.append(label);
       }
       if (selectedShipping && !modes.includes(selectedShipping.mode)) selectedShipping = null;
+      if (selectedShipping?.mode === "pickup") modesNode.append(pickupTimingFieldset());
       // Lot A (K1) : un seul mode possible est présélectionné ; le devis est alors redemandé avec ce mode pour afficher
       // le total sans clic. Le serveur recalcule et valide comme pour un choix manuel.
       let autoSelected = false;
       if (!selectedShipping && modes.length === 1) {
-        selectedShipping = { mode: modes[0] };
+        selectedShipping = shippingSelection(modes[0]);
         modesNode.querySelector('input[name="shipping-mode"]').checked = true;
+        if (selectedShipping.mode === "pickup") modesNode.append(pickupTimingFieldset());
         const expectedCountry = countryForShippingMode(modes[0]);
         if (expectedCountry && countryField) {
           countryField.value = expectedCountry;
@@ -628,8 +657,15 @@
       refresh();
     });
     modesNode.addEventListener("change", (event) => {
+      if (event.target.name === "pickup-timing") {
+        // Pas de nouveau devis : le moment du retrait ne change ni le prix ni les modes proposés.
+        pickupTiming = event.target.value;
+        if (selectedShipping?.mode === "pickup") selectedShipping = shippingSelection("pickup");
+        checkoutStatus.hidden = true;
+        return;
+      }
       if (event.target.name !== "shipping-mode") return;
-      selectedShipping = { mode: event.target.value };
+      selectedShipping = shippingSelection(event.target.value);
       const expectedCountry = countryForShippingMode(event.target.value);
       if (expectedCountry && countryField) {
         countryField.value = expectedCountry;
@@ -652,6 +688,12 @@
       if (!store.getItems().length || !selectedShipping || !lastResult?.quote?.totalCents) {
         checkoutStatus.textContent = "Complétez le panier et choisissez un mode de livraison disponible.";
         checkoutStatus.hidden = false;
+        return;
+      }
+      if (selectedShipping.mode === "pickup" && !selectedShipping.pickupTiming) {
+        checkoutStatus.textContent = quoteStatusMessage({ error: "pickup_timing_required" });
+        checkoutStatus.hidden = false;
+        modesNode.querySelector('input[name="pickup-timing"]')?.focus();
         return;
       }
       if (!customerForm.checkValidity()) {
@@ -783,6 +825,8 @@
     SHOP_LEGAL_CURRENT_VERSION,
     EMPTY_SHIPPING_MESSAGE,
     MODE_LABELS,
+    PICKUP_TIMING_LABELS,
+    PICKUP_TIMING_QUESTION,
     STORAGE_KEY,
     STORAGE_VERSION,
     autoInit,

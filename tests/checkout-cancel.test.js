@@ -142,8 +142,8 @@ test("Stripe : expiration et relecture d'une session, identifiant contrôlé, cl
 test("seul un panier avec des produits du catalogue reçoit le lien d'annulation signé", async () => {
   const run = async (items) => {
     const calls = [];
-    await executeCheckout({ checkoutAttemptId: "123e4567-e89b-42d3-a456-426614174000", items, shipping: { mode: "pickup" },
-      customer: { firstName: "Test", lastName: "Panier", email: "panier@example.test", phone: "0600000000", country: "FR" }, legalAcceptance: { version: "cgv-2026-10-07", accepted: true } }, {
+    await executeCheckout({ checkoutAttemptId: "123e4567-e89b-42d3-a456-426614174000", items, shipping: { mode: "pickup", pickupTiming: "appointment" },
+      customer: { firstName: "Test", lastName: "Panier", email: "panier@example.test", phone: "0600000000", country: "FR" }, legalAcceptance: { version: "cgv-phase4-projet", accepted: true } }, {
       env: ENV, origin: "https://boutique.test", now: () => NOW,
       listCatalogue: async () => ({ available: true, products: [{ reference: "shampoing-test", name: "Shampoing", family: "COLIS", publicPriceCents: 1500, familyPriceCents: null, weightGrams: 300, purchasable: true, maxOrderQuantity: 3 }] }),
       manager: { async createOrder() { return { reference: REFERENCE }; }, async attachPaymentReference() { return {}; } },

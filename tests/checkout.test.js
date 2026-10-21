@@ -17,7 +17,7 @@ function checkoutInput(overrides = {}) {
     items: [{ productId: "animoco", quantity: 1, unitPriceCents: 1, totalCents: 1 }],
     shipping: { mode: "animoco-light-fr", priceCents: 1 },
     customer: CUSTOMER,
-    legalAcceptance: { version: "cgv-2026-10-07", accepted: true },
+    legalAcceptance: { version: "cgv-phase4-projet", accepted: true },
     totalCents: 1,
     ...overrides
   };
@@ -55,7 +55,7 @@ test("recalcule le prix serveur et crée la commande Manager avant Stripe", asyn
   assert.equal(deps.calls[0][1].lines[0].unitPriceCents, 1999);
   assert.equal(deps.calls[0][1].shippingCents, 350);
   assert.equal(deps.calls[0][1].totalCents, 2349);
-  assert.equal(deps.calls[0][1].legalVersion, "cgv-2026-10-07");
+  assert.equal(deps.calls[0][1].legalVersion, "cgv-phase4-projet");
   assert.match(deps.calls[0][1].legalAcceptedAt, /^\d{4}-\d{2}-\d{2}T/);
   assert.equal(deps.calls[1][1].lines[0].unitPriceCents, 1999);
   assert.equal(deps.calls[1][1].shippingCents, 350);
@@ -104,7 +104,7 @@ test("un colis sans grille reste commandable uniquement en retrait", async () =>
   const deps = dependencies();
   const result = await executeCheckout(checkoutInput({
     items: [{ productId: "cosmetics:block", quantity: 1 }],
-    shipping: { mode: "pickup" },
+    shipping: { mode: "pickup", pickupTiming: "appointment" },
     customer: { firstName: "David", lastName: "Test", email: "david@example.test", phone: "0600000000" }
   }), deps);
   assert.equal(result.ok, true);
@@ -122,15 +122,14 @@ test("refuse un mode Animoco incompatible avec le pays avant tout appel externe"
   }
 });
 
-test("accepte les modes Animoco correspondant au pays", async () => {
-  for (const [mode, country, total] of [["animoco-light-fr", "FR", 2349], ["animoco-light-be", "BE", 2489]]) {
-    const deps = dependencies();
-    const result = await executeCheckout(checkoutInput({
-      shipping: { mode }, customer: { ...CUSTOMER, country }
-    }), deps);
-    assert.equal(result.ok, true);
-    assert.equal(deps.calls[0][1].totalCents, total);
-  }
+test("phase 4 : envoi Animoco en France seulement, la Belgique est refusée avant tout appel externe", async () => {
+  const france = dependencies();
+  assert.equal((await executeCheckout(checkoutInput({ shipping: { mode: "animoco-light-fr" }, customer: { ...CUSTOMER, country: "FR" } }), france)).ok, true);
+  assert.equal(france.calls[0][1].totalCents, 2349);
+  const belgium = dependencies();
+  const refused = await executeCheckout(checkoutInput({ shipping: { mode: "animoco-light-be" }, customer: { ...CUSTOMER, country: "BE" } }), belgium);
+  assert.equal(refused.error, "invalid_shipping_mode");
+  assert.deepEqual(belgium.calls, []);
 });
 
 test("accepte Red Dingo en France et en Belgique", async () => {
@@ -180,7 +179,7 @@ test("refuse un consentement juridique absent ou d'une version obsolète", async
 
 test("ignore tout horodatage juridique envoyé par le navigateur", async () => {
   const deps = dependencies({ now: () => new Date("2026-10-06T12:00:00.000Z") });
-  await executeCheckout(checkoutInput({ legalAcceptedAt: "2000-01-01T00:00:00.000Z", legalAcceptance: { version: "cgv-2026-10-07", accepted: true, acceptedAt: "2000-01-01T00:00:00.000Z" } }), deps);
+  await executeCheckout(checkoutInput({ legalAcceptedAt: "2000-01-01T00:00:00.000Z", legalAcceptance: { version: "cgv-phase4-projet", accepted: true, acceptedAt: "2000-01-01T00:00:00.000Z" } }), deps);
   assert.equal(deps.calls[0][1].legalAcceptedAt, "2026-10-06T12:00:00.000Z");
 });
 
