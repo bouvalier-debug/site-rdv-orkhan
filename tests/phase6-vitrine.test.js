@@ -67,14 +67,15 @@ test("rayons : six URL stables, rayon vide sobre, parcours Animoco / Red Dingo e
   for (const rayon of RAYONS) assert.ok(vitrine.renderRayon({ available: true, products: [] }, rayon.slug).includes(SHOP_HEADER), rayon.slug);
 });
 
-test("accueil : six accès aux rayons toujours visibles, nouveautés masquées si vides, accès Sur demande, pas de scène provisoire", () => {
+test("accueil : scène interactive puis six accès classiques aux rayons, nouveautés masquées si vides, accès Sur demande", () => {
   const html = vitrine.renderAccueil(CATALOGUE);
   for (const rayon of RAYONS) assert.ok(html.includes(`class="rayon-tile`) && html.includes(`href="/rayons/${rayon.slug}/"`), rayon.slug);
   assert.match(html, /id="nouveautes"[\s\S]*Laisse &lt;cuir&gt;/);
   assert.match(html, /href="\/sur-demande\/"/);
   assert.match(html, /class="hero"/, "le bandeau photo actuel est conservé");
-  assert.equal(vitrine.SCENE, null);
-  assert.doesNotMatch(html, /home-scene/, "aucun emplacement vide en attendant l'image définitive");
+  assert.ok(html.indexOf('class="hero"') < html.indexOf("home-scene"), "la scène vient sous le visuel principal");
+  assert.ok(html.indexOf("home-scene") < html.indexOf('id="rayons-title"'), "puis les accès classiques");
+  assert.equal((html.match(/class="scene-zone /g) || []).length, 6);
   assert.doesNotMatch(vitrine.renderAccueil({ available: true, products: [product({ isNew: false })] }), /id="nouveautes"/);
   assert.match(vitrine.renderAccueil({ available: false, products: [] }), /Nos rayons/, "les rayons restent accessibles si le catalogue est indisponible");
 });
@@ -82,8 +83,8 @@ test("accueil : six accès aux rayons toujours visibles, nouveautés masquées s
 test("scène interactive : zones cliquables en HTML, indépendantes de l'image, une par rayon", () => {
   const zones = Object.fromEntries(RAYONS.map((rayon, index) => [rayon.key, { left: index * 15, top: 50, width: 12, height: 30 }]));
   const html = vitrine.sceneHtml({ image: "/assets/scene.webp", width: 1600, height: 900, alt: "Deux chiots et six produits", zones });
-  assert.equal((html.match(/class="scene-zone"/g) || []).length, 6);
-  for (const rayon of RAYONS) assert.match(html, new RegExp(`href="/rayons/${rayon.slug}/"[^>]*><span>${rayon.label}</span>`));
+  assert.equal((html.match(/class="scene-zone /g) || []).length, 6);
+  for (const rayon of RAYONS) assert.match(html, new RegExp(`href="/rayons/${rayon.slug}/"[^>]*><span aria-hidden="true">${rayon.label}</span>`));
   assert.equal(vitrine.sceneHtml(null), "");
 });
 
@@ -134,4 +135,28 @@ test("gabarit commun : même en-tête sur toutes les pages Boutique, 404 statiqu
   for (const archive of ["cgv-2026-10-05", "cgv-2026-10-07", "cgv-2026-10-21"]) {
     assert.equal(read(`conditions-generales-de-vente/${archive}/index.html`).includes(SHOP_HEADER), false, `${archive} reste telle que publiée`);
   }
+});
+
+test("scène validée : image recompressée en deux tailles, six zones sans chevauchement, libellés hors de l'image", () => {
+  const scene = vitrine.SCENE;
+  for (const [url, width] of scene.sources) {
+    const file = path.join(root, url.slice(1));
+    assert.ok(fs.existsSync(file), url);
+    assert.ok(fs.statSync(file).size < (width > 1000 ? 220 : 80) * 1024, `${url} optimisée`);
+  }
+  assert.deepEqual(Object.keys(scene.zones).sort(), RAYONS.map((rayon) => rayon.key).sort());
+  const boxes = Object.entries(scene.zones);
+  for (const [key, zone] of boxes) {
+    assert.ok(zone.left >= 0 && zone.top >= 0 && zone.left + zone.width <= 100 && zone.top + zone.height <= 100, key);
+    for (const [other, box] of boxes) {
+      if (other === key) continue;
+      const overlap = Math.min(zone.left + zone.width, box.left + box.width) - Math.max(zone.left, box.left) > 0.5
+        && Math.min(zone.top + zone.height, box.top + box.height) - Math.max(zone.top, box.top) > 0.5;
+      assert.equal(overlap, false, `${key} / ${other}`);
+    }
+  }
+  const html = vitrine.sceneHtml(scene);
+  assert.ok(html.includes('srcset="/assets/accueil/scene-boutique-800.webp 800w, /assets/accueil/scene-boutique-1586.webp 1586w"'));
+  assert.match(html, /width="1586" height="992"/);
+  assert.match(html, /aria-label="Rayon Identification : la médaille"/);
 });

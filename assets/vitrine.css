@@ -60,13 +60,30 @@
 .home-promises p{margin:0;padding:18px 20px;border-top:3px solid var(--gold);background:#fff;color:var(--muted);font-size:.95rem}
 .home-promises strong{display:block;color:var(--wine)}
 
-/* Scène interactive (structure prête ; rendue seulement lorsque l'image définitive est validée) */
-.home-scene{margin:48px 0 0}
-.scene-frame{position:relative;overflow:hidden;border-radius:16px}
+/* Scène interactive de l'accueil : image intacte, zones et libellés en HTML/CSS (aucun accès par le seul survol). */
+.home-scene>h2{margin-bottom:4px}
+.scene-hint{margin:0 0 18px;color:var(--muted)}
+.scene-frame{position:relative;overflow:hidden;border-radius:18px;box-shadow:var(--shadow)}
 .scene-frame img{display:block;width:100%;height:auto}
-.scene-zone{position:absolute;display:flex;align-items:flex-end;justify-content:center;border-radius:12px;text-decoration:none}
-.scene-zone span{margin-bottom:6px;padding:6px 12px;border-radius:999px;background:rgba(255,253,249,.92);color:var(--wine);font-weight:800;font-size:.9rem;box-shadow:0 4px 14px rgba(0,0,0,.12)}
-.scene-zone:hover,.scene-zone:focus-visible{outline:2px solid var(--gold);outline-offset:-2px;background:rgba(255,253,249,.12)}
+.scene-zone{position:absolute;display:flex;justify-content:center;border-radius:14px;color:var(--wine);text-decoration:none;transition:background .18s,box-shadow .18s}
+.scene-label-bottom{align-items:flex-end}.scene-label-center{align-items:center}.scene-label-top{align-items:flex-start}
+.scene-label-below{align-items:flex-end}.scene-label-below span{transform:translateY(calc(100% + 8px))}
+.scene-zone span{margin:10px;padding:7px 14px;border-radius:999px;background:rgba(255,253,249,.94);color:var(--wine);font-size:.88rem;font-weight:800;white-space:nowrap;box-shadow:0 6px 18px rgba(40,20,20,.18);transition:background .18s,color .18s}
+.scene-zone:hover,.scene-zone:focus-visible{background:rgba(255,253,249,.14);box-shadow:inset 0 0 0 2px rgba(189,148,82,.95)}
+.scene-zone:hover span,.scene-zone:focus-visible span{background:var(--wine);color:#fff}
+.scene-zone:focus-visible{outline:none}
+@media(max-width:960px){.scene-zone span{margin:6px;padding:5px 10px;font-size:.78rem}}
+/* Mobile : libellés remplacés par des repères dorés ; la zone (élargie à 44 px au moins) reste le lien. */
+@media(max-width:700px){
+  .scene-frame{border-radius:12px}
+  .scene-zone{align-items:center!important}
+  .scene-zone span{position:absolute;width:1px;height:1px;margin:0;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .scene-zone::before{content:"";width:18px;height:18px;border:3px solid #fff;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(189,148,82,.35),0 3px 8px rgba(0,0,0,.25)}
+  .scene-zone-small::after{content:"";position:absolute;inset:-9px}
+  .scene-zone:active::before{background:var(--wine)}
+}
+@media(prefers-reduced-motion:no-preference) and (max-width:700px){.scene-zone::before{animation:scene-pulse 2.4s ease-in-out infinite}}
+@keyframes scene-pulse{0%,100%{box-shadow:0 0 0 4px rgba(189,148,82,.35),0 3px 8px rgba(0,0,0,.25)}50%{box-shadow:0 0 0 9px rgba(189,148,82,.12),0 3px 8px rgba(0,0,0,.25)}}
 
 /* Fiche produit (C5 / CAT-02) */
 .breadcrumb{margin:26px 0 18px;color:var(--muted);font-size:.9rem}

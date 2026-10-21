@@ -9,10 +9,24 @@ const { BACK_TO_TOP, FACEBOOK_FAB, RAYONS, SHOP_FOOTER, SHOP_HEADER } = require(
 const ORIGIN = "https://boutique.dynastiedorkhan.com";
 const FICHE_SLUG = /^[a-z0-9]+([-:][a-z0-9]+)*$/;
 
-// Emplacement de la future scène interactive (VIS-02). Tant qu'aucune image définitive n'est validée, la section
-// n'est pas rendue : les six accès classiques aux rayons suffisent. Format attendu :
-// { image: "/assets/...", width, height, alt, zones: { ALIMENTATION: { left, top, width, height }, ... } } en %.
-const SCENE = null;
+// Scène interactive de l'accueil (VIS-02), image validée par le porteur le 21/10/2026 et conservée telle quelle
+// (seulement recompressée). Les zones, en % de l'image, entourent le produit représentatif de chaque rayon ; les
+// libellés et interactions sont dans le code, jamais sur l'image. labelAt : position du libellé dans la zone.
+const SCENE = {
+  image: "/assets/accueil/scene-boutique-1586.webp",
+  sources: [["/assets/accueil/scene-boutique-800.webp", 800], ["/assets/accueil/scene-boutique-1586.webp", 1586]],
+  width: 1586,
+  height: 992,
+  alt: "Un chiot Cavalier King Charles et un chiot Bullmastiff entourés de six produits de la boutique : croquettes, gamelles, collier, médaille, shampooing et peluche.",
+  zones: {
+    ALIMENTATION: { product: "les croquettes", left: 5.7, top: 6.9, width: 23.5, height: 52.6, labelAt: "bottom" },
+    ACCESSOIRES: { product: "les gamelles", left: 0.5, top: 60, width: 34.9, height: 22.9, labelAt: "center" },
+    SELLERIE: { product: "le collier", left: 37.5, top: 70.6, width: 22.4, height: 15.1, labelAt: "below" },
+    IDENTIFICATION: { product: "la médaille", left: 62.4, top: 75.6, width: 7.9, height: 12.6, labelAt: "below" },
+    HYGIENE_SOINS: { product: "le shampooing", left: 78.1, top: 17.6, width: 8.7, height: 46.4, labelAt: "center" },
+    JOUETS: { product: "la peluche", left: 73.1, top: 64.5, width: 26.9, height: 25.7, labelAt: "center" }
+  }
+};
 
 // Parcours spéciaux conservés (Identification) et accès temporaire aux cosmétiques actuels jusqu'à la phase 7.
 const AMOUNT_COSMETICS = Math.min(...CATALOG_CONFIG.parcelProducts.filter((product) => product.id.startsWith("cosmetics:")).map((product) => product.priceCents));
@@ -171,13 +185,18 @@ function emptyRayon() {
   return '<p class="rayon-empty">Produits prochainement disponibles.</p>';
 }
 
+// Chaque zone est un lien ordinaire (clic, clavier, toucher) ; aucun accès ne dépend du survol.
 function sceneHtml(scene) {
   if (!scene) return "";
   const zones = RAYONS.filter((rayon) => scene.zones?.[rayon.key]).map((rayon) => {
     const zone = scene.zones[rayon.key];
-    return `<a class="scene-zone" href="/rayons/${rayon.slug}/" style="left:${zone.left}%;top:${zone.top}%;width:${zone.width}%;height:${zone.height}%"><span>${rayon.label}</span></a>`;
+    const label = `Rayon ${rayon.label}${zone.product ? ` : ${zone.product}` : ""}`;
+    // Petits produits (médaille, flacon) : zone tactile élargie sur mobile pour atteindre environ 44 px.
+    return `<a class="scene-zone scene-label-${zone.labelAt || "bottom"}${zone.width < 10 ? " scene-zone-small" : ""}" href="/rayons/${rayon.slug}/" aria-label="${escapeHtml(label)}" style="left:${zone.left}%;top:${zone.top}%;width:${zone.width}%;height:${zone.height}%"><span aria-hidden="true">${rayon.label}</span></a>`;
   }).join("");
-  return `<section class="home-scene" aria-label="Explorer les rayons"><div class="scene-frame"><img src="${scene.image}" alt="${escapeHtml(scene.alt)}" width="${scene.width}" height="${scene.height}">${zones}</div></section>`;
+  const srcset = (scene.sources || []).map(([url, width]) => `${url} ${width}w`).join(", ");
+  return `<section class="home-section home-scene" aria-labelledby="scene-title"><h2 id="scene-title">Explorez la boutique</h2><p class="scene-hint">Choisissez un produit pour découvrir son rayon.</p>`
+    + `<div class="scene-frame"><img src="${scene.image}"${srcset ? ` srcset="${srcset}" sizes="(max-width: 1220px) calc(100vw - 28px), 1180px"` : ""} alt="${escapeHtml(scene.alt)}" width="${scene.width}" height="${scene.height}" decoding="async">${zones}</div></section>`;
 }
 
 function renderAccueil(catalogue) {
