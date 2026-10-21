@@ -14,7 +14,6 @@ const {
   countryForShippingMode,
   displayOptionRows,
   parseStoredCart,
-  parseStoredCustomer,
   quoteStatusMessage,
   requestQuote,
   requestCheckout,
@@ -187,22 +186,21 @@ test("une indisponibilité Famille bloque le total et le paiement avec le messag
   assert.match(source, /checkoutButton\.disabled = result\?\.error === "family_verification_unavailable"/);
 });
 
-test("les coordonnées ne sont conservées qu'après consentement explicite", () => {
-  const storage = memoryStorage();
+test("K3 : les coordonnées ne sont jamais enregistrées et les anciennes coordonnées locales sont effacées", () => {
+  const storage = memoryStorage({
+    "orkhan-shop-customer-v1": "ancienne",
+    [CUSTOMER_STORAGE_KEY]: JSON.stringify({ version: 2, savedAt: "2026-10-01T00:00:00.000Z", customer: { firstName: "David" } }),
+    [STORAGE_KEY]: "panier",
+    "orkhan-shop-family-chip-v1": "puce"
+  });
   const customer = createCustomerStore({ storage, now: () => NOW });
+  assert.equal(customer.get().firstName, "");
   customer.setField("firstName", "David");
-  customer.setField("email", "david@example.test");
+  assert.equal(customer.get().firstName, "David");
+  assert.equal(storage.getItem("orkhan-shop-customer-v1"), null);
   assert.equal(storage.getItem(CUSTOMER_STORAGE_KEY), null);
-  customer.setRemember(true);
-  const restored = createCustomerStore({ storage, now: () => NOW }).get();
-  assert.equal(restored.firstName, "David");
-  assert.equal(restored.email, "david@example.test");
-  assert.equal(JSON.parse(storage.getItem(CUSTOMER_STORAGE_KEY)).version, 2);
-});
-
-test("des coordonnées locales corrompues sont ignorées", () => {
-  assert.equal(parseStoredCustomer("{cassé").customer.firstName, "");
-  assert.equal(parseStoredCustomer(JSON.stringify({ version: 99, customer: { firstName: "Intrus" } })).customer.firstName, "");
+  assert.equal(storage.getItem(STORAGE_KEY), "panier");
+  assert.equal(storage.getItem("orkhan-shop-family-chip-v1"), "puce");
 });
 
 test("le retrait conserve les contacts obligatoires mais rend l’adresse facultative", () => {
@@ -220,9 +218,9 @@ test("les coordonnées ne sont jamais envoyées à cart-quote", () => {
   assert.doesNotMatch(JSON.stringify(payload), /David|example\.test/);
 });
 
-test("la page affiche l'aide livraison et le consentement de mémorisation", () => {
+test("la page affiche l'aide livraison, sans option de mémorisation des coordonnées", () => {
   assert.ok(cartPage.includes(EMPTY_SHIPPING_MESSAGE));
-  assert.match(cartPage, /type="checkbox" data-remember-customer> Enregistrer mes coordonnées/);
+  assert.doesNotMatch(cartPage, /data-remember-customer|Enregistrer mes coordonnées|data-clear-customer/);
   assert.doesNotMatch(cartPage, />Vérifier mes coordonnées<\/button>/);
 });
 
@@ -282,21 +280,7 @@ test("récapitulatif : sans encadré, case CGV non précochée juste avant le bo
   for (const term of ["rétractation", "Red Dingo gravées", "/conditions-generales-de-vente/", "/mentions-legales/", "/renoncer-au-contrat/"]) assert.ok(reminder.includes(term), term);
 });
 
-test("le panier et les coordonnées expirés sont supprimés", () => {
+test("le panier expiré est supprimé", () => {
   const oldCart = JSON.stringify({ version: 1, updatedAt: "2026-09-01T00:00:00.000Z", items: [{ lineId: "1", productId: "animoco", quantity: 1 }] });
   assert.deepEqual(parseStoredCart(oldCart, NOW), []);
-  const oldCustomer = JSON.stringify({ version: 2, savedAt: "2025-10-01T00:00:00.000Z", customer: { firstName: "David" } });
-  assert.equal(parseStoredCustomer(oldCustomer, NOW).customer.firstName, "");
-  assert.equal(parseStoredCustomer(JSON.stringify({ version: 2, savedAt: "invalide", customer: { firstName: "David" } }), NOW).customer.firstName, "");
-});
-
-test("la clé coordonnées v1 est supprimée au chargement et v2 est effacée au décochage", () => {
-  const storage = memoryStorage({ "orkhan-shop-customer-v1": "ancienne" });
-  const customer = createCustomerStore({ storage, now: () => NOW });
-  assert.equal(storage.getItem("orkhan-shop-customer-v1"), null);
-  customer.setRemember(true);
-  customer.setField("firstName", "David");
-  assert.ok(storage.getItem(CUSTOMER_STORAGE_KEY));
-  customer.setRemember(false);
-  assert.equal(storage.getItem(CUSTOMER_STORAGE_KEY), null);
 });

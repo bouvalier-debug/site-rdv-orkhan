@@ -237,3 +237,17 @@ body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]::after{cont
   .site-nav a,.ecosystem-nav a{min-height:44px}
   .site-footer p a,body>footer p a{display:inline-block;padding-block:11px}
 }
+
+/* Lot A (K5) : « Retour en haut » commun, aligné sous le bouton Facebook. */
+#to-top{border:0;color:#fff;background:var(--wine);cursor:pointer}
+#to-top:hover,#to-top:focus-visible{background:var(--wine-dark)}
+.facebook-fab{right:18px}
+@media(max-width:700px){
+  .facebook-fab,#to-top{right:16px;width:46px;height:46px}
+  .facebook-fab{bottom:calc(16px + 46px + 14px)}
+  #to-top{bottom:16px}
+}
+/* Lot A (K4) : champs de saisie à 16 px au moins sur mobile, pour éviter le zoom automatique d’iOS. */
+@media(max-width:800px){
+  input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{font-size:16px!important}
+}
