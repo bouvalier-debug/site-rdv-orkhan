@@ -74,7 +74,8 @@ test("ne garde que les champs publics et relaie les photos par la Boutique", asy
   assert.deepEqual(result.products, [{
     reference: "test-photos-001", name: "Pack hiver", family: "COLIS", description: "Soins d'hiver\nPour chiens",
     publicPriceCents: 3490, familyPriceCents: 2990, weightGrams: 900, purchasable: false, maxOrderQuantity: 0,
-    photos: [{ url: `/api/catalogue-photo?id=${PHOTO}`, width: 640, height: 480, altText: "Pack ouvert" }]
+    photos: [{ url: `/api/catalogue-photo?id=${PHOTO}`, width: 640, height: 480, altText: "Pack ouvert" }],
+    shelf: null, subcategory: null, variantGroup: null, variantLabel: null, onRequest: false, isNew: true, availability: null, listed: true
   }]);
   const serialized = JSON.stringify(result);
   for (const forbidden of [SECRET, BYPASS, "supabase", "storage", "priceChanges", "uuid-interne", "manager-preview", "DRAFT"]) assert.equal(serialized.includes(forbidden), false, forbidden);

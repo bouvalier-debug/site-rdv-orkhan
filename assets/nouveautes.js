@@ -17,8 +17,10 @@
   // Les autres restent affichés à titre informatif.
 
   const NOT_FOR_SALE = "Bientôt disponible — pas encore en vente";
-  const OUT_OF_STOCK = "Rupture de stock";
+  // Phase 3 (CAT-04, CAT-10) : un produit en vente sans stock reste affiché ; l'état est calculé par le Manager.
+  const OUT_OF_STOCK = "Indisponible pour le moment";
   const PICKUP_ONLY = "Retrait sur place à l’élevage";
+  const LOW_STOCK = "Stock faible · retrait sur place à l’élevage";
   const MESSAGES = {
     loading: "Chargement des nouveautés…",
     unavailable: "Les nouveautés sont momentanément indisponibles. Les autres produits de la boutique restent disponibles à la commande.",
@@ -39,15 +41,16 @@
     if (product.purchasable !== true || !reference) return { reference, buyable: false, availability: NOT_FOR_SALE };
     const maxQuantity = Number.isInteger(product.maxOrderQuantity) ? product.maxOrderQuantity : 0;
     return maxQuantity > 0
-      ? { reference, buyable: true, maxQuantity, availability: PICKUP_ONLY }
+      ? { reference, buyable: true, maxQuantity, availability: product.availability === "low_stock" ? LOW_STOCK : PICKUP_ONLY }
       : { reference, buyable: false, availability: OUT_OF_STOCK };
   }
 
   // Modèle d'affichage : ne garde que des champs publics ; l'achat n'est proposé que sur indication du Manager.
   function describeProducts(data) {
     if (!data || data.available !== true || !Array.isArray(data.products)) return [];
-    return data.products.filter((product) => product && typeof product.name === "string" && Number.isInteger(product.publicPriceCents)).map((product) => ({
-      name: product.name,
+    return data.products.filter((product) => product && typeof product.name === "string" && Number.isInteger(product.publicPriceCents) && product.onRequest !== true).map((product) => ({
+      // Variantes (CAT-02) : chaque format reste une ligne distincte, nommée avec son format en attendant les fiches.
+      name: typeof product.variantLabel === "string" && product.variantLabel ? `${product.name} — ${product.variantLabel}` : product.name,
       description: typeof product.description === "string" ? product.description : "",
       price: formatPrice(product.publicPriceCents),
       familyPrice: Number.isInteger(product.familyPriceCents) ? formatPrice(product.familyPriceCents) : null,
@@ -142,5 +145,5 @@
     });
   }
 
-  return { MESSAGES, NOT_FOR_SALE, OUT_OF_STOCK, PICKUP_ONLY, addToCart, autoInit, describeProducts, formatPrice, loadCatalogue, renderCatalogue, saleState, statusMessage };
+  return { LOW_STOCK, MESSAGES, NOT_FOR_SALE, OUT_OF_STOCK, PICKUP_ONLY, addToCart, autoInit, describeProducts, formatPrice, loadCatalogue, renderCatalogue, saleState, statusMessage };
 }));
