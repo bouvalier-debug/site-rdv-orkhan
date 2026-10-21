@@ -18,9 +18,9 @@ test("aucun sitemap ni robots partagé ne masque les réécritures par hôte", (
 
 test("sitemap.xml et robots.txt sont servis selon l'hôte, Boutique par défaut", () => {
   // Phase 6 : les réécritures de la vitrine (accueil, rayons, Sur demande, fiches) précèdent celles du SEO.
-  assert.deepEqual(config.rewrites.filter((rewrite) => !rewrite.destination.startsWith("/api/vitrine?")), [
+  assert.deepEqual(config.rewrites.filter((rewrite) => !rewrite.destination.startsWith("/api/vitrine?") || rewrite.source === "/sitemap.xml"), [
     { source: "/sitemap.xml", has: RDV_HOST, destination: "/seo/sitemap-rdv.xml" },
-    { source: "/sitemap.xml", destination: "/api/sitemap" },
+    { source: "/sitemap.xml", destination: "/api/vitrine?vue=sitemap" },
     { source: "/robots.txt", has: RDV_HOST, destination: "/seo/robots-rdv.txt" },
     { source: "/robots.txt", destination: "/seo/robots-boutique.txt" }
   ]);

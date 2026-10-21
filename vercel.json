@@ -187,7 +187,7 @@
     },
     {
       "source": "/sitemap.xml",
-      "destination": "/api/sitemap"
+      "destination": "/api/vitrine?vue=sitemap"
     },
     {
       "source": "/robots.txt",
@@ -247,7 +247,7 @@
     }
   ],
   "functions": {
-    "api/sitemap.js": {
+    "api/vitrine.js": {
       "includeFiles": "seo/sitemap-boutique.xml"
     }
   }

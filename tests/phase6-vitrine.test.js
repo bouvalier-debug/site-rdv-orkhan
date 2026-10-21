@@ -162,8 +162,7 @@ test("scène validée : image recompressée en deux tailles, six zones sans chev
 });
 
 test("sitemap Boutique : pages fixes puis fiches produit du catalogue, pages fixes seules si le catalogue est indisponible", async () => {
-  const sitemap = require("../api/sitemap");
-  const run = async (catalogue) => { const res = recorder(); await sitemap({ method: "GET" }, res, { listCatalogue: async () => catalogue }); return res; };
+  const run = async (catalogue) => { const res = recorder(); await handler({ method: "GET", query: { vue: "sitemap" } }, res, { listCatalogue: async () => catalogue }); return res; };
   const ok = await run(CATALOGUE);
   assert.equal(ok.headers["Content-Type"], "application/xml; charset=utf-8");
   assert.match(ok.body, /<loc>https:\/\/boutique\.dynastiedorkhan\.com\/rayons\/alimentation\/<\/loc>/);
