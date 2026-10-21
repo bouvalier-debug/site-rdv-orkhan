@@ -6,7 +6,6 @@ const { fetchCataloguePhoto, listCatalogue, publicProduct } = require("../api/_o
 const productsHandler = require("../api/catalogue-produits");
 const photoHandler = require("../api/catalogue-photo");
 const { validateCart } = require("../api/_cart");
-const { describeProducts, renderCatalogue, saleState, statusMessage, MESSAGES, NOT_FOR_SALE, OUT_OF_STOCK, PICKUP_ONLY } = require("../assets/nouveautes");
 
 const SECRET = "secret-boutique-de-test-0123456789";
 const BYPASS = "bypass-preview-de-test";
@@ -150,61 +149,6 @@ test("relaie une photo publiée sans exposer le Manager, et refuse les identifia
     const invalid = responseRecorder(); await photoHandler({ method: "GET", query: { id: "x" } }, invalid);
     assert.equal(invalid.statusCode, 404);
   });
-});
-
-function fakeDocument() {
-  const make = (tag) => ({ tag, children: [], dataset: {}, className: "", textContent: "", append(...nodes) { this.children.push(...nodes); }, replaceChildren(...nodes) { this.children = nodes; } });
-  return { createElement: make };
-}
-function flatten(node) { return [node, ...node.children.flatMap(flatten)]; }
-
-test("la page affiche nom, description, prix et photos, sans moyen d'acheter un produit non achetable", () => {
-  const data = { available: true, products: [{ name: "<img src=x onerror=alert(1)>", description: "Texte", publicPriceCents: 3490, familyPriceCents: 2990, photos: [{ url: `/api/catalogue-photo?id=${PHOTO}`, altText: "Pack", width: 640, height: 480 }, { url: "https://evil.example/x.png" }] }] };
-  const document = fakeDocument(); const container = document.createElement("section"); const status = document.createElement("p");
-  assert.equal(renderCatalogue(document, container, status, data), 1);
-  const nodes = flatten(container);
-  assert.deepEqual(nodes.filter((node) => node.tag === "img").map((node) => node.src), [`/api/catalogue-photo?id=${PHOTO}`]);
-  assert.equal(nodes.some((node) => ["button", "form", "a", "input"].includes(node.tag)), false);
-  const texts = nodes.map((node) => node.textContent).filter(Boolean);
-  assert.ok(texts.includes(NOT_FOR_SALE));
-  assert.ok(texts.includes("<img src=x onerror=alert(1)>"));
-  assert.ok(texts.some((value) => /Prix : 34,90/.test(value)));
-  assert.ok(texts.some((value) => /Prix famille Dynastie : 29,90/.test(value)));
-  assert.equal(status.hidden, true);
-});
-
-test("la page affiche un message adapté si le catalogue est indisponible ou vide", () => {
-  assert.equal(statusMessage({ available: false, products: [] }), MESSAGES.unavailable);
-  assert.equal(statusMessage(null), MESSAGES.unavailable);
-  assert.equal(statusMessage({ available: true, products: [] }), MESSAGES.empty);
-  assert.deepEqual(describeProducts({ available: false, products: [{ name: "x", publicPriceCents: 1 }] }), []);
-  const document = fakeDocument(); const container = document.createElement("section"); const status = document.createElement("p");
-  renderCatalogue(document, container, status, { available: false });
-  assert.equal(status.textContent, MESSAGES.unavailable); assert.equal(status.hidden, false); assert.equal(container.children.length, 0);
-});
-
-test("lot 2 : seul un produit achetable avec du stock affiche le bouton d'ajout au panier", () => {
-  const document = fakeDocument(); const container = document.createElement("section"); const status = document.createElement("p");
-  const product = (extra) => ({ reference: "shampoing-test", name: "Shampoing", publicPriceCents: 1500, photos: [], ...extra });
-  renderCatalogue(document, container, status, { available: true, products: [
-    product({ purchasable: true, maxOrderQuantity: 2 }), product({ reference: "brosse-test", purchasable: true, maxOrderQuantity: 0 }), product({ reference: "gamelle-test", purchasable: false, maxOrderQuantity: 5 })
-  ] });
-  const nodes = flatten(container);
-  const buttons = nodes.filter((node) => node.tag === "button");
-  assert.equal(buttons.length, 1);
-  assert.equal(buttons[0].dataset.catalogueReference, "shampoing-test");
-  const texts = nodes.map((node) => node.textContent);
-  for (const label of [PICKUP_ONLY, OUT_OF_STOCK, NOT_FOR_SALE]) assert.ok(texts.includes(label), label);
-  assert.deepEqual(saleState({ reference: "x", purchasable: true }), { reference: "x", buyable: false, availability: OUT_OF_STOCK });
-});
-
-test("la page /nouveautes/ n'a pas de paiement direct et n'est pas indexée", () => {
-  const html = fs.readFileSync(path.join(__dirname, "..", "nouveautes", "index.html"), "utf8");
-  assert.match(html, /<meta name="robots" content="noindex">/);
-  assert.match(html, /retrait sur place à l’élevage/);
-  assert.match(html, /<script src="\/assets\/product-cart\.js"><\/script>/);
-  assert.equal(/checkout|stripe/i.test(html), false);
-  assert.equal(/ORKHAN_|SECRET|supabase/i.test(html + fs.readFileSync(path.join(__dirname, "..", "assets", "nouveautes.js"), "utf8")), false);
 });
 
 test("sans catalogue Manager, un produit du nouveau catalogue ne peut pas entrer dans le panier serveur", () => {

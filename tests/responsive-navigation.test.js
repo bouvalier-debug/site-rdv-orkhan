@@ -36,14 +36,13 @@ test("les caractéristiques des médailles connectées passent sur une colonne e
   assert.match(styles, /\.specs\{grid-template-columns:repeat\(2,1fr\)/, "deux colonnes conservées au-delà");
 });
 
-test("le menu Boutique propose « Nouveautés » après « Cosmétiques », actif seulement sur /nouveautes/", () => {
-  const pages = { "index.html": false, "cosmetiques/index.html": false, "medailles-connectees/index.html": false, "nouveautes/index.html": true };
-  for (const [file, active] of Object.entries(pages)) {
-    const nav = read(file).match(/<nav class="site-nav shop-nav"[^>]*>.*?<\/nav>/s)[0];
-    assert.equal((nav.match(/href="\/nouveautes\/"/g) || []).length, 1, file);
-    assert.ok(nav.indexOf('href="/nouveautes/"') > nav.indexOf('href="/cosmetiques/"'), `${file} : après Cosmétiques`);
-    assert.ok(nav.indexOf('href="/nouveautes/"') < nav.indexOf('href="/panier/"'), `${file} : avant le panier`);
-    assert.equal(/class="active" aria-current="page" href="\/nouveautes\/"/.test(nav), active, `${file} : état actif`);
-  }
-  assert.match(read("nouveautes/index.html"), /<meta name="robots" content="noindex">/, "page toujours non indexée pendant le lot 1");
+test("phase 6 : menu Boutique « Accueil | Rayons | Panier | Contact », sans Rendez-vous ni Nouveautés", () => {
+  const { RAYONS, SHOP_HEADER } = require("../scripts/shop-layout");
+  const labels = [...SHOP_HEADER.matchAll(/<nav class="shop-menu"[^>]*>(.*)<\/nav>/gs)][0][1];
+  assert.deepEqual([...labels.matchAll(/<(?:a [^>]*|summary)>([^<]+)/g)].map((match) => match[1].trim()).filter((label) => ["Accueil", "Rayons", "Panier", "Contact"].includes(label)), ["Accueil", "Rayons", "Panier", "Contact"]);
+  assert.deepEqual(RAYONS.map((rayon) => rayon.label), ["Alimentation", "Sellerie", "Identification", "Jouets", "Accessoires", "Hygiène et soins"]);
+  for (const rayon of RAYONS) assert.ok(SHOP_HEADER.includes(`<a href="/rayons/${rayon.slug}/">${rayon.label}</a>`), rayon.label);
+  assert.doesNotMatch(SHOP_HEADER, /demande-de-rdv|Rendez-vous|nouveautes/);
+  assert.match(SHOP_HEADER, /<details class="shop-rayons"><summary>Rayons<\/summary>/, "ouverture au clic, au clavier et au toucher");
+  assert.match(css, /\.shop-menu>a,\.shop-rayons>summary\{[^}]*min-height:44px/, "cibles tactiles d’au moins 44 px");
 });

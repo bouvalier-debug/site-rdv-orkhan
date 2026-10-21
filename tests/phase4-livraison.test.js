@@ -82,7 +82,7 @@ test("pages produits : Animoco en France, Red Dingo en UE 27 et commandé sépar
   const animoco = read("medailles-connectees/index.html");
   assert.match(animoco, /Livraison en France uniquement\./);
   assert.doesNotMatch(animoco, /Belgique|Mondial Relay/);
-  const redDingo = read("index.html");
+  const redDingo = read("medailles-gravees/index.html");
   assert.match(redDingo, /27 pays de l’Union européenne/);
   assert.doesNotMatch(redDingo, /Retrait gratuit à l’élevage possible/);
 });

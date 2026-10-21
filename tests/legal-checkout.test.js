@@ -35,7 +35,7 @@ test("le formulaire officiel conserve littéralement les sept marqueurs (*)", ()
 
 test("les pages Boutique exposent les quatre liens permanents", () => {
   for (const file of [
-    "index.html", "medailles-connectees/index.html", "cosmetiques/index.html", "panier/index.html",
+    "medailles-gravees/index.html", "medailles-connectees/index.html", "cosmetiques/index.html", "panier/index.html",
     "panier/confirmation/index.html", "conditions-generales-de-vente/index.html",
     "confidentialite/index.html", "mentions-legales/index.html", "renoncer-au-contrat/index.html"
   ]) {
@@ -77,20 +77,20 @@ test("les libellés et délais de livraison restent stables", () => {
 });
 
 test("les blocs juridiques produits reprennent les arbitrages validés", () => {
-  assert.match(read("index.html"), /Produit personnalisé — pas de droit de rétractation/);
+  assert.match(read("medailles-gravees/index.html"), /Produit personnalisé — pas de droit de rétractation/);
   assert.match(read("medailles-connectees/index.html"), /droit de rétractation de 14 jours/i);
   assert.match(read("cosmetiques/index.html"), /produit descellé.*raisons d’hygiène ou de protection de la santé/i);
 });
 
 test("toutes les phrases et routes de l'ancien circuit ont disparu des pages Boutique", () => {
-  const pages = ["index.html", "medailles-connectees/index.html", "cosmetiques/index.html", "panier/index.html", "panier/confirmation/index.html", "conditions-generales-de-vente/index.html", "confidentialite/index.html", "mentions-legales/index.html"];
+  const pages = ["medailles-gravees/index.html", "medailles-connectees/index.html", "cosmetiques/index.html", "panier/index.html", "panier/confirmation/index.html", "conditions-generales-de-vente/index.html", "confidentialite/index.html", "mentions-legales/index.html"];
   const obsolete = ["Envoyer ma demande de vérification", "Envoyer ma demande de commande", "Envoyer ma demande", "Afficher l'ancien formulaire de demande", "Merci de ne pas effectuer de règlement", "règlement est demandé uniquement après", "Frais réduits confirmés avant règlement", "Autre pays — nous contacter", "Choix Mondial Relay à venir", "pourront bientôt ajouter", "Payer par carte", "/api/medaille-webhook", "/medailles-gravees/conditions-vente.html"];
   const html = pages.map(read).join("\n");
   for (const phrase of obsolete) assert.equal(html.includes(phrase), false, phrase);
 });
 
 test("tous les scripts intégrés aux pages produits sont syntaxiquement valides", () => {
-  for (const file of ["index.html", "medailles-connectees/index.html", "cosmetiques/index.html"]) {
+  for (const file of ["medailles-gravees/index.html", "medailles-connectees/index.html", "cosmetiques/index.html"]) {
     const scripts = [...read(file).matchAll(/<script(?![^>]*src=|[^>]*application\/ld\+json)[^>]*>([\s\S]*?)<\/script>/g)];
     for (const [, source] of scripts) assert.doesNotThrow(() => new Function(source), file);
   }

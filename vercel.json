@@ -13,7 +13,7 @@
           "value": "rdv.dynastiedorkhan.com"
         }
       ],
-      "destination": "https://boutique.dynastiedorkhan.com/",
+      "destination": "https://boutique.dynastiedorkhan.com/medailles-gravees/",
       "permanent": true
     },
     {
@@ -24,17 +24,61 @@
           "value": "rdv.dynastiedorkhan.com"
         }
       ],
-      "destination": "https://boutique.dynastiedorkhan.com/",
+      "destination": "https://boutique.dynastiedorkhan.com/medailles-gravees/",
       "permanent": true
     },
     {
-      "source": "/medailles-gravees",
-      "destination": "/",
+      "source": "/rayons/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "rdv.dynastiedorkhan.com"
+        }
+      ],
+      "destination": "https://boutique.dynastiedorkhan.com/rayons/:path*",
       "permanent": true
     },
     {
-      "source": "/medailles-gravees/",
-      "destination": "/",
+      "source": "/produits/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "rdv.dynastiedorkhan.com"
+        }
+      ],
+      "destination": "https://boutique.dynastiedorkhan.com/produits/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/sur-demande/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "rdv.dynastiedorkhan.com"
+        }
+      ],
+      "destination": "https://boutique.dynastiedorkhan.com/sur-demande/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/sur-demande",
+      "has": [
+        {
+          "type": "host",
+          "value": "rdv.dynastiedorkhan.com"
+        }
+      ],
+      "destination": "https://boutique.dynastiedorkhan.com/sur-demande",
+      "permanent": true
+    },
+    {
+      "source": "/nouveautes",
+      "destination": "/#nouveautes",
+      "permanent": true
+    },
+    {
+      "source": "/nouveautes/",
+      "destination": "/#nouveautes",
       "permanent": true
     },
     {
@@ -104,6 +148,34 @@
   ],
   "rewrites": [
     {
+      "source": "/",
+      "destination": "/api/vitrine?vue=accueil"
+    },
+    {
+      "source": "/rayons/:rayon",
+      "destination": "/api/vitrine?vue=rayon&rayon=:rayon"
+    },
+    {
+      "source": "/rayons/:rayon/",
+      "destination": "/api/vitrine?vue=rayon&rayon=:rayon"
+    },
+    {
+      "source": "/sur-demande",
+      "destination": "/api/vitrine?vue=sur-demande"
+    },
+    {
+      "source": "/sur-demande/",
+      "destination": "/api/vitrine?vue=sur-demande"
+    },
+    {
+      "source": "/produits/:fiche",
+      "destination": "/api/vitrine?vue=produit&fiche=:fiche"
+    },
+    {
+      "source": "/produits/:fiche/",
+      "destination": "/api/vitrine?vue=produit&fiche=:fiche"
+    },
+    {
       "source": "/sitemap.xml",
       "has": [
         {
@@ -115,7 +187,7 @@
     },
     {
       "source": "/sitemap.xml",
-      "destination": "/seo/sitemap-boutique.xml"
+      "destination": "/api/vitrine?vue=sitemap"
     },
     {
       "source": "/robots.txt",
@@ -173,5 +245,10 @@
         }
       ]
     }
-  ]
+  ],
+  "functions": {
+    "api/vitrine.js": {
+      "includeFiles": "seo/sitemap-boutique.xml"
+    }
+  }
 }

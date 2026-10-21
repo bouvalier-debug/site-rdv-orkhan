@@ -94,7 +94,7 @@ test("les lignes pages produits ne transmettent aucun prix au devis", () => {
 });
 
 test("les trois pages chargent le panier commun et affichent son compteur", () => {
-  for (const file of ["index.html", "medailles-connectees/index.html", "cosmetiques/index.html"]) {
+  for (const file of ["medailles-gravees/index.html", "medailles-connectees/index.html", "cosmetiques/index.html"]) {
     const html = fs.readFileSync(path.join(__dirname, "..", file), "utf8");
     assert.match(html, /\/assets\/cart\.js/);
     assert.match(html, /data-cart-count/);
@@ -103,7 +103,7 @@ test("les trois pages chargent le panier commun et affichent son compteur", () =
 });
 
 test("le formulaire Red Dingo masque sans exiger la couleur quand le modèle n'en propose aucune", () => {
-  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const html = fs.readFileSync(path.join(__dirname, "..", "medailles-gravees", "index.html"), "utf8");
   assert.match(html, /else if\(model&&!model\.color\)/);
   assert.match(html, /<input type="hidden" name="couleur" id="color" value="">/);
   assert.match(html, /La couleur est propre à ce modèle : aucun choix n’est nécessaire\./);
@@ -112,7 +112,7 @@ test("le formulaire Red Dingo masque sans exiger la couleur quand le modèle n'e
 });
 
 test("les anciens parcours directs ont été retirés au profit du panier commun", () => {
-  const redDingo = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const redDingo = fs.readFileSync(path.join(__dirname, "..", "medailles-gravees", "index.html"), "utf8");
   const animoco = fs.readFileSync(path.join(__dirname, "..", "medailles-connectees/index.html"), "utf8");
   const cosmetics = fs.readFileSync(path.join(__dirname, "..", "cosmetiques/index.html"), "utf8");
   assert.doesNotMatch(redDingo, /\/api\/medaille-webhook/);
@@ -154,7 +154,7 @@ test("la confirmation d'ajout mutualisée apparaît sous le bouton avec le lien 
 });
 
 test("les trois pages utilisent la confirmation mutualisée avec leur libellé", () => {
-  const redDingo = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const redDingo = fs.readFileSync(path.join(__dirname, "..", "medailles-gravees", "index.html"), "utf8");
   const animoco = fs.readFileSync(path.join(__dirname, "..", "medailles-connectees", "order.js"), "utf8");
   const cosmetics = fs.readFileSync(path.join(__dirname, "..", "cosmetiques", "index.html"), "utf8");
   assert.match(redDingo, /showAddConfirmation\(event\.currentTarget,'Médaille Red Dingo ajoutée au panier\.',message\)/);
