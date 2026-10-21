@@ -287,3 +287,8 @@ body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]::after{cont
   .shop-rayons{position:static}
   .shop-rayons ul{left:0;right:0;min-width:0;transform:none}
 }
+
+/* Phase 6 (L1/L2) : page rendez-vous alignée sur le site principal ; bouton Boutique doré avant « Prendre rendez-vous ». */
+.ecosystem-nav a.nav-shop{order:5;min-height:42px;padding:9px 16px;border:1px solid var(--gold);border-radius:999px;color:var(--wine-dark);background:var(--gold);font-weight:800;box-shadow:0 6px 16px rgba(189,148,82,.28)}
+.ecosystem-nav a.nav-shop:hover{background:#c9a465;color:var(--wine-dark)}
+body>footer .footer-links{margin-top:14px;font-size:.92rem}

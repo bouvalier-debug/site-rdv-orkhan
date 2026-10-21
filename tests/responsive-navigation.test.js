@@ -16,12 +16,16 @@ test("la navigation Boutique peut aller à la ligne sur tablette", () => {
   assert.match(css, /@media\(min-width:701px\) and \(max-width:959px\)\{\s*body:not\(:has\(> \.ecosystem-nav\)\) main>\.site-nav:first-of-type\{display:flex;height:auto;max-width:100%;flex-wrap:wrap;/);
 });
 
-test("la page RDV propose un retour explicite vers le site de l’élevage, avant la bannière", () => {
+test("phase 6 (L2) : la page RDV reprend le menu du site principal, bouton Boutique doré, sans « Retour au site » en doublon", () => {
   const html = read("demande-de-rdv/index.html");
-  const back = html.indexOf('<a class="shop-return" href="https://www.dynastiedorkhan.com/">← Retour au site de l’élevage</a>');
-  assert.ok(back > html.indexOf('<nav class="ecosystem-nav"'), "après la navigation");
-  assert.ok(back < html.indexOf("<header>"), "avant la bannière");
-  assert.equal((html.match(/class="shop-return"/g) || []).length, 1);
+  const nav = html.match(/<nav class="ecosystem-nav"[^>]*>(.*?)<\/nav>/s)[1];
+  assert.deepEqual([...nav.matchAll(/>([^<]+)<\/a>/g)].map((match) => match[1]), ["Accueil", "L’élevage", "Conseils", "Outils", "Le Journal", "PuppyPass", "Contact", "Boutique", "Prendre rendez-vous"]);
+  assert.match(nav, /<a class="nav-shop" href="https:\/\/boutique\.dynastiedorkhan\.com\/">Boutique<\/a>/, "plus de lien « / » qui renvoyait vers la page RDV elle-même");
+  assert.match(nav, /<a href="\/demande-de-rdv\/" aria-current="page">Prendre rendez-vous<\/a>/);
+  assert.doesNotMatch(html, /class="shop-return"|Retour au site de l’élevage/);
+  assert.match(html, /<nav class="footer-links"[^>]*>.*https:\/\/boutique\.dynastiedorkhan\.com\/.*Mentions légales/s);
+  assert.match(css, /\.ecosystem-nav a\.nav-shop\{order:5;[^}]*background:var\(--gold\)/);
+  assert.equal((html.match(/<form/g) || []).length, 1, "formulaire de rendez-vous inchangé");
 });
 
 test("la page Cosmétiques renvoie aussi vers la boutique, comme la médaille connectée", () => {
