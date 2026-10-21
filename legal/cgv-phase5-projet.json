@@ -109,7 +109,7 @@
     },
     {
       "type": "p",
-      "text": "4.3. **Tarif Famille Dynastie.** Il est réservé aux propriétaires d'un chien issu de l'Élevage de la Dynastie d'Orkhan, ainsi qu'aux familles ayant réservé un chiot auprès de l'élevage. Il est accordé après vérification automatique, au moment de la commande, de l'un des deux éléments suivants, saisi par le client : le numéro d'identification (puce) du chien, ou le code Famille temporaire remis par l'élevage lors de la réservation. Le code Famille est attaché à la réservation ; il est valable trois mois à compter de sa remise, peut être prolongé par l'élevage et cesse d'être valable en cas de révocation, notamment si la réservation est annulée. Si le numéro ou le code n'est pas reconnu, ou si le code n'est plus valable, le prix public s'applique."
+      "text": "4.3. **Tarif Famille Dynastie.** Il est réservé aux propriétaires d'un chien issu de l'Élevage de la Dynastie d'Orkhan, ainsi qu'aux familles ayant réservé un chiot auprès de l'élevage. Il est accordé après vérification automatique, au moment de la commande, de l'un des deux éléments suivants, saisi par le client : le numéro d'identification (puce) du chien, ou le code Famille temporaire remis par l'élevage lors de la réservation. Le code Famille est attaché à la réservation ; il est valable trois mois à compter de son émission, peut être prolongé par l'élevage et cesse d'être valable en cas de révocation, notamment si la réservation est annulée. Si le numéro ou le code n'est pas reconnu, ou si le code n'est plus valable, le prix public s'applique."
     },
     {
       "type": "p",
