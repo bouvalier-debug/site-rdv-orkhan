@@ -1,6 +1,7 @@
-const { listCatalogue } = require("./_orkhan-catalog");
+const { isNouveaute, listCatalogue } = require("./_orkhan-catalog");
 
-// Nouveautés du catalogue Manager (lot 1) : produits publiés, affichés à titre informatif, jamais achetables.
+// Nouveautés du catalogue Manager. Phase 3 : seuls les produits visibles (un produit volontairement fermé à l'achat
+// n'est jamais envoyé au navigateur), publiés depuis moins de 14 jours et hors « Sur demande ».
 module.exports = async (req, res) => {
   res.setHeader("X-Robots-Tag", "noindex");
   if (req.method !== "GET") {
@@ -9,5 +10,5 @@ module.exports = async (req, res) => {
   }
   const catalogue = await listCatalogue();
   res.setHeader("Cache-Control", catalogue.available ? "public, s-maxage=60, stale-while-revalidate=300" : "no-store");
-  return res.status(200).json(catalogue);
+  return res.status(200).json({ ...catalogue, products: catalogue.products.filter(isNouveaute) });
 };

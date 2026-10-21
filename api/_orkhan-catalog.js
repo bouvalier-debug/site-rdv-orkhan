@@ -12,6 +12,10 @@ const FAMILIES = new Set(["ANIMOCO", "RED_DINGO", "COLIS", "CROQUETTES"]);
 const MAX_PRICE_CENTS = 10_000_000;
 const MAX_ORDER_QUANTITY = 20;
 const MAX_WEIGHT_GRAMS = 100_000;
+// Phase 3 : référentiel des rayons et états de disponibilité calculés par le Manager.
+const SHELVES = new Set(["ALIMENTATION", "SELLERIE", "IDENTIFICATION", "JOUETS", "ACCESSOIRES", "HYGIENE_SOINS"]);
+const AVAILABILITIES = new Set(["in_stock", "low_stock", "out_of_stock", "on_request"]);
+const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 function configuration(options = {}) {
   const baseUrl = options.baseUrl || process.env.ORKHAN_MANAGER_URL;
@@ -56,7 +60,11 @@ function publicProduct(raw) {
   // Achetable uniquement sur indication explicite du Manager, pour une famille vendable et un prix non nul.
   // Familles vendables : les mêmes que dans le Manager (CATALOG_SELLABLE_FAMILIES) ; Red Dingo reste exclu.
   const maxOrderQuantity = Number.isSafeInteger(raw.maxOrderQuantity) ? Math.min(Math.max(raw.maxOrderQuantity, 0), MAX_ORDER_QUANTITY) : 0;
-  const purchasable = raw.purchasable === true && ["COLIS", "ANIMOCO", "CROQUETTES"].includes(raw.family) && publicPriceCents > 0;
+  // Phase 3 (CAT-09) : un produit « Sur demande » n'est jamais achetable, quoi qu'indique le reste de la réponse.
+  const onRequest = raw.onRequest === true;
+  const purchasable = raw.purchasable === true && !onRequest && ["COLIS", "ANIMOCO", "CROQUETTES"].includes(raw.family) && publicPriceCents > 0;
+  const shelf = SHELVES.has(raw.shelf) ? raw.shelf : null;
+  const variantGroup = typeof raw.variantGroup === "string" && raw.variantGroup.length <= 80 && SLUG.test(raw.variantGroup) ? raw.variantGroup : null;
   const photos = (Array.isArray(raw.photos) ? raw.photos : []).map((photo) => {
     const match = typeof photo?.url === "string" ? photo.url.match(MANAGER_PHOTO_PATH) : null;
     if (!match) return null;
@@ -77,8 +85,24 @@ function publicProduct(raw) {
     weightGrams: Number.isSafeInteger(raw.weightGrams) && raw.weightGrams > 0 && raw.weightGrams <= MAX_WEIGHT_GRAMS ? raw.weightGrams : null,
     purchasable,
     maxOrderQuantity: purchasable ? maxOrderQuantity : 0,
-    photos
+    photos,
+    // Phase 3 : rayon, variante (chaque format garde sa référence, son prix et son stock), Nouveauté, Sur demande,
+    // disponibilité et visibilité. Un Manager antérieur à la phase 3 n'envoie pas ces champs : le produit reste alors
+    // listé et compté comme nouveauté, comme avant.
+    shelf,
+    subcategory: shelf ? text(raw.subcategory, 60) : null,
+    variantGroup,
+    variantLabel: variantGroup ? text(raw.variantLabel, 60) : null,
+    onRequest,
+    isNew: raw.isNew === undefined ? true : raw.isNew === true,
+    availability: AVAILABILITIES.has(raw.availability) ? raw.availability : null,
+    listed: raw.listed === undefined ? true : raw.listed === true
   };
+}
+
+// Nouveautés (CAT-08, CAT-10) : produits visibles, publiés depuis moins de 14 jours, hors « Sur demande ».
+function isNouveaute(product) {
+  return product.listed && product.isNew && !product.onRequest;
 }
 
 function logFailure(scope, error) {
@@ -114,4 +138,4 @@ async function fetchCataloguePhoto(id, options = {}) {
   }
 }
 
-module.exports = { fetchCataloguePhoto, listCatalogue, publicProduct };
+module.exports = { fetchCataloguePhoto, isNouveaute, listCatalogue, publicProduct };
