@@ -160,3 +160,17 @@ test("scène validée : image recompressée en deux tailles, six zones sans chev
   assert.match(html, /width="1586" height="992"/);
   assert.match(html, /aria-label="Rayon Identification : la médaille"/);
 });
+
+test("sitemap Boutique : pages fixes puis fiches produit du catalogue, pages fixes seules si le catalogue est indisponible", async () => {
+  const sitemap = require("../api/sitemap");
+  const run = async (catalogue) => { const res = recorder(); await sitemap({ method: "GET" }, res, { listCatalogue: async () => catalogue }); return res; };
+  const ok = await run(CATALOGUE);
+  assert.equal(ok.headers["Content-Type"], "application/xml; charset=utf-8");
+  assert.match(ok.body, /<loc>https:\/\/boutique\.dynastiedorkhan\.com\/rayons\/alimentation\/<\/loc>/);
+  for (const slug of ["croquettes-test", "laisse-test", "panier-osier"]) assert.match(ok.body, new RegExp(`<loc>https://boutique\.dynastiedorkhan\.com/produits/${slug}/</loc>`));
+  assert.doesNotMatch(ok.body, /produits\/masque|croquettes-test-10kg/, "ni produit masqué, ni doublon de format");
+  assert.equal((ok.body.match(/<\/urlset>/g) || []).length, 1);
+  const down = await run({ available: false, products: [] });
+  assert.doesNotMatch(down.body, /\/produits\//);
+  assert.match(down.body, /<loc>https:\/\/boutique\.dynastiedorkhan\.com\/<\/loc>/);
+});

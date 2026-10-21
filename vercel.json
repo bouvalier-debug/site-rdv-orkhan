@@ -187,7 +187,7 @@
     },
     {
       "source": "/sitemap.xml",
-      "destination": "/seo/sitemap-boutique.xml"
+      "destination": "/api/sitemap"
     },
     {
       "source": "/robots.txt",
@@ -245,5 +245,10 @@
         }
       ]
     }
-  ]
+  ],
+  "functions": {
+    "api/sitemap.js": {
+      "includeFiles": "seo/sitemap-boutique.xml"
+    }
+  }
 }
