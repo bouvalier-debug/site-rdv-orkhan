@@ -11,7 +11,7 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DELIVERY_FIELDS = ["address", "postalCode", "city", "country"];
 // Phase 4 : version des CGV en vigueur (à l'identique dans
 // legal/, assets/cart.js et orkhan-manager). Un panier ouvert sur l'ancienne version reçoit legal_version_outdated.
-const SHOP_LEGAL_CURRENT_VERSION = "cgv-phase5-projet";
+const SHOP_LEGAL_CURRENT_VERSION = "cgv-2026-10-21-2";
 // Pays acceptés : ceux de la livraison Red Dingo (UE 27), qui contiennent la France des envois Animoco.
 const SHOP_COUNTRIES = SHIPPING_CONFIG.redDingo.servedCountries;
 // Lot 2, décision 3 : la session de paiement d'une commande avec des produits du catalogue expire après 30 minutes

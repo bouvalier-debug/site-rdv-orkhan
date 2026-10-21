@@ -84,7 +84,7 @@ test("panier : un seul champ ; une saisie avec lettres part comme code, sinon co
 });
 
 test("CGV : seule l'article 4.3 change, les versions précédentes restent archivées ; la confidentialité mentionne le code", () => {
-  const current = require("../legal/cgv-phase5-projet.json");
+  const current = require("../legal/cgv-2026-10-21-2.json");
   const previous = require("../legal/cgv-2026-10-21.json");
   assert.equal(SHOP_LEGAL_CURRENT_VERSION, current.version);
   const changed = current.blocks.map((block, index) => JSON.stringify(block) !== JSON.stringify(previous.blocks[index]) ? index : null).filter((index) => index !== null);

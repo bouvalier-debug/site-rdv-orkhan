@@ -99,7 +99,7 @@ function checkoutDeps(managerError) {
 }
 
 function checkoutInput(items) {
-  return { checkoutAttemptId: "123e4567-e89b-42d3-a456-426614174000", items, shipping: { mode: "pickup", pickupTiming: "appointment" }, customer: CUSTOMER, legalAcceptance: { version: "cgv-phase5-projet", accepted: true } };
+  return { checkoutAttemptId: "123e4567-e89b-42d3-a456-426614174000", items, shipping: { mode: "pickup", pickupTiming: "appointment" }, customer: CUSTOMER, legalAcceptance: { version: "cgv-2026-10-21-2", accepted: true } };
 }
 
 test("commande avec un produit du catalogue : prix Manager et session Stripe de 31 minutes", async () => {

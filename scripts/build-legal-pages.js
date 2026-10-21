@@ -2,9 +2,9 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
-// Phase 5 : CGV en vigueur (cgv-phase5-projet, article 4.3 : code Famille) ; les versions précédentes sont
+// Phase 5 : CGV en vigueur (cgv-2026-10-21-2, article 4.3 : code Famille) ; les versions précédentes sont
 // publiées comme archives, à l'identique de leur source.
-const document = require("../legal/cgv-phase5-projet.json");
+const document = require("../legal/cgv-2026-10-21-2.json");
 const ARCHIVES = ["cgv-2026-10-05", "cgv-2026-10-07", "cgv-2026-10-21"];
 
 function inline(value) {
