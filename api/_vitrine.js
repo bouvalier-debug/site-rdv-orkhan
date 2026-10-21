@@ -23,7 +23,7 @@ const SCENE = {
     ACCESSOIRES: { product: "les gamelles", left: 0.5, top: 60, width: 34.9, height: 22.9, labelAt: "center" },
     SELLERIE: { product: "le collier", left: 37.5, top: 70.6, width: 22.4, height: 15.1, labelAt: "below" },
     IDENTIFICATION: { product: "la médaille", left: 62.4, top: 75.6, width: 7.9, height: 12.6, labelAt: "below" },
-    HYGIENE_SOINS: { product: "le shampooing", left: 78.1, top: 17.6, width: 8.7, height: 46.4, labelAt: "center" },
+    HYGIENE_SOINS: { product: "le shampooing", left: 78.1, top: 17.6, width: 8.7, height: 46.4, labelAt: "bottom" },
     JOUETS: { product: "la peluche", left: 73.1, top: 64.5, width: 26.9, height: 25.7, labelAt: "center" }
   }
 };
