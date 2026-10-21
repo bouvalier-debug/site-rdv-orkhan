@@ -8,7 +8,7 @@ const { pageHtml } = require("../scripts/build-legal-pages");
 const root = path.join(__dirname, "..");
 const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 const SHOP_PAGES = [
-  "index.html", "nouveautes/index.html", "cosmetiques/index.html", "medailles-connectees/index.html", "panier/index.html",
+  "medailles-gravees/index.html", "cosmetiques/index.html", "medailles-connectees/index.html", "panier/index.html",
   "panier/confirmation/index.html", "conditions-generales-de-vente/index.html", "confidentialite/index.html",
   "mentions-legales/index.html", "renoncer-au-contrat/index.html"
 ];

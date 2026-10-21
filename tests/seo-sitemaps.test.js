@@ -17,7 +17,8 @@ test("aucun sitemap ni robots partagé ne masque les réécritures par hôte", (
 });
 
 test("sitemap.xml et robots.txt sont servis selon l'hôte, Boutique par défaut", () => {
-  assert.deepEqual(config.rewrites, [
+  // Phase 6 : les réécritures de la vitrine (accueil, rayons, Sur demande, fiches) précèdent celles du SEO.
+  assert.deepEqual(config.rewrites.filter((rewrite) => !rewrite.destination.startsWith("/api/vitrine?")), [
     { source: "/sitemap.xml", has: RDV_HOST, destination: "/seo/sitemap-rdv.xml" },
     { source: "/sitemap.xml", destination: "/seo/sitemap-boutique.xml" },
     { source: "/robots.txt", has: RDV_HOST, destination: "/seo/robots-rdv.txt" },
@@ -27,8 +28,13 @@ test("sitemap.xml et robots.txt sont servis selon l'hôte, Boutique par défaut"
 
 test("le sitemap Boutique ne liste que des pages Boutique publiques et indexables", () => {
   const urls = locs(read("seo/sitemap-boutique.xml"));
+  const { RAYONS } = require("../scripts/shop-layout");
+  // Phase 6 : accueil, rayons et Sur demande sont rendus côté serveur (réécritures vers /api/vitrine) ; les autres
+  // pages sont des fichiers statiques.
+  const vitrine = ["https://boutique.dynastiedorkhan.com/", ...RAYONS.map((rayon) => `https://boutique.dynastiedorkhan.com/rayons/${rayon.slug}/`), "https://boutique.dynastiedorkhan.com/sur-demande/"];
   assert.deepEqual(urls, [
-    "https://boutique.dynastiedorkhan.com/",
+    ...vitrine,
+    "https://boutique.dynastiedorkhan.com/medailles-gravees/",
     "https://boutique.dynastiedorkhan.com/medailles-connectees/",
     "https://boutique.dynastiedorkhan.com/cosmetiques/",
     "https://boutique.dynastiedorkhan.com/conditions-generales-de-vente/",
@@ -36,12 +42,13 @@ test("le sitemap Boutique ne liste que des pages Boutique publiques et indexable
     "https://boutique.dynastiedorkhan.com/mentions-legales/",
     "https://boutique.dynastiedorkhan.com/confidentialite/"
   ]);
-  for (const url of urls) {
+  for (const url of urls.filter((item) => !vitrine.includes(item))) {
     const html = read(pageFile(url));
     assert.doesNotMatch(html, /<meta name="robots" content="[^"]*noindex/i, url);
     assert.doesNotMatch(html, /http-equiv="refresh"/i, url);
   }
-  assert.equal(urls.some((url) => /\/panier\/|\/medailles-gravees\/|\/demande-de-rdv\//.test(url)), false);
+  assert.equal(fs.existsSync(path.join(root, "index.html")), false, "l'accueil n'est plus un fichier statique");
+  assert.equal(urls.some((url) => /\/panier\/|\/demande-de-rdv\/|\/nouveautes\//.test(url)), false);
 });
 
 test("le sitemap RDV ne liste que la demande de rendez-vous", () => {
@@ -60,22 +67,24 @@ test("chaque robots.txt annonce son propre sitemap et exclut le panier", () => {
   }
 });
 
-test("l'ancienne route médailles gravées redirige en 308 vers la page des médailles gravées", () => {
+test("phase 6 : la page Red Dingo est servie sur /medailles-gravees/, sans redirection vers l'accueil ni boucle", () => {
   const routes = config.redirects.filter((entry) => entry.source === "/medailles-gravees" || entry.source === "/medailles-gravees/");
   assert.deepEqual(routes, [
-    { source: "/medailles-gravees", has: RDV_HOST, destination: "https://boutique.dynastiedorkhan.com/", permanent: true },
-    { source: "/medailles-gravees/", has: RDV_HOST, destination: "https://boutique.dynastiedorkhan.com/", permanent: true },
-    { source: "/medailles-gravees", destination: "/", permanent: true },
-    { source: "/medailles-gravees/", destination: "/", permanent: true }
+    { source: "/medailles-gravees", has: RDV_HOST, destination: "https://boutique.dynastiedorkhan.com/medailles-gravees/", permanent: true },
+    { source: "/medailles-gravees/", has: RDV_HOST, destination: "https://boutique.dynastiedorkhan.com/medailles-gravees/", permanent: true }
   ]);
-  const firstGeneric = config.redirects.findIndex((entry) => entry.source.startsWith("/medailles-gravees") && !entry.has);
-  const lastRdv = config.redirects.findLastIndex((entry) => entry.source.startsWith("/medailles-gravees") && entry.has);
-  assert.ok(lastRdv < firstGeneric, "les règles RDV doivent précéder la règle générique");
-  assert.match(read("index.html"), /<h1>Médailles gravées Red Dingo<\/h1>/);
+  assert.equal(config.redirects.some((entry) => entry.source.startsWith("/medailles-gravees") && !entry.has && entry.destination === "/"), false);
+  const html = read("medailles-gravees/index.html");
+  assert.match(html, /<h1>Médailles gravées Red Dingo<\/h1>/);
+  assert.ok(html.includes('<link rel="canonical" href="https://boutique.dynastiedorkhan.com/medailles-gravees/">'));
+  assert.doesNotMatch(html, /http-equiv="refresh"/);
+  for (const source of ["/nouveautes", "/nouveautes/"]) {
+    assert.deepEqual(config.redirects.find((entry) => entry.source === source), { source, destination: "/#nouveautes", permanent: true });
+  }
 });
 
 test("les ressources du catalogue Red Dingo restent servies sous /medailles-gravees/", () => {
-  assert.match(read("index.html"), /src="\/medailles-gravees\/\$\{encodeURI\(model\.image\)\}"/);
+  assert.match(read("medailles-gravees/index.html"), /src="\/medailles-gravees\/\$\{encodeURI\(model\.image\)\}"/);
   for (const entry of config.redirects.filter((item) => item.source.startsWith("/medailles-gravees"))) {
     assert.doesNotMatch(entry.source, /[:*(]/, entry.source);
   }

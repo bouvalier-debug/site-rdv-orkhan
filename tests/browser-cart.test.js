@@ -273,7 +273,8 @@ test("la page panier propose un consentement explicite avant paiement sans expos
 });
 
 test("récapitulatif : sans encadré, case CGV non précochée juste avant le bouton, informations légales accessibles par lien", () => {
-  assert.doesNotMatch(cartPage, /<details|Avant de commander/);
+  // Le menu Rayons de l'en-tête commun (phase 6) est un <details> : seul le récapitulatif est contrôlé ici.
+  assert.doesNotMatch(cartPage.replace(require("../scripts/shop-layout").SHOP_HEADER, ""), /<details|Avant de commander/);
   assert.match(cartPage, /<p class="summary-delays">[\s\S]*?data-delivery-delays/);
   assert.match(cartPage, /<input type="checkbox" data-legal-acceptance autocomplete="off">/);
   assert.match(cartPage, /data-legal-acceptance[\s\S]*?<\/div>\s*<button class="customer-submit checkout-submit" type="button" data-checkout-button>/);

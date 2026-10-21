@@ -10,4 +10,24 @@ const FACEBOOK_FAB = '<a class="facebook-fab" href="https://www.facebook.com/dyn
 
 const BACK_TO_TOP = '<button id="to-top" type="button" aria-label="Remonter en haut de la page" title="Remonter en haut">↑</button><script src="/assets/back-to-top.js" defer></script>';
 
-module.exports = { SHOP_FOOTER, FACEBOOK_FAB, BACK_TO_TOP };
+// Phase 6 : les six rayons validés, dans l'ordre de la feuille de route. La clé est celle du référentiel du Manager
+// (CATALOG_SHELVES) ; le slug donne l'URL stable /rayons/<slug>/.
+const RAYONS = Object.freeze([
+  { key: "ALIMENTATION", slug: "alimentation", label: "Alimentation", subcategories: { croquettes: "Croquettes", patees: "Pâtées", friandises: "Friandises", complements: "Compléments" } },
+  { key: "SELLERIE", slug: "sellerie", label: "Sellerie", subcategories: { colliers: "Colliers", laisses: "Laisses", harnais: "Harnais" } },
+  { key: "IDENTIFICATION", slug: "identification", label: "Identification", subcategories: { "medailles-animoco": "Médailles Animoco connectées", "medailles-red-dingo": "Médailles Red Dingo gravées" } },
+  { key: "JOUETS", slug: "jouets", label: "Jouets", subcategories: { peluches: "Peluches", "jouets-a-macher": "Jouets à mâcher", "jouets-d-occupation": "Jouets d’occupation" } },
+  { key: "ACCESSOIRES", slug: "accessoires", label: "Accessoires", subcategories: { gamelles: "Gamelles", couchages: "Couchages", transport: "Transport" } },
+  { key: "HYGIENE_SOINS", slug: "hygiene-et-soins", label: "Hygiène et soins", subcategories: { shampooings: "Shampooings", entretien: "Entretien", soins: "Soins" } }
+].map(Object.freeze));
+
+// Phase 6 (NAV-02 à NAV-04) : en-tête commun « Accueil | Rayons | Panier | Contact », sans lien Rendez-vous. Le menu
+// Rayons est un <details> : il s'ouvre au clic, au clavier et au toucher, sans dépendre du survol ni de JavaScript.
+// Le panier reste visible sur mobile. Identique sur toutes les pages Boutique (vérifié par tests/shop-layout.test.js).
+const SHOP_HEADER = '<header class="shop-header"><a class="shop-brand" href="/"><img src="/medailles-gravees/assets/logo-dynastie-orkhan.png" alt="" width="76" height="76"><span>Élevage de la Dynastie d’Orkhan<small>La boutique</small></span></a>'
+  + '<nav class="shop-menu" aria-label="Navigation de la boutique"><a href="/">Accueil</a>'
+  + `<details class="shop-rayons"><summary>Rayons</summary><ul>${RAYONS.map((rayon) => `<li><a href="/rayons/${rayon.slug}/">${rayon.label}</a></li>`).join("")}<li class="shop-rayons-extra"><a href="/sur-demande/">Sur demande</a></li></ul></details>`
+  + '<a class="cart-nav-link" href="/panier/">Panier <span class="cart-badge" data-cart-count hidden>0</span></a><a href="https://www.dynastiedorkhan.com/contact/">Contact</a></nav>'
+  + '<script src="/assets/shop-menu.js" defer></script></header>';
+
+module.exports = { SHOP_FOOTER, FACEBOOK_FAB, BACK_TO_TOP, RAYONS, SHOP_HEADER };

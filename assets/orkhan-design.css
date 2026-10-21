@@ -255,3 +255,35 @@ body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]::after{cont
 @media(max-width:700px){
   body:has(.facebook-fab,#to-top) .site-footer{padding-bottom:150px}
 }
+
+/* Phase 6 : en-tête commun de la Boutique (logo, menu Accueil | Rayons | Panier | Contact) */
+.shop-header{position:relative;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:112px}
+.shop-brand{display:inline-flex;align-items:center;gap:12px;color:var(--wine);text-decoration:none}
+.shop-brand img{width:76px;height:76px;object-fit:contain;flex:0 0 auto}
+.shop-brand span{display:flex;flex-direction:column;font-family:"Lora",Georgia,serif;font-size:1.08rem;font-weight:700;line-height:1.2}
+.shop-brand small{color:var(--gold);font-family:"Manrope",Arial,sans-serif;font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.shop-menu{display:flex;align-items:center;gap:6px}
+.shop-menu>a,.shop-rayons>summary{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:8px 14px;border-radius:999px;color:var(--wine);font-weight:800;font-size:.95rem;text-decoration:none;cursor:pointer}
+.shop-menu>a:hover,.shop-rayons>summary:hover,.shop-rayons[open]>summary{background:var(--cream)}
+.shop-menu>a:focus-visible,.shop-rayons>summary:focus-visible,.shop-rayons a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.shop-rayons{position:relative}
+.shop-rayons>summary{list-style:none}
+.shop-rayons>summary::-webkit-details-marker{display:none}
+.shop-rayons>summary::after{content:"";width:7px;height:7px;margin-top:-4px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);transition:transform .15s}
+.shop-rayons[open]>summary::after{margin-top:3px;transform:rotate(225deg)}
+.shop-rayons ul{position:absolute;top:calc(100% + 8px);left:50%;min-width:250px;margin:0;padding:8px;list-style:none;background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);transform:translateX(-50%)}
+.shop-rayons li a{display:flex;align-items:center;min-height:44px;padding:8px 14px;border-radius:8px;color:var(--ink);font-weight:700;text-decoration:none}
+.shop-rayons li a:hover{background:var(--cream);color:var(--wine)}
+.shop-rayons .shop-rayons-extra{margin-top:6px;padding-top:6px;border-top:1px solid var(--line)}
+.shop-rayons .shop-rayons-extra a{color:var(--muted);font-weight:600}
+.shop-menu .cart-nav-link{border:1px solid var(--line);background:#fff}
+.shop-menu .cart-badge{display:inline-flex;min-width:1.55rem;height:1.55rem;padding:0 .4rem;align-items:center;justify-content:center;border-radius:999px;background:var(--wine);color:#fff;font-size:.78rem}
+.shop-menu .cart-badge[hidden]{display:none}
+@media(max-width:700px){
+  .shop-header{flex-direction:column;align-items:stretch;gap:10px;min-height:0;padding-bottom:12px}
+  .shop-brand img{width:56px;height:56px}
+  .shop-menu{justify-content:space-between;gap:2px}
+  .shop-menu>a,.shop-rayons>summary{padding:8px 10px;font-size:.9rem}
+  .shop-rayons{position:static}
+  .shop-rayons ul{left:0;right:0;min-width:0;transform:none}
+}

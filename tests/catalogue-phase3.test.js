@@ -3,7 +3,6 @@ const assert = require("node:assert/strict");
 const { isNouveaute, publicProduct } = require("../api/_orkhan-catalog");
 const { quoteCartRequest } = require("../api/cart-quote");
 const productsHandler = require("../api/catalogue-produits");
-const { LOW_STOCK, OUT_OF_STOCK, PICKUP_ONLY, describeProducts } = require("../assets/nouveautes");
 
 // Phase 3.2 : lecture des champs ajoutés par le Manager (rayons, variantes, Nouveautés, Sur demande, disponibilité).
 const BASE = { reference: "jouet-corde-grand", name: "Jouet corde", family: "COLIS", publicPriceCents: 900, familyPriceCents: null, weightGrams: 200, photos: [],
@@ -53,17 +52,6 @@ test("Nouveautés : visibles, de moins de 14 jours et hors Sur demande ; un prod
     if (saved.secret === undefined) delete process.env.ORKHAN_SHOP_ORDERS_SECRET; else process.env.ORKHAN_SHOP_ORDERS_SECRET = saved.secret;
   }
   assert.deepEqual(res.body.products.map((item) => item.reference), ["jouet-corde-grand", "rupture"]);
-});
-
-test("affichage : format de la variante, stock faible et « Indisponible pour le moment »", () => {
-  const items = describeProducts({ available: true, products: [
-    product(), product({ reference: "faible", availability: "low_stock" }), product({ reference: "rupture", maxOrderQuantity: 0, availability: "out_of_stock" }),
-    product({ reference: "vitrine", onRequest: true })
-  ] });
-  assert.deepEqual(items.map((item) => [item.name, item.availability, item.buyable]), [
-    ["Jouet corde — Grand", PICKUP_ONLY, true], ["Jouet corde — Grand", LOW_STOCK, true], ["Jouet corde — Grand", OUT_OF_STOCK, false]
-  ]);
-  assert.equal(OUT_OF_STOCK, "Indisponible pour le moment");
 });
 
 test("devis : Sur demande refusé côté serveur ; chaque variante garde sa référence, son prix et son stock", async () => {
