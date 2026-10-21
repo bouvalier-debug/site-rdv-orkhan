@@ -48,3 +48,9 @@ test("K6 et P4 : plus de formulations techniques ni saisonnières visibles", () 
   assert.match(cosmetics, /Pack Été complet/);
   assert.match(cosmetics, /id:'pack-ete'/);
 });
+
+test("K3 : la politique de confidentialité ne mentionne plus l'option et garde les autres données locales", () => {
+  const html = read("confidentialite/index.html");
+  assert.doesNotMatch(html, /Enregistrer mes coordonnées|Coordonnées enregistrées/);
+  assert.match(html, /<li><strong>Panier :<\/strong>[^<]*30 jours après sa dernière modification\.<\/li><\/ul><br><ul><li><strong>Cookie technique de paiement :<\/strong>/);
+});

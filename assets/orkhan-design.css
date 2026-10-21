@@ -251,3 +251,7 @@ body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]::after{cont
 @media(max-width:800px){
   input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{font-size:16px!important}
 }
+/* Lot A (K5) : en bas de page, les derniers liens du pied de page restent au-dessus des boutons flottants. */
+@media(max-width:700px){
+  body:has(.facebook-fab,#to-top) .site-footer{padding-bottom:150px}
+}
