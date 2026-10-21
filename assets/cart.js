@@ -15,7 +15,7 @@
   const STORAGE_KEY = "orkhan-shop-cart-v1";
   const LEGACY_CUSTOMER_STORAGE_KEY = "orkhan-shop-customer-v1";
   const CUSTOMER_STORAGE_KEY = "orkhan-shop-customer-v2";
-  const SHOP_LEGAL_CURRENT_VERSION = "cgv-2026-10-21-2"; // Phase 5 : version des CGV en vigueur (identique côté serveur et Manager).
+  const SHOP_LEGAL_CURRENT_VERSION = "cgv-2026-10-21-3"; // Phase 5 : version des CGV en vigueur (identique côté serveur et Manager).
   const STORAGE_VERSION = 1;
   const MAX_QUANTITY = 20;
   const EMPTY_SHIPPING_MESSAGE = "Les modes de livraison disponibles s’afficheront selon le contenu de votre panier.";
@@ -375,6 +375,8 @@
   }
 
   // Moment du retrait (CGV 7.5), libellés de la feuille de route V1.2.4.
+  // Lot A5 : le rendez-vous de retrait est fixé avec le client après la commande (pas de formulaire de visite).
+  const PICKUP_APPOINTMENT_NOTE = "La date de retrait sera convenue avec vous après votre commande, en fonction de vos disponibilités.";
   const PICKUP_TIMING_QUESTION = "Quand souhaitez-vous retirer vos achats ?";
   const PICKUP_TIMING_LABELS = Object.freeze({
     "puppy-departure": "Lors du départ de mon chiot",
@@ -386,6 +388,13 @@
     if (className) node.className = className;
     if (text !== undefined) node.textContent = text;
     return node;
+  }
+
+  // Nom de repli tant que le devis n'a pas donné le nom du produit (devis en cours ou refusé).
+  function fallbackLineName(productId) {
+    if (/^red-dingo:/i.test(productId)) return "Médaille Red Dingo gravée";
+    if (productId === "animoco") return "Médaille connectée Animoco";
+    return "Article du panier";
   }
 
   function updateCounters(document, count) {
@@ -401,7 +410,6 @@
     const result = [];
     if (hasRedDingo && mode === "red-dingo-free") result.push("Médailles gravées : transmission à Red Dingo sous 24 h ouvrées, puis fabrication et expédition par Red Dingo sous 7 à 10 jours ouvrés (indicatif). Livraison comprise.");
     if (hasOther && mode === "animoco-light-fr") result.push("Préparation et expédition sous 48 h ouvrées, puis La Poste Lettre verte suivie : 3 à 5 jours ouvrés (indicatif).");
-    else if (hasOther && mode === "pickup") result.push("Disponible à l’élevage sous 24 h ouvrées, sur rendez-vous. Vous êtes prévenu par email.");
     return result;
   }
 
@@ -434,6 +442,7 @@
     if (familyInput) familyInput.value = familyStore.get();
     const delaysNode = container.querySelector("[data-delivery-delays]");
     const countryField = customerForm.querySelector('[name="country"]');
+    const knownNames = new Map();
     let selectedShipping = null;
     let pickupTiming = "";
     let lastResult = null;
@@ -465,7 +474,8 @@
       customerForm.querySelectorAll("[name]").forEach((field) => {
         field.required = required.has(field.name);
         // Lot A (K2) : en retrait, l'adresse n'est pas demandée ; les champs sont seulement masqués à l'affichage.
-        if (ADDRESS_FIELDS.includes(field.name)) field.closest("label").hidden = pickup;
+        // Lot A4 : le pays disparaît aussi en retrait gratuit ; il revient si une expédition autorisée est choisie.
+        if (ADDRESS_FIELDS.includes(field.name) || field.name === "country") field.closest("label").hidden = pickup;
       });
       const addressHint = customerForm.querySelector("[data-address-hint]");
       if (addressHint) addressHint.hidden = pickup;
@@ -479,7 +489,7 @@
       updateCustomerRequirements();
     }
 
-    function renderLines(items, quote) {
+    function renderLines(items, quote, state = "pending") {
       linesNode.replaceChildren();
       emptyNode.hidden = items.length > 0;
       items.forEach((item, index) => {
@@ -487,7 +497,9 @@
         const card = element(document, "article", "cart-line");
         card.dataset.lineId = item.lineId;
         const info = element(document, "div", "cart-line__info");
-        info.append(element(document, "h2", "cart-line__title", serverLine?.name || "Article du panier"));
+        if (serverLine?.name) knownNames.set(item.productId, serverLine.name);
+        const lineName = serverLine?.name || knownNames.get(item.productId) || fallbackLineName(item.productId);
+        info.append(element(document, "h2", "cart-line__title", lineName));
         const optionsList = element(document, "dl", "cart-line__options");
         displayOptionRows(item).forEach(([label, value]) => {
           optionsList.append(element(document, "dt", "", label), element(document, "dd", "", value));
@@ -507,10 +519,10 @@
         const remove = element(document, "button", "cart-remove", "Retirer");
         remove.type = "button";
         remove.dataset.remove = item.lineId;
-        remove.setAttribute("aria-label", `Retirer ${serverLine?.name || "cet article"} du panier`);
+        remove.setAttribute("aria-label", `Retirer ${lineName} du panier`);
         controls.append(quantityLabel, remove);
         const price = element(document, "div", "cart-line__price");
-        price.append(element(document, "span", "cart-line__unit", serverLine ? `${money(serverLine.unitPriceCents)} l’unité` : "Prix en cours de calcul"));
+        price.append(element(document, "span", "cart-line__unit", serverLine ? `${money(serverLine.unitPriceCents)} l’unité` : (state === "failed" ? "Prix non calculé" : "Prix en cours de calcul")));
         price.append(element(document, "strong", "", serverLine ? money(serverLine.subtotalCents) : "—"));
         card.append(info, controls, price);
         linesNode.append(card);
@@ -535,6 +547,10 @@
         label.append(input, element(document, "span", "", text));
         fieldset.append(label);
       }
+      const note = element(document, "p", "pickup-note", PICKUP_APPOINTMENT_NOTE);
+      note.dataset.pickupNote = "";
+      note.hidden = pickupTiming !== "appointment";
+      fieldset.append(note);
       return fieldset;
     }
 
@@ -579,12 +595,12 @@
     function renderResult(items, result) {
       lastResult = result;
       const quote = result?.quote;
-      renderLines(items, quote);
+      renderLines(items, quote, "failed");
       const autoSelected = renderModes(result);
       subtotalNode.textContent = money(quote?.subtotalCents);
       shippingNode.textContent = quote?.shipping ? money(quote.shipping.priceCents) : "À choisir";
       totalNode.textContent = money(quote?.totalCents);
-      if (checkoutButton) checkoutButton.disabled = result?.error === "family_verification_unavailable";
+      if (checkoutButton) checkoutButton.disabled = !quote;
       renderFamilyStatus(result);
       const message = quoteStatusMessage(result);
       statusNode.textContent = message;
@@ -593,9 +609,11 @@
       const hasRedDingo = items.some((item) => /^red-dingo:/i.test(item.productId));
       const hasOther = items.some((item) => !/^red-dingo:/i.test(item.productId));
       if (engravingWrap) engravingWrap.hidden = !hasRedDingo;
+      container.querySelectorAll("[data-red-dingo-only]").forEach((node) => { node.hidden = !hasRedDingo; });
       if (delaysNode) {
         const delays = selectedShipping ? deliveryDelayLines({ hasRedDingo, hasOther, mode: selectedShipping.mode }) : [];
-        delaysNode.textContent = delays.length ? delays.join(" ") : "Choisissez un mode de livraison pour afficher les délais.";
+        delaysNode.textContent = delays.join(" ");
+        if (delaysNode.parentElement) delaysNode.parentElement.hidden = !delays.length;
       }
       if (autoSelected) refresh();
     }
@@ -603,6 +621,8 @@
     async function refresh() {
       const items = store.getItems();
       updateCounters(document, store.count());
+      container.toggleAttribute("data-empty", !items.length);
+      if (checkoutButton) checkoutButton.disabled = true;
       if (!items.length) {
         selectedShipping = null;
         lastResult = null;
@@ -610,12 +630,15 @@
         modesNode.replaceChildren(element(document, "p", "shipping-empty", EMPTY_SHIPPING_MESSAGE));
         statusNode.hidden = true;
         if (engravingWrap) engravingWrap.hidden = true;
+        container.querySelectorAll("[data-red-dingo-only]").forEach((node) => { node.hidden = true; });
         subtotalNode.textContent = money(0);
         shippingNode.textContent = "—";
         totalNode.textContent = money(0);
         return;
       }
       const sequence = ++requestSequence;
+      // Les lignes s'affichent tout de suite (jamais « panier vide » avec un compteur non nul) ; les prix suivent le devis.
+      renderLines(items, lastResult?.quote?.lines?.length === items.length ? lastResult.quote : null, "pending");
       statusNode.hidden = false;
       statusNode.textContent = "Calcul en cours…";
       try {
@@ -672,6 +695,8 @@
       if (event.target.name === "pickup-timing") {
         // Pas de nouveau devis : le moment du retrait ne change ni le prix ni les modes proposés.
         pickupTiming = event.target.value;
+        const appointmentNote = modesNode.querySelector("[data-pickup-note]");
+        if (appointmentNote) appointmentNote.hidden = pickupTiming !== "appointment";
         if (selectedShipping?.mode === "pickup") selectedShipping = shippingSelection("pickup");
         checkoutStatus.hidden = true;
         return;
@@ -744,6 +769,7 @@
     restoreCustomer();
     if (options.deferInitialQuote) {
       // Retour d'une annulation signée : le devis attend que l'annulation soit traitée (voir initCartPage).
+      container.toggleAttribute("data-empty", !store.getItems().length);
       renderLines(store.getItems(), null);
       statusNode.hidden = false;
       statusNode.textContent = "Calcul en cours…";
@@ -837,6 +863,7 @@
     SHOP_LEGAL_CURRENT_VERSION,
     EMPTY_SHIPPING_MESSAGE,
     MODE_LABELS,
+    PICKUP_APPOINTMENT_NOTE,
     PICKUP_TIMING_LABELS,
     PICKUP_TIMING_QUESTION,
     STORAGE_KEY,

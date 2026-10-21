@@ -101,7 +101,7 @@ test("fiche : formats avec référence, prix et stock propres ; ajout au panier 
   assert.match(vitrine.renderFiche(CATALOGUE, "croquettes-test-10kg"), /value="croquettes-test-10kg" checked/, "l'URL d'un format le présélectionne");
   const onRequest = vitrine.renderFiche(CATALOGUE, "panier-osier");
   assert.doesNotMatch(onRequest, /data-fiche-add|Ajouter au panier/);
-  assert.match(onRequest, /sans achat en ligne/);
+  assert.match(onRequest, /non achetable directement en ligne/);
   assert.equal(vitrine.renderFiche(CATALOGUE, "masque"), null);
   assert.equal(vitrine.renderFiche(CATALOGUE, "../secret"), null);
   const injected = vitrine.renderFiche({ available: true, products: [product({ variantGroup: null, name: "</script><script>alert(1)</script>" })] }, "croquettes-test-2kg");
@@ -128,7 +128,8 @@ test("gabarit commun : même en-tête sur toutes les pages Boutique, 404 statiqu
     "conditions-generales-de-vente/index.html", "confidentialite/index.html", "mentions-legales/index.html", "renoncer-au-contrat/index.html", "404.html"]) {
     const html = read(file);
     assert.equal(html.split(SHOP_HEADER).length, 2, file);
-    assert.doesNotMatch(html, /class="site-nav shop-nav"|Retour au site de l’élevage/, file);
+    assert.doesNotMatch(html, /class="site-nav shop-nav"/, file);
+    assert.match(html, /<a class="shop-return-link" href="https:\/\/www\.dynastiedorkhan\.com\/">← Retour au site de l’élevage<\/a>/, file);
     assert.match(html, /<h1[\s>]/, file);
   }
   assert.equal(read("404.html").replace(/\r\n/g, "\n"), vitrine.renderNotFound(), "404.html est régénérée depuis renderNotFound()");

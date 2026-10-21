@@ -224,6 +224,7 @@ body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-d
 body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]::after{content:"Prendre rendez-vous";font-size:.84rem;font-weight:800;line-height:1}
 .product-cart-confirmation{margin:12px 0 0;padding:14px;border-left:4px solid #2f7d45;border-radius:4px;background:#edf7ef;color:var(--ink)}
 .product-cart-confirmation a{font-weight:800}
+.cart-conflict{margin:12px 0 0;padding:14px;border-left:4px solid var(--gold);border-radius:4px;background:var(--cream);color:var(--ink)}.cart-conflict p{margin:0 0 12px}.cart-conflict__actions{display:flex;flex-wrap:wrap;gap:10px}
 @media(max-width:700px){
   body:not(:has(> .ecosystem-nav)) main>.site-nav:first-of-type a[href="/demande-de-rdv/"]::after,
   body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]::after{font-size:.78rem}
@@ -257,6 +258,8 @@ body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]::after{cont
 }
 
 /* Phase 6 : en-tête commun de la Boutique (logo, menu Accueil | Rayons | Panier | Contact) */
+.shop-return-link{display:inline-flex;align-items:center;min-height:44px;padding:6px 2px;color:var(--wine);font-size:.88rem;font-weight:800;text-decoration:none}.shop-return-link:hover{text-decoration:underline}.shop-return-link:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.size-guide{margin-top:6px}.size-guide summary{cursor:pointer;color:var(--bordeaux,var(--wine));font-weight:700;min-height:44px;display:flex;align-items:center}.size-guide .size-intro{margin:6px 0 0}.size-guide .size-photo{display:block;width:100%;max-width:220px;height:auto;margin:0 auto 4px;aspect-ratio:1}.size-guide .size-card{min-height:0}
 .shop-header{position:relative;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:112px}
 .shop-brand{display:inline-flex;align-items:center;gap:12px;color:var(--wine);text-decoration:none}
 .shop-brand img{width:76px;height:76px;object-fit:contain;flex:0 0 auto}

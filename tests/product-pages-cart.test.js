@@ -123,13 +123,12 @@ test("les anciens parcours directs ont été retirés au profit du panier commun
   assert.match(cosmetics, /Ajouter au panier/);
 });
 
-test("le bouton de vérification de puce garde un texte avant, pendant et après", () => {
+test("lot A3 : la fiche Animoco n'a plus de vérification de puce, elle reste dans le panier", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "medailles-connectees", "index.html"), "utf8");
   const script = fs.readFileSync(path.join(__dirname, "..", "medailles-connectees", "order.js"), "utf8");
-  assert.match(html, /id="verify-family-chip"[^>]*>Vérifier la puce<\/button><p class="family-status/);
-  assert.match(script, /verifyButton\.textContent="Vérification…"/);
-  assert.match(script, /finally\{verifyButton\.disabled=false;verifyButton\.textContent="Vérifier la puce"\}/);
-  assert.doesNotMatch(script, /verifyButton\.textContent=""/);
+  assert.doesNotMatch(html, /family-chip|verify-family|family-status|Vérifier la puce/);
+  assert.doesNotMatch(script, /family-eligibility|chipInput|verifyButton|familyChipStore/);
+  assert.match(fs.readFileSync(path.join(__dirname, "..", "panier", "index.html"), "utf8"), /data-family-chip-verify/);
 });
 
 test("la confirmation d'ajout mutualisée apparaît sous le bouton avec le lien panier", () => {
@@ -157,7 +156,7 @@ test("les trois pages utilisent la confirmation mutualisée avec leur libellé",
   const redDingo = fs.readFileSync(path.join(__dirname, "..", "medailles-gravees", "index.html"), "utf8");
   const animoco = fs.readFileSync(path.join(__dirname, "..", "medailles-connectees", "order.js"), "utf8");
   const cosmetics = fs.readFileSync(path.join(__dirname, "..", "cosmetiques", "index.html"), "utf8");
-  assert.match(redDingo, /showAddConfirmation\(event\.currentTarget,'Médaille Red Dingo ajoutée au panier\.',message\)/);
-  assert.match(animoco, /showAddConfirmation\(event\.currentTarget,"Médaille Animoco ajoutée au panier\.",message\)/);
-  assert.match(cosmetics, /showAddConfirmation\(button,`\$\{product\.name\} ajouté au panier\.`\)/);
+  assert.match(redDingo, /addLineGuarded\(sharedCart,line,\{button,onAdded\(\)\{[^}]*showAddConfirmation\(button,'Médaille Red Dingo ajoutée au panier\.',message\)/);
+  assert.match(animoco, /addLineGuarded\(sharedCart,line,\{button,onAdded\(\)\{[^}]*showAddConfirmation\(button,"Médaille Animoco ajoutée au panier\.",message\)/);
+  assert.match(cosmetics, /addLineGuarded\([\s\S]*?showAddConfirmation\(button,`\$\{product\.name\} ajouté au panier\.`\)/);
 });

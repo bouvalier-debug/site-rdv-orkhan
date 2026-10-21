@@ -48,9 +48,10 @@
     try {
       const quantity = Math.min(Math.max(Number(quantityInput?.value) || 1, 1), current.maxQuantity);
       const store = cart.createCartStore();
-      productCart.addLine(store, productCart.catalogueLine(current.reference, quantity));
-      cart.updateCounters(document, store.count());
-      productCart.showAddConfirmation(addButton, `${fiche.querySelector("h1").textContent} ajouté au panier.`, fiche.querySelector(".product-cart-confirmation"));
+      productCart.addLineGuarded(store, productCart.catalogueLine(current.reference, quantity), { button: addButton, onAdded() {
+        cart.updateCounters(document, store.count());
+        productCart.showAddConfirmation(addButton, `${fiche.querySelector("h1").textContent} ajouté au panier.`, fiche.querySelector(".product-cart-confirmation"));
+      } });
     } catch {
       productCart.showAddConfirmation(addButton, "Ce produit n’a pas pu être ajouté au panier.", fiche.querySelector(".product-cart-confirmation"));
     }

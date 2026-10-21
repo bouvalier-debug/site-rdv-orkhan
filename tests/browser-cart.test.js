@@ -183,7 +183,7 @@ test("une indisponibilité Famille bloque le total et le paiement avec le messag
   const result = { error: "family_verification_unavailable", status: 503 };
   assert.equal(quoteStatusMessage(result), "Le service de vérification du tarif Famille est momentanément indisponible. Réessayez dans quelques instants, ou retirez le numéro de puce ou le code Famille pour commander au tarif public.");
   const source = fs.readFileSync(path.join(__dirname, "..", "assets", "cart.js"), "utf8");
-  assert.match(source, /checkoutButton\.disabled = result\?\.error === "family_verification_unavailable"/);
+  assert.match(source, /checkoutButton\.disabled = !quote/, "sans devis valide (dont Famille indisponible ou panier vide), le paiement est bloqué");
 });
 
 test("K3 : les coordonnées ne sont jamais enregistrées et les anciennes coordonnées locales sont effacées", () => {
@@ -253,7 +253,7 @@ test("le checkout navigateur ne transmet aucun montant stocké", async () => {
   }, "123e4567-e89b-42d3-a456-426614174000");
   assert.doesNotMatch(JSON.stringify(payload), /priceCents|totalCents/);
   assert.equal(payload.items[0].options.chipNumber, "250123456789012");
-  assert.deepEqual(payload.legalAcceptance, { version: "cgv-2026-10-21-2", accepted: true });
+  assert.deepEqual(payload.legalAcceptance, { version: "cgv-2026-10-21-3", accepted: true });
 
   let request;
   const result = await requestCheckout(payload, { fetch: async (url, options) => {
@@ -275,11 +275,11 @@ test("la page panier propose un consentement explicite avant paiement sans expos
 test("récapitulatif : sans encadré, case CGV non précochée juste avant le bouton, informations légales accessibles par lien", () => {
   // Le menu Rayons de l'en-tête commun (phase 6) est un <details> : seul le récapitulatif est contrôlé ici.
   assert.doesNotMatch(cartPage.replace(require("../scripts/shop-layout").SHOP_HEADER, ""), /<details|Avant de commander/);
-  assert.match(cartPage, /<p class="summary-delays">[\s\S]*?data-delivery-delays/);
+  assert.match(cartPage, /<p class="summary-delays"[^>]*>[\s\S]*?data-delivery-delays/);
   assert.match(cartPage, /<input type="checkbox" data-legal-acceptance autocomplete="off">/);
   assert.match(cartPage, /data-legal-acceptance[\s\S]*?<\/div>\s*<button class="customer-submit checkout-submit" type="button" data-checkout-button>/);
   const reminder = cartPage.match(/<p class="legal-reminder">([\s\S]*?)<\/p>/)[1];
-  for (const term of ["rétractation", "Red Dingo gravées", "/conditions-generales-de-vente/", "/mentions-legales/", "/renoncer-au-contrat/"]) assert.ok(reminder.includes(term), term);
+  for (const term of ["rétractation", "data-red-dingo-only", "Red Dingo gravées", "/conditions-generales-de-vente/", "/mentions-legales/", "/renoncer-au-contrat/"]) assert.ok(reminder.includes(term), term);
 });
 
 test("le panier expiré est supprimé", () => {

@@ -69,6 +69,59 @@
     return store.count();
   }
 
+  // Lot A1 : une commande Red Dingo ne se mélange pas avec d'autres articles (fabricant distinct, expédition directe).
+  const isRedDingo = (productId) => /^red-dingo:/i.test(String(productId || ""));
+
+  function mixConflict(store, line) {
+    const items = store && typeof store.getItems === "function" ? store.getItems() : [];
+    if (!items.length) return null;
+    const incoming = isRedDingo(line.productId);
+    if (incoming && items.some((item) => !isRedDingo(item.productId))) return "cart-has-other";
+    if (!incoming && items.some((item) => isRedDingo(item.productId))) return "cart-has-red-dingo";
+    return null;
+  }
+
+  const CONFLICT_MESSAGES = Object.freeze({
+    "cart-has-other": "Les médailles Red Dingo gravées sont fabriquées et expédiées directement par Red Dingo : elles se commandent séparément des autres articles. Votre panier contient déjà d’autres articles.",
+    "cart-has-red-dingo": "Votre panier contient des médailles Red Dingo gravées, fabriquées et expédiées directement par Red Dingo : elles se commandent séparément des autres articles."
+  });
+
+  // Ajoute la ligne, ou, en cas de mélange, demande de conserver le panier actuel ou de le remplacer (jamais de
+  // suppression silencieuse). Retourne « added » ou « conflict » ; onAdded est appelé après l'ajout effectif.
+  function addLineGuarded(store, line, { button, onAdded } = {}) {
+    const conflict = mixConflict(store, line);
+    if (!conflict) { addLine(store, line); if (onAdded) onAdded(); return "added"; }
+    if (!button || !button.ownerDocument) throw new TypeError("confirmation_button_required");
+    const document = button.ownerDocument;
+    button.parentNode.querySelectorAll(".cart-conflict").forEach((node) => node.remove());
+    const panel = document.createElement("div");
+    panel.className = "cart-conflict";
+    panel.setAttribute("role", "alert");
+    const text = document.createElement("p");
+    text.textContent = CONFLICT_MESSAGES[conflict];
+    const actions = document.createElement("div");
+    actions.className = "cart-conflict__actions";
+    const keep = document.createElement("button");
+    keep.type = "button";
+    keep.className = "button secondary";
+    keep.textContent = "Conserver mon panier actuel";
+    keep.addEventListener("click", () => panel.remove());
+    const replace = document.createElement("button");
+    replace.type = "button";
+    replace.className = "button";
+    replace.textContent = "Remplacer mon panier par cet article";
+    replace.addEventListener("click", () => {
+      store.clear();
+      addLine(store, line);
+      panel.remove();
+      if (onAdded) onAdded();
+    });
+    actions.append(keep, replace);
+    panel.append(text, actions);
+    button.insertAdjacentElement("afterend", panel);
+    return "conflict";
+  }
+
   function showAddConfirmation(button, message, existingNode) {
     if (!button || !button.ownerDocument) throw new TypeError("confirmation_button_required");
     const document = button.ownerDocument;
@@ -85,5 +138,5 @@
     return node;
   }
 
-  return { addLine, animocoLine, catalogueLine, cosmeticLine, engravingLines, quantity, redDingoLine, showAddConfirmation };
+  return { addLine, addLineGuarded, mixConflict, animocoLine, catalogueLine, cosmeticLine, engravingLines, quantity, redDingoLine, showAddConfirmation };
 }));

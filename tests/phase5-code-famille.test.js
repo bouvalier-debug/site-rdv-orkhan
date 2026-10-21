@@ -86,11 +86,17 @@ test("panier : un seul champ ; une saisie avec lettres part comme code, sinon co
 test("CGV : seule l'article 4.3 change, les versions précédentes restent archivées ; la confidentialité mentionne le code", () => {
   const current = require("../legal/cgv-2026-10-21-2.json");
   const previous = require("../legal/cgv-2026-10-21.json");
-  assert.equal(SHOP_LEGAL_CURRENT_VERSION, current.version);
+  // Corrections finales : la version en vigueur est cgv-2026-10-21-3 ; elle ne diffère de -2 que par l'article 7.5 (sans délai de 24 h).
+  const latest = require("../legal/cgv-2026-10-21-3.json");
+  assert.equal(SHOP_LEGAL_CURRENT_VERSION, latest.version);
+  const latestChanged = latest.blocks.map((block, index) => JSON.stringify(block) !== JSON.stringify(current.blocks[index]) ? index : null).filter((index) => index !== null);
+  assert.equal(latestChanged.length, 2, "titre de version et article 7.5");
+  assert.match(latest.blocks[latestChanged[1]].text, /^7\.5\. \*\*Retrait à l'élevage\*\*.*lors du départ du chiot, soit à une autre date convenue/);
+  assert.doesNotMatch(latest.blocks[latestChanged[1]].text, /24 heures/);
   const changed = current.blocks.map((block, index) => JSON.stringify(block) !== JSON.stringify(previous.blocks[index]) ? index : null).filter((index) => index !== null);
   assert.equal(changed.length, 2);
   assert.match(JSON.stringify(current.blocks[changed[1]]), /^\{"type":"p","text":"4\.3\. \*\*Tarif Famille Dynastie\.\*\*.*code Famille temporaire/);
-  for (const version of ["cgv-2026-10-05", "cgv-2026-10-07", "cgv-2026-10-21"]) {
+  for (const version of ["cgv-2026-10-05", "cgv-2026-10-07", "cgv-2026-10-21", "cgv-2026-10-21-2"]) {
     assert.equal(require(`../legal/${version}.json`).version, version);
     assert.match(read(`conditions-generales-de-vente/${version}/index.html`), new RegExp(`Version ${version} — validée le`));
   }
