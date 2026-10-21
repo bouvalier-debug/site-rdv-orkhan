@@ -30,13 +30,28 @@ function renderBlocks(blocks) {
   }).join("\n");
 }
 
-// Shared Facebook button (VIS-001), only on the current terms: the archived version stays as published.
-const facebookFab = '<a class="facebook-fab" href="https://www.facebook.com/dynastiedorkhan" target="_blank" rel="noopener noreferrer" aria-label="Suivre l’Élevage de la Dynastie d’Orkhan sur Facebook"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06H297V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg></a>';
+// Pied de page et boutons flottants communs (D1, K5), seulement sur les CGV en vigueur : la version archivée reste telle que publiée.
+const { SHOP_FOOTER, FACEBOOK_FAB, BACK_TO_TOP } = require("./shop-layout");
+const ARCHIVE_FOOTER = '<footer class="site-footer"><a href="/conditions-generales-de-vente/">Conditions générales de vente</a> · <a href="/confidentialite/">Politique de confidentialité</a> · <a href="/mentions-legales/">Mentions légales</a> · <a href="/renoncer-au-contrat/">Renoncer au contrat ici</a></footer>';
+
+// Lot A (K6) : la page courante affiche la date de version lisible au lieu de l'identifiant technique. Le JSON source,
+// l'identifiant enregistré avec les commandes et la version archivée restent inchangés.
+const MONTHS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+
+function readableVersionTitle(text) {
+  const match = /^\*\*Version cgv-[\d-]+ — validée le (\d{2})\/(\d{2})\/(\d{4}), (.+)\*\*$/.exec(text);
+  return match ? `**Version du ${Number(match[1])} ${MONTHS[Number(match[2]) - 1]} ${match[3]}, ${match[4]}**` : text;
+}
+
+function displayBlocks(source) {
+  if (source !== document) return source.blocks;
+  return source.blocks.map((block) => block.type === "p" && block.text ? { ...block, text: readableVersionTitle(block.text) } : block);
+}
 
 function pageHtml(source = document) {
   const articles = source.blocks.filter((block) => block.type === "h3" && /^Article /.test(block.text));
   const summary = articles.map((block) => { const number = /^Article (\d+)/.exec(block.text)[1]; return `<li><a href="#article-${number}">${inline(block.text)}</a></li>`; }).join("");
-  return `<!doctype html>\n<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Conditions générales de vente | Dynastie d'Orkhan</title><meta name="description" content="Conditions générales de vente de la Boutique de l'Élevage de la Dynastie d'Orkhan."><link rel="stylesheet" href="/assets/orkhan-design.css"><style>.legal{max-width:920px;margin:auto;padding:32px 20px}.legal h1,.legal h2,.legal h3{color:var(--bordeaux)}.legal-nav{padding:18px 24px;background:#fff;border:1px solid var(--line);border-radius:8px}.legal-nav ol{columns:2}.legal blockquote{margin:18px 0;padding:14px 18px;border-left:4px solid var(--or);background:#fff}.legal-table{overflow:auto}.legal table{width:100%;border-collapse:collapse}.legal th,.legal td{padding:10px;border:1px solid var(--line);vertical-align:top}.site-footer{text-align:center;padding:24px;border-top:1px solid var(--line)}</style></head><body><main class="legal"><p><a href="/">← Retour à la boutique</a></p><h1>${inline(source.title)}</h1><nav class="legal-nav" aria-label="Sommaire"><h2>Sommaire</h2><ol>${summary}</ol></nav>${renderBlocks(source.blocks)}</main><footer class="site-footer"><a href="/conditions-generales-de-vente/">Conditions générales de vente</a> · <a href="/confidentialite/">Politique de confidentialité</a> · <a href="/mentions-legales/">Mentions légales</a> · <a href="/renoncer-au-contrat/">Renoncer au contrat ici</a></footer>${source === document ? facebookFab : ""}</body></html>\n`;
+  return `<!doctype html>\n<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Conditions générales de vente | Dynastie d'Orkhan</title><meta name="description" content="Conditions générales de vente de la Boutique de l'Élevage de la Dynastie d'Orkhan."><link rel="stylesheet" href="/assets/orkhan-design.css"><style>.legal{max-width:920px;margin:auto;padding:32px 20px}.legal h1,.legal h2,.legal h3{color:var(--bordeaux)}.legal-nav{padding:18px 24px;background:#fff;border:1px solid var(--line);border-radius:8px}.legal-nav ol{columns:2}.legal blockquote{margin:18px 0;padding:14px 18px;border-left:4px solid var(--or);background:#fff}.legal-table{overflow:auto}.legal table{width:100%;border-collapse:collapse}.legal th,.legal td{padding:10px;border:1px solid var(--line);vertical-align:top}.site-footer{text-align:center;padding:24px;border-top:1px solid var(--line)}</style></head><body><main class="legal"><p><a href="/">← Retour à la boutique</a></p><h1>${inline(source.title)}</h1><nav class="legal-nav" aria-label="Sommaire"><h2>Sommaire</h2><ol>${summary}</ol></nav>${renderBlocks(displayBlocks(source))}</main>${source === document ? SHOP_FOOTER + FACEBOOK_FAB + BACK_TO_TOP : ARCHIVE_FOOTER}</body></html>\n`;
 }
 
 const output = path.join(process.cwd(), "conditions-generales-de-vente", "index.html");

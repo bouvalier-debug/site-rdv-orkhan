@@ -31,6 +31,7 @@
   const CUSTOMER_FIELDS = Object.freeze([
     "firstName", "lastName", "email", "phone", "address", "addressExtra", "postalCode", "city", "country"
   ]);
+  const ADDRESS_FIELDS = Object.freeze(["address", "addressExtra", "postalCode", "city"]);
 
   function validQuantity(value) {
     return Number.isInteger(value) && value >= 1 && value <= MAX_QUANTITY;
@@ -216,46 +217,23 @@
     return customer;
   }
 
-  function parseStoredCustomer(raw, now = Date.now()) {
-    if (!raw) return { customer: sanitizeCustomer({}), savedAt: null };
-    try {
-      const parsed = JSON.parse(raw);
-      return parsed?.version === 2 && validStoredDate(parsed.savedAt, 365, now)
-        ? { customer: sanitizeCustomer(parsed.customer), savedAt: parsed.savedAt }
-        : { customer: sanitizeCustomer({}), savedAt: null };
-    } catch {
-      return { customer: sanitizeCustomer({}), savedAt: null };
-    }
-  }
-
+  // Lot A (K3) : les coordonnées restent en mémoire le temps de la page, sans enregistrement dans le navigateur. Les
+  // coordonnées enregistrées par l'ancienne option « Enregistrer mes coordonnées » (v1 et v2) sont effacées ; le panier
+  // et la puce Famille ne sont pas touchés.
   function createCustomerStore(options = {}) {
     const storage = options.storage || (typeof localStorage !== "undefined" ? localStorage : null);
-    if (storage) storage.removeItem(LEGACY_CUSTOMER_STORAGE_KEY);
-    const restored = storage ? parseStoredCustomer(storage.getItem(CUSTOMER_STORAGE_KEY), options.now?.() || Date.now()) : { customer: sanitizeCustomer({}), savedAt: null };
-    let customer = restored.customer;
-    let savedAt = restored.savedAt;
-    let remember = Boolean(savedAt);
-    if (storage && !savedAt) storage.removeItem(CUSTOMER_STORAGE_KEY);
-    function persist() {
-      if (storage && remember) storage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify({ version: 2, savedAt, customer }));
-      return { ...customer };
-    }
+    try {
+      if (storage) { storage.removeItem(LEGACY_CUSTOMER_STORAGE_KEY); storage.removeItem(CUSTOMER_STORAGE_KEY); }
+    } catch { /* stockage indisponible : rien à effacer */ }
+    let customer = sanitizeCustomer({});
     return {
       get: () => ({ ...customer }),
-      isRemembered: () => remember,
-      setRemember(value) {
-        remember = value === true;
-        if (remember) { savedAt ||= new Date(options.now?.() || Date.now()).toISOString(); persist(); }
-        else { savedAt = null; if (storage) storage.removeItem(CUSTOMER_STORAGE_KEY); }
-        return remember;
-      },
-      clear() { customer = sanitizeCustomer({}); remember = false; savedAt = null; if (storage) storage.removeItem(CUSTOMER_STORAGE_KEY); return { ...customer }; },
       setField(field, value) {
         if (!CUSTOMER_FIELDS.includes(field)) return { ...customer };
         customer = { ...customer, [field]: typeof value === "string" ? value.slice(0, 300) : "" };
-        return persist();
+        return { ...customer };
       },
-      replace(value) { customer = sanitizeCustomer(value); return persist(); }
+      replace(value) { customer = sanitizeCustomer(value); return { ...customer }; }
     };
   }
 
@@ -426,11 +404,8 @@
     const shippingNode = container.querySelector("[data-cart-shipping]");
     const totalNode = container.querySelector("[data-cart-total]");
     const customerForm = container.querySelector("[data-customer-form]");
-    const customerStatus = customerForm.querySelector("[data-customer-status]");
     const checkoutButton = container.querySelector("[data-checkout-button]");
     const checkoutStatus = container.querySelector("[data-checkout-status]");
-    const rememberCustomer = container.querySelector("[data-remember-customer]");
-    const clearCustomer = container.querySelector("[data-clear-customer]");
     const legalCheckbox = container.querySelector("[data-legal-acceptance]");
     const engravingWrap = container.querySelector("[data-engraving-confirmation-wrap]");
     const engravingCheckbox = container.querySelector("[data-engraving-confirmation]");
@@ -470,15 +445,14 @@
 
     function updateCustomerRequirements() {
       const required = new Set(requiredCustomerFields(selectedShipping?.mode));
+      const pickup = selectedShipping?.mode === "pickup";
       customerForm.querySelectorAll("[name]").forEach((field) => {
         field.required = required.has(field.name);
+        // Lot A (K2) : en retrait, l'adresse n'est pas demandée ; les champs sont seulement masqués à l'affichage.
+        if (ADDRESS_FIELDS.includes(field.name)) field.closest("label").hidden = pickup;
       });
       const addressHint = customerForm.querySelector("[data-address-hint]");
-      if (addressHint) {
-        addressHint.textContent = selectedShipping?.mode === "pickup"
-          ? "Adresse facultative pour un retrait à l’élevage."
-          : "Adresse requise pour une livraison.";
-      }
+      if (addressHint) addressHint.hidden = pickup;
     }
 
     function restoreCustomer() {
@@ -487,7 +461,6 @@
         if (Object.prototype.hasOwnProperty.call(customer, field.name)) field.value = customer[field.name];
       });
       updateCustomerRequirements();
-      if (rememberCustomer) rememberCustomer.checked = customerStore.isRemembered();
     }
 
     function renderLines(items, quote) {
@@ -515,9 +488,10 @@
         quantity.value = String(item.quantity);
         quantity.dataset.quantity = item.lineId;
         quantityLabel.append(quantity);
-        const remove = element(document, "button", "cart-remove", "Supprimer");
+        const remove = element(document, "button", "cart-remove", "Retirer");
         remove.type = "button";
         remove.dataset.remove = item.lineId;
+        remove.setAttribute("aria-label", `Retirer ${serverLine?.name || "cet article"} du panier`);
         controls.append(quantityLabel, remove);
         const price = element(document, "div", "cart-line__price");
         price.append(element(document, "span", "cart-line__unit", serverLine ? `${money(serverLine.unitPriceCents)} l’unité` : "Prix en cours de calcul"));
@@ -546,14 +520,28 @@
         modesNode.append(label);
       }
       if (selectedShipping && !modes.includes(selectedShipping.mode)) selectedShipping = null;
+      // Lot A (K1) : un seul mode possible est présélectionné ; le devis est alors redemandé avec ce mode pour afficher
+      // le total sans clic. Le serveur recalcule et valide comme pour un choix manuel.
+      let autoSelected = false;
+      if (!selectedShipping && modes.length === 1) {
+        selectedShipping = { mode: modes[0] };
+        modesNode.querySelector('input[name="shipping-mode"]').checked = true;
+        const expectedCountry = countryForShippingMode(modes[0]);
+        if (expectedCountry && countryField) {
+          countryField.value = expectedCountry;
+          customerStore.setField("country", expectedCountry);
+        }
+        autoSelected = true;
+      }
       updateCustomerRequirements();
+      return autoSelected;
     }
 
     function renderResult(items, result) {
       lastResult = result;
       const quote = result?.quote;
       renderLines(items, quote);
-      renderModes(result);
+      const autoSelected = renderModes(result);
       subtotalNode.textContent = money(quote?.subtotalCents);
       shippingNode.textContent = quote?.shipping ? money(quote.shipping.priceCents) : "À choisir";
       totalNode.textContent = money(quote?.totalCents);
@@ -570,6 +558,7 @@
         const delays = selectedShipping ? deliveryDelayLines({ hasRedDingo, hasOther, mode: selectedShipping.mode }) : [];
         delaysNode.textContent = delays.length ? delays.join(" ") : "Choisissez un mode de livraison pour afficher les délais.";
       }
+      if (autoSelected) refresh();
     }
 
     async function refresh() {
@@ -589,7 +578,7 @@
       }
       const sequence = ++requestSequence;
       statusNode.hidden = false;
-      statusNode.textContent = "Calcul du devis serveur…";
+      statusNode.textContent = "Calcul en cours…";
       try {
         const result = await requestQuote(items, selectedShipping, { ...options, familyChipNumber: familyStore.get() });
         if (sequence === requestSequence) renderResult(items, result);
@@ -657,11 +646,6 @@
       }
       refresh();
     });
-    if (rememberCustomer) rememberCustomer.addEventListener("change", () => customerStore.setRemember(rememberCustomer.checked));
-    if (clearCustomer) clearCustomer.addEventListener("click", () => {
-      customerStore.clear(); customerForm.reset(); updateCustomerRequirements();
-      customerStatus.textContent = "Vos coordonnées enregistrées ont été effacées de ce navigateur."; customerStatus.hidden = false;
-    });
     customerForm.addEventListener("submit", (event) => event.preventDefault());
     if (checkoutButton) checkoutButton.addEventListener("click", async () => {
       checkoutStatus.hidden = true;
@@ -708,7 +692,7 @@
       // Retour d'une annulation signée : le devis attend que l'annulation soit traitée (voir initCartPage).
       renderLines(store.getItems(), null);
       statusNode.hidden = false;
-      statusNode.textContent = "Calcul du devis serveur…";
+      statusNode.textContent = "Calcul en cours…";
     } else refresh();
     return { customerStore, refresh, store, getLastResult: () => lastResult };
   }
@@ -820,7 +804,6 @@
     mountCartPage,
     optionRows,
     parseStoredCart,
-    parseStoredCustomer,
     quoteStatusMessage,
     requestQuote,
     requestCheckout,
