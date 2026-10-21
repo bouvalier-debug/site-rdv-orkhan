@@ -67,9 +67,8 @@ test("les libellés et délais de livraison restent stables", () => {
   assert.deepEqual(deliveryDelayLines({ hasRedDingo: true, hasOther: false, mode: "red-dingo-free" }), [
     "Médailles gravées : transmission à Red Dingo sous 24 h ouvrées, puis fabrication et expédition par Red Dingo sous 7 à 10 jours ouvrés (indicatif). Livraison comprise."
   ]);
-  assert.deepEqual(deliveryDelayLines({ hasRedDingo: false, hasOther: true, mode: "pickup" }), [
-    "Disponible à l’élevage sous 24 h ouvrées, sur rendez-vous. Vous êtes prévenu par email."
-  ]);
+  // Lot A6 : plus aucune promesse de délai pour le retrait gratuit à l'élevage.
+  assert.deepEqual(deliveryDelayLines({ hasRedDingo: false, hasOther: true, mode: "pickup" }), []);
   assert.deepEqual(deliveryDelayLines({ hasRedDingo: false, hasOther: true, mode: "animoco-light-fr" }), [
     "Préparation et expédition sous 48 h ouvrées, puis La Poste Lettre verte suivie : 3 à 5 jours ouvrés (indicatif)."
   ]);

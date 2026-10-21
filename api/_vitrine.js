@@ -44,7 +44,7 @@ const AVAILABILITY_LABELS = {
   in_stock: "En stock",
   low_stock: "Stock limité",
   out_of_stock: "Indisponible pour le moment",
-  on_request: "Sur demande",
+  on_request: "Sur commande",
   soon: "Bientôt disponible"
 };
 const AVAILABILITY_RANK = ["in_stock", "low_stock", "out_of_stock", "soon", "on_request"];
@@ -118,6 +118,29 @@ function priceText(cents, from) {
   return `${from ? "À partir de " : ""}${money(cents)}`;
 }
 
+// B6 : la description du Manager (un seul champ texte) peut contenir des paragraphes, des intertitres (ligne courte se
+// terminant par « : ») et des listes (« - » ou « • »), pour présenter caractéristiques, composition et conseils.
+function descriptionHtml(text) {
+  const blocks = String(text || "").replace(/\r/g, "").split(/\n{2,}/).map((block) => block.trim()).filter(Boolean);
+  return blocks.map((block) => {
+    const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
+    const out = [];
+    let list = [];
+    const paragraph = [];
+    const flush = () => { if (list.length) out.push(`<ul>${list.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`); list = []; };
+    const flushParagraph = () => { if (paragraph.length) out.push(`<p>${paragraph.map(escapeHtml).join("<br>")}</p>`); paragraph.length = 0; };
+    for (const line of lines) {
+      const item = line.match(/^[-•*]\s+(.*)$/);
+      if (item) { flushParagraph(); list.push(item[1]); continue; }
+      flush();
+      if (line.length <= 60 && line.endsWith(":")) { flushParagraph(); out.push(`<h3>${escapeHtml(line.slice(0, -1).trim())}</h3>`); } else paragraph.push(line);
+    }
+    flush();
+    flushParagraph();
+    return out.join("");
+  }).join("");
+}
+
 function photoHtml(photo, className, loading = "lazy") {
   const size = photo.width && photo.height ? ` width="${photo.width}" height="${photo.height}"` : "";
   return `<img class="${className}" src="${escapeHtml(photo.url)}" alt="${escapeHtml(photo.altText)}" loading="${loading}"${size}>`;
@@ -128,7 +151,7 @@ function photoHtml(photo, className, loading = "lazy") {
 function ficheCard(fiche) {
   const href = `/produits/${encodeURIComponent(fiche.slug)}/`;
   const photo = fiche.photos[0];
-  return `<article class="product-tile"><a class="product-tile-photo" href="${href}" tabindex="-1" aria-hidden="true">${photo ? photoHtml(photo, "") : `<span class="product-tile-placeholder">${escapeHtml(rayonByKey(fiche.shelf)?.label || "Boutique")}</span>`}</a>`
+  return `<article class="product-tile"><a class="product-tile-photo" href="${href}" tabindex="-1" aria-hidden="true">${photo ? photoHtml(photo, "") : `<span class="product-tile-placeholder">Photo à venir</span>`}</a>`
     + `<div class="product-tile-body"><h3><a href="${href}">${escapeHtml(fiche.name)}</a></h3>`
     + (fiche.onRequest ? "" : `<p class="product-price">${priceText(fiche.price, fiche.priceFrom)}</p>`)
     + (fiche.familyPrice !== null && !fiche.onRequest ? `<p class="family-price">Prix Famille Dynastie : ${priceText(fiche.familyPrice, fiche.familyPriceFrom)}</p>` : "")
@@ -212,7 +235,7 @@ function renderAccueil(catalogue) {
   const body = sceneHtml(SCENE)
     + `<section class="home-section" aria-labelledby="rayons-title"><h2 id="rayons-title">Nos rayons</h2><div class="rayon-grid">${tiles}</div></section>`
     + (nouveautes.length ? `<section class="home-section" id="nouveautes" aria-labelledby="nouveautes-title"><h2 id="nouveautes-title">Nos nouveautés</h2><div class="product-grid">${nouveautes.map(ficheCard).join("")}</div></section>` : "")
-    + '<section class="home-section home-on-request"><div><h2>Sur demande</h2><p>Découvrez les articles que nous proposons sur demande, sans achat en ligne.</p></div><a class="btn-voir" href="/sur-demande/">Voir la rubrique</a></section>'
+    + '<section class="home-section home-on-request"><div><h2>Produits sur commande</h2><p>Des produits à consulter ici, mais non achetables directement en ligne.</p></div><a class="btn-voir" href="/sur-demande/">Voir la rubrique</a></section>'
     + '<section class="home-section home-promises"><p><strong>Retrait gratuit à l’élevage</strong> pour les articles de la boutique</p><p><strong>Tarif Famille Dynastie</strong> avec votre numéro de puce ou votre code Famille</p><p><strong>Paiement sécurisé</strong> en ligne</p></section>';
   return page({
     title: "Boutique de l'Élevage de la Dynastie d'Orkhan | Alimentation, sellerie, médailles et soins",
@@ -253,11 +276,11 @@ function renderRayon(catalogue, slug) {
 function renderSurDemande(catalogue) {
   const fiches = catalogue.available ? buildFiches(catalogue.products).filter((fiche) => fiche.onRequest) : [];
   return page({
-    title: "Sur demande | Boutique Dynastie d'Orkhan",
-    description: "Articles présentés sur demande par l'Élevage de la Dynastie d'Orkhan, sans achat en ligne.",
+    title: "Produits sur commande | Boutique Dynastie d'Orkhan",
+    description: "Produits sur commande de l'Élevage de la Dynastie d'Orkhan : à consulter en ligne, non achetables directement sur la boutique.",
     canonical: "/sur-demande/",
-    hero: heroHtml("Sur demande", "Des articles que nous proposons sur demande : contactez-nous pour en parler.", true),
-    body: `${rayonsNav(null)}<section class="rayon-listing">${fiches.length ? `<div class="product-grid">${fiches.map(ficheCard).join("")}</div>` : '<p class="rayon-empty">Aucun article sur demande pour le moment.</p>'}</section>`
+    hero: heroHtml("Produits sur commande", "Des produits à consulter ici, mais non achetables directement en ligne : contactez-nous pour en parler.", true),
+    body: `${rayonsNav(null)}<section class="rayon-listing">${fiches.length ? `<div class="product-grid">${fiches.map(ficheCard).join("")}</div>` : '<p class="rayon-empty">Aucun produit sur commande pour le moment.</p>'}</section>`
   });
 }
 
@@ -282,12 +305,12 @@ function renderFiche(catalogue, slug) {
   const photos = fiche.photos;
   const gallery = photos.length
     ? `<div class="fiche-gallery">${photoHtml(photos[0], "fiche-photo", "eager").replace("<img", '<img data-fiche-photo')}${photos.length > 1 ? `<div class="fiche-thumbs">${photos.map((photo, index) => `<button type="button" data-photo="${escapeHtml(photo.url)}" data-alt="${escapeHtml(photo.altText)}"${index === 0 ? ' aria-current="true"' : ""}>${photoHtml(photo, "")}</button>`).join("")}</div>` : ""}</div>`
-    : `<div class="fiche-gallery"><span class="product-tile-placeholder fiche-photo">${escapeHtml(rayon?.label || "Boutique")}</span></div>`;
+    : `<div class="fiche-gallery"><span class="product-tile-placeholder fiche-photo">Photo à venir</span></div>`;
   const choice = variants.length > 1
     ? `<fieldset class="fiche-variants"><legend>Format</legend>${variants.map((variant) => `<label><input type="radio" name="variant" value="${escapeHtml(variant.reference)}"${variant.reference === current.reference ? " checked" : ""}><span>${escapeHtml(variant.label)}</span><small>${variant.price}</small></label>`).join("")}</fieldset>`
     : "";
   const purchase = fiche.onRequest
-    ? '<p class="fiche-on-request">Article présenté sur demande, sans achat en ligne. <a href="https://www.dynastiedorkhan.com/contact/">Contactez-nous</a> pour en parler.</p>'
+    ? '<p class="fiche-on-request">Produit sur commande, non achetable directement en ligne. <a href="https://www.dynastiedorkhan.com/contact/">Contactez-nous</a> pour en parler.</p>'
     : `<div class="fiche-buy"><label>Quantité<input type="number" data-fiche-quantity min="1" max="${Math.max(current.maxQuantity, 1)}" value="1"${current.maxQuantity ? "" : " disabled"}></label><button type="button" class="btn-primary" data-fiche-add${current.maxQuantity ? "" : " disabled"}>Ajouter au panier</button></div><p class="fiche-pickup">Retrait gratuit à l’élevage, sur rendez-vous.</p>`;
   const jsonLd = {
     "@context": "https://schema.org", "@type": "Product", name: fiche.name, sku: current.reference,
@@ -295,13 +318,13 @@ function renderFiche(catalogue, slug) {
     ...(photos.length ? { image: photos.map((photo) => `${ORIGIN}${photo.url}`) } : {}),
     ...(fiche.onRequest ? {} : { offers: { "@type": "AggregateOffer", priceCurrency: "EUR", lowPrice: (fiche.price / 100).toFixed(2), highPrice: (Math.max(...fiche.variants.map((variant) => variant.publicPriceCents)) / 100).toFixed(2), offerCount: fiche.variants.length } })
   };
-  const body = `<nav class="breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a>${rayon ? ` › <a href="/rayons/${rayon.slug}/">${rayon.label}</a>` : fiche.onRequest ? ' › <a href="/sur-demande/">Sur demande</a>' : ""} › <span>${escapeHtml(fiche.name)}</span></nav>`
+  const body = `<nav class="breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a>${rayon ? ` › <a href="/rayons/${rayon.slug}/">${rayon.label}</a>` : fiche.onRequest ? ' › <a href="/sur-demande/">Produits sur commande</a>' : ""} › <span>${escapeHtml(fiche.name)}</span></nav>`
     + `<article class="fiche" data-fiche><div class="fiche-media">${gallery}</div><div class="fiche-info"><h1>${escapeHtml(fiche.name)}</h1>${choice}`
     + (fiche.onRequest ? "" : `<p class="product-price fiche-price" data-fiche-price>${current.price}</p><p class="family-price" data-fiche-family${current.familyPrice ? "" : " hidden"}>Prix Famille Dynastie : <span>${current.familyPrice || ""}</span></p>`)
     + `<p class="availability availability-${current.state}" data-fiche-availability>${current.availability}</p>${purchase}`
     + (fiche.familyPrice !== null && !fiche.onRequest ? '<p class="fiche-family-note">Le prix Famille s’applique au panier après vérification de votre numéro de puce ou de votre code Famille.</p>' : "")
     + `<p class="fiche-ref">Référence : <span data-fiche-ref>${escapeHtml(current.reference)}</span></p></div></article>`
-    + (fiche.description ? `<section class="fiche-description"><h2>Description</h2><p>${escapeHtml(fiche.description)}</p></section>` : "")
+    + (fiche.description ? `<section class="fiche-description"><h2>Description</h2>${descriptionHtml(fiche.description)}</section>` : "")
     + `<script type="application/json" id="fiche-variants">${JSON.stringify(variants).replace(/</g, "\\u003c")}</script>`
     + `<script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, "\\u003c")}</script>`;
   return page({
@@ -323,6 +346,6 @@ function renderNotFound() {
 }
 
 module.exports = {
-  AVAILABILITY_LABELS, PARCOURS, SCENE, buildFiches, escapeHtml, findFiche, ficheCard, money, rayonBySlug,
+  AVAILABILITY_LABELS, PARCOURS, SCENE, buildFiches, descriptionHtml, escapeHtml, findFiche, ficheCard, money, rayonBySlug,
   renderAccueil, renderFiche, renderNotFound, renderRayon, renderSurDemande, sceneHtml, variantAvailability
 };

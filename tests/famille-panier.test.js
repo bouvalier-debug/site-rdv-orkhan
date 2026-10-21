@@ -62,7 +62,7 @@ test("paiement : la puce du panier est revérifiée côté serveur ; le Manager 
     checkoutAttemptId: "123e4567-e89b-42d3-a456-426614174000", items: [{ productId: "croquettes-test", quantity: 1 }], shipping: { mode: "pickup", pickupTiming: "appointment" },
     familyChipNumber: CHIP,
     customer: { firstName: "Test", lastName: "Famille", email: "contact@dynastiedorkhan.com", phone: "0600000000", country: "FR" },
-    legalAcceptance: { version: "cgv-2026-10-21-2", accepted: true }
+    legalAcceptance: { version: "cgv-2026-10-21-3", accepted: true }
   }, {
     env: { ORKHAN_SHOP_ORDERS_SECRET: "secret-test" }, origin: "https://boutique.test",
     listCatalogue: async () => ({ available: true, products: [CROQUETTES] }), verifyFamilyChip: verifier(true, calls),
@@ -108,6 +108,5 @@ test("pages : zone unique dans le panier ; la page Animoco garde sa vérificatio
   for (const attribute of ["data-family-chip ", "data-family-chip-verify", "data-family-chip-remove", "data-family-status"]) assert.ok(panier.includes(attribute), attribute);
   const animoco = read("medailles-connectees/order.js");
   assert.match(animoco, /OrkhanProductCart\.animocoLine\(\{quantity:quantity\.value\}\)/);
-  assert.match(animoco, /familyChipStore\.set\(chipInput\.value\)/);
-  assert.match(animoco, /\/api\/family-eligibility/);
+  assert.doesNotMatch(animoco, /familyChipStore|\/api\/family-eligibility/, "lot A3 : plus de vérification sur la fiche Animoco");
 });

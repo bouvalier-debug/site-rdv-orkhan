@@ -28,10 +28,11 @@ test("phase 6 (L2) : la page RDV reprend le menu du site principal, bouton Bouti
   assert.equal((html.match(/<form/g) || []).length, 1, "formulaire de rendez-vous inchangé");
 });
 
-test("la page Cosmétiques renvoie aussi vers la boutique, comme la médaille connectée", () => {
-  for (const file of ["cosmetiques/index.html", "medailles-connectees/index.html"]) {
-    assert.match(read(file), /<p><a href="\/">Retour à la boutique<\/a><\/p>/, file);
-  }
+test("lot B3 : plus de « Retour à la boutique » en pied de page, l'accueil reste dans l'en-tête", () => {
+  const { SHOP_FOOTER, SHOP_HEADER } = require("../scripts/shop-layout");
+  assert.doesNotMatch(SHOP_FOOTER, /Retour à la boutique/);
+  assert.match(SHOP_HEADER, /<a href="\/">Accueil<\/a>/);
+  assert.match(SHOP_FOOTER, /<a href="https:\/\/www\.dynastiedorkhan\.com\/contact\/">Contact<\/a>/, "Contact reste accessible depuis le pied de page");
 });
 
 test("les caractéristiques des médailles connectées passent sur une colonne entre 851 et 1023 px", () => {
@@ -40,10 +41,12 @@ test("les caractéristiques des médailles connectées passent sur une colonne e
   assert.match(styles, /\.specs\{grid-template-columns:repeat\(2,1fr\)/, "deux colonnes conservées au-delà");
 });
 
-test("phase 6 : menu Boutique « Accueil | Rayons | Panier | Contact », sans Rendez-vous ni Nouveautés", () => {
+test("lots B1 B2 : menu Boutique « Accueil | Rayons | Panier » sans Contact, lien de retour au site de l'élevage avant l'en-tête", () => {
   const { RAYONS, SHOP_HEADER } = require("../scripts/shop-layout");
   const labels = [...SHOP_HEADER.matchAll(/<nav class="shop-menu"[^>]*>(.*)<\/nav>/gs)][0][1];
-  assert.deepEqual([...labels.matchAll(/<(?:a [^>]*|summary)>([^<]+)/g)].map((match) => match[1].trim()).filter((label) => ["Accueil", "Rayons", "Panier", "Contact"].includes(label)), ["Accueil", "Rayons", "Panier", "Contact"]);
+  assert.deepEqual([...labels.matchAll(/<(?:a [^>]*|summary)>([^<]+)/g)].map((match) => match[1].trim()).filter((label) => ["Accueil", "Rayons", "Panier", "Contact"].includes(label)), ["Accueil", "Rayons", "Panier"]);
+  assert.ok(SHOP_HEADER.startsWith('<a class="shop-return-link" href="https://www.dynastiedorkhan.com/">← Retour au site de l’élevage</a><header class="shop-header">'));
+  assert.match(css, /\.shop-return-link\{[^}]*min-height:44px/);
   assert.deepEqual(RAYONS.map((rayon) => rayon.label), ["Alimentation", "Sellerie", "Identification", "Jouets", "Accessoires", "Hygiène et soins"]);
   for (const rayon of RAYONS) assert.ok(SHOP_HEADER.includes(`<a href="/rayons/${rayon.slug}/">${rayon.label}</a>`), rayon.label);
   assert.doesNotMatch(SHOP_HEADER, /demande-de-rdv|Rendez-vous|nouveautes/);
