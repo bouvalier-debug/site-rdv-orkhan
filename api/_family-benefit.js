@@ -1,4 +1,4 @@
-const { verifyFamilyChip } = require("./_family-eligibility");
+const { verifyFamilyChip, verifyFamilyCode } = require("./_family-eligibility");
 
 function cleanString(value, maximum = 32) {
   return typeof value === "string" ? value.trim().slice(0, maximum) : "";
@@ -22,8 +22,21 @@ function chipNumbers(items, familyChipNumber) {
   return [...chips.values()];
 }
 
+// Phase 5 (FAM-06) : une seule preuve par panier, le code Famille OU la puce, jamais les deux.
+function familyCodeInput(value) {
+  return cleanString(value, 40);
+}
+
 async function resolveFamilyEligibility(items, options = {}) {
   const chips = chipNumbers(items, options.familyChipNumber);
+  const familyCode = familyCodeInput(options.familyCode);
+  if (familyCode) {
+    if (chips.length) return { error: "family_proof_conflict", status: 400 };
+    const verification = await (options.verifyFamilyCode || verifyFamilyCode)(familyCode, options.familyOptions);
+    if (verification.status === "invalid") return { error: "invalid_family_code", status: 400 };
+    if (verification.status !== "ok") return { error: "family_verification_unavailable", status: 503 };
+    return { familyEligible: verification.recognized === true };
+  }
   if (chips.length > 1) return { error: "multiple_family_chips", status: 400 };
   if (chips.length === 0) return { familyEligible: false };
   const verification = await (options.verifyFamilyChip || verifyFamilyChip)(chips[0], options.familyOptions);
@@ -32,4 +45,4 @@ async function resolveFamilyEligibility(items, options = {}) {
   return { familyEligible: verification.recognized === true };
 }
 
-module.exports = { chipNumbers, resolveFamilyEligibility };
+module.exports = { chipNumbers, familyCodeInput, resolveFamilyEligibility };

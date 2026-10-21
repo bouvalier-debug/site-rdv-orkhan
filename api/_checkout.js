@@ -11,7 +11,7 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DELIVERY_FIELDS = ["address", "postalCode", "city", "country"];
 // Phase 4 : version des CGV en vigueur (à l'identique dans
 // legal/, assets/cart.js et orkhan-manager). Un panier ouvert sur l'ancienne version reçoit legal_version_outdated.
-const SHOP_LEGAL_CURRENT_VERSION = "cgv-2026-10-21";
+const SHOP_LEGAL_CURRENT_VERSION = "cgv-phase5-projet";
 // Pays acceptés : ceux de la livraison Red Dingo (UE 27), qui contiennent la France des envois Animoco.
 const SHOP_COUNTRIES = SHIPPING_CONFIG.redDingo.servedCountries;
 // Lot 2, décision 3 : la session de paiement d'une commande avec des produits du catalogue expire après 30 minutes
@@ -132,7 +132,7 @@ async function executeCheckout(input, options = {}) {
     return { error: "shipping_country_mismatch", status: 400 };
   }
 
-  const eligibility = await resolveFamilyEligibility(input.items, { ...options, familyChipNumber: input.familyChipNumber });
+  const eligibility = await resolveFamilyEligibility(input.items, { ...options, familyChipNumber: input.familyChipNumber, familyCode: input.familyCode });
   if (eligibility.error) return eligibility;
   const familyEligible = eligibility.familyEligible;
 

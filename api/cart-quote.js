@@ -1,6 +1,6 @@
 const { quoteCart } = require("./_cart");
 const { cartCatalog } = require("./_cart-catalogue");
-const { chipNumbers, resolveFamilyEligibility } = require("./_family-benefit");
+const { chipNumbers, familyCodeInput, resolveFamilyEligibility } = require("./_family-benefit");
 const { clientIp, consumeRequest } = require("./_family-eligibility");
 
 function send(res, status, body) {
@@ -9,7 +9,7 @@ function send(res, status, body) {
 }
 
 async function quoteCartRequest(input, options = {}) {
-  const eligibility = await resolveFamilyEligibility(input?.items, { ...options, familyChipNumber: input?.familyChipNumber });
+  const eligibility = await resolveFamilyEligibility(input?.items, { ...options, familyChipNumber: input?.familyChipNumber, familyCode: input?.familyCode });
   if (eligibility.error) return eligibility;
   const catalogue = await (options.cartCatalog || cartCatalog)(input?.items, options);
   if (catalogue.error) return catalogue;
@@ -22,7 +22,8 @@ async function quoteCartRequest(input, options = {}) {
 
 async function handler(req, res) {
   if (req.method !== "POST") return send(res, 405, { error: "method_not_allowed" });
-  if (chipNumbers(req.body?.items, req.body?.familyChipNumber).length && !consumeRequest(clientIp(req))) {
+  const familyProof = chipNumbers(req.body?.items, req.body?.familyChipNumber).length || familyCodeInput(req.body?.familyCode);
+  if (familyProof && !consumeRequest(clientIp(req))) {
     return send(res, 429, { error: "rate_limited" });
   }
   const result = await quoteCartRequest(req.body);
