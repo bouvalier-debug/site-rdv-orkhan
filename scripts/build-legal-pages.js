@@ -2,7 +2,10 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
-const document = require("../legal/cgv-2026-10-07.json");
+// Phase 4 : CGV en vigueur (cgv-2026-10-21) ; les versions précédentes sont
+// publiées comme archives, à l'identique de leur source.
+const document = require("../legal/cgv-2026-10-21.json");
+const ARCHIVES = ["cgv-2026-10-05", "cgv-2026-10-07"];
 
 function inline(value) {
   const escaped = String(value).replace(/[&<>]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[character]);
@@ -39,7 +42,7 @@ const ARCHIVE_FOOTER = '<footer class="site-footer"><a href="/conditions-general
 const MONTHS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
 
 function readableVersionTitle(text) {
-  const match = /^\*\*Version cgv-[\d-]+ — validée le (\d{2})\/(\d{2})\/(\d{4}), (.+)\*\*$/.exec(text);
+  const match = /^\*\*Version cgv-[a-z0-9-]+ — validée le (\d{2})\/(\d{2})\/(\d{4}), (.+)\*\*$/.exec(text);
   return match ? `**Version du ${Number(match[1])} ${MONTHS[Number(match[2]) - 1]} ${match[3]}, ${match[4]}**` : text;
 }
 
@@ -57,9 +60,10 @@ function pageHtml(source = document) {
 const output = path.join(process.cwd(), "conditions-generales-de-vente", "index.html");
 fs.mkdirSync(path.dirname(output), { recursive: true });
 fs.writeFileSync(output, pageHtml(), "utf8");
-const archive = require("../legal/cgv-2026-10-05.json");
-const archiveOutput = path.join(process.cwd(), "conditions-generales-de-vente", "cgv-2026-10-05", "index.html");
-fs.mkdirSync(path.dirname(archiveOutput), { recursive: true });
-fs.writeFileSync(archiveOutput, pageHtml(archive), "utf8");
+for (const version of ARCHIVES) {
+  const archiveOutput = path.join(process.cwd(), "conditions-generales-de-vente", version, "index.html");
+  fs.mkdirSync(path.dirname(archiveOutput), { recursive: true });
+  fs.writeFileSync(archiveOutput, pageHtml(require(`../legal/${version}.json`)), "utf8");
+}
 
 module.exports = { inline, renderBlocks, pageHtml };

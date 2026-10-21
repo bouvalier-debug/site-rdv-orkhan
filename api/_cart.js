@@ -109,6 +109,8 @@ function quoteCart(input, options = {}) {
   const validated = validateCart(input, options);
   if (validated.error) return validated;
   const profile = shippingProfile(validated.lines);
+  // Phase 4 : refus dès le devis, même sans mode choisi, pour inviter à passer deux commandes (CGV 5.6).
+  if (profile.kind === "red-dingo-mixed") return { error: "red_dingo_separate_order", status: 409, availableModes: [] };
   const shippingConfig = options.shippingConfig;
   const availableModes = availableShippingModes(profile, shippingConfig);
   const shippingStatus = profile.kind === "parcel" && !mondialRelayConfigured(profile, shippingConfig)

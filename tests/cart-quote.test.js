@@ -42,9 +42,10 @@ test("1 Animoco France utilise le prix public et l'envoi léger", () => {
   assert.equal(result.quote.shippingProfile.kind, "animoco-light");
 });
 
-test("2 Animoco Belgique utilisent l'envoi léger", () => {
-  const result = quote([{ productId: "animoco", quantity: 2 }], { mode: SHIPPING_MODES.ANIMOCO_LIGHT_BE });
-  assert.equal(result.quote.totalCents, 4488);
+test("phase 4 : 2 Animoco en France ou en retrait, plus d'envoi en Belgique", () => {
+  assert.deepEqual(quote([{ productId: "animoco", quantity: 2 }]).quote.availableShippingModes, ["pickup", "animoco-light-fr"]);
+  assert.equal(quote([{ productId: "animoco", quantity: 2 }], { mode: SHIPPING_MODES.ANIMOCO_LIGHT_FR }).quote.totalCents, 4348);
+  assert.equal(quote([{ productId: "animoco", quantity: 2 }], { mode: SHIPPING_MODES.ANIMOCO_LIGHT_BE }).error, "invalid_shipping_mode");
 });
 
 test("3 Animoco basculent en colis", () => {
@@ -74,14 +75,14 @@ test("Animoco plus produit colis basculent en colis", () => {
   assert.equal(result.quote.shippingProfile.parcelWeightGrams, 500);
 });
 
-test("Animoco plus Red Dingo garde l'envoi léger et le port Red Dingo offert", () => {
-  const result = quote([
+test("phase 4 : Animoco plus Red Dingo exige deux commandes séparées, avec ou sans mode choisi", () => {
+  const items = [
     { productId: "animoco", quantity: 1 },
     { productId: "red-dingo:01-BN", quantity: 1, options: { size: "M", colour: "Black", frontLines: ["ORKHAN"] } }
-  ], { mode: SHIPPING_MODES.ANIMOCO_LIGHT_FR });
-  assert.equal(result.quote.shippingProfile.kind, "animoco-light");
-  assert.equal(result.quote.shippingProfile.hasRedDingo, true);
-  assert.equal(result.quote.totalCents, 4044);
+  ];
+  for (const shipping of [undefined, { mode: SHIPPING_MODES.ANIMOCO_LIGHT_FR }, { mode: "pickup" }]) {
+    assert.deepEqual(quote(items, shipping), { error: "red_dingo_separate_order", status: 409, availableModes: [] });
+  }
 });
 
 test("les prix public et Famille sont recalculés depuis le catalogue", () => {
@@ -270,7 +271,7 @@ test("cart-quote applique le tarif Famille uniquement après vérification serve
 test("cart-quote ignore un bénéfice Famille forgé sans puce", async () => {
   const result = await quoteCartRequest({
     items: [{ productId: "animoco", quantity: 1 }],
-    shipping: { mode: "pickup" },
+    shipping: { mode: "pickup", pickupTiming: "appointment" },
     benefits: { dynastieFamily: true }
   }, { quoteOptions: { catalog: TEST_CATALOG, shippingConfig: TEST_SHIPPING_CONFIG } });
   assert.equal(result.quote.lines[0].unitPriceCents, 1999);

@@ -33,10 +33,12 @@ test("K5 : un seul bouton « Retour en haut » sur les pages Boutique longues", 
 
 test("K6 : la page CGV affiche une date lisible sans changer l'identifiant enregistré ni l'archive", () => {
   const html = read("conditions-generales-de-vente/index.html");
-  assert.match(html, /<strong>Version du 7 octobre 2026, applicable aux commandes passées à compter de sa mise en ligne<\/strong>/);
-  assert.doesNotMatch(html, /cgv-2026-10-07/);
+  // Phase 4 : version du 21 octobre 2026 ; les versions précédentes restent archivées.
+  assert.match(html, /<strong>Version du 21 octobre 2026, applicable aux commandes passées à compter de sa mise en ligne<\/strong>/);
+  assert.doesNotMatch(html, /cgv-2026-10-21|cgv-2026-10-07/);
   assert.equal(require("../legal/cgv-2026-10-07.json").version, "cgv-2026-10-07");
   assert.match(read("conditions-generales-de-vente/cgv-2026-10-05/index.html"), /Version cgv-2026-10-05 — validée le 05\/10\/2026/);
+  assert.match(read("conditions-generales-de-vente/cgv-2026-10-07/index.html"), /Version cgv-2026-10-07 — validée le 07\/10\/2026/);
 });
 
 test("K6 et P4 : plus de formulations techniques ni saisonnières visibles", () => {

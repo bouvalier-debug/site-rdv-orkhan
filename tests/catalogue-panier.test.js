@@ -34,7 +34,7 @@ test("un panier uniquement historique n'interroge pas le catalogue Manager", asy
 });
 
 test("un produit achetable du catalogue est chiffré au prix du Manager, en retrait sur place uniquement", async () => {
-  const result = await quote([{ productId: "shampoing-test", quantity: 2 }], { shipping: { mode: "pickup" } });
+  const result = await quote([{ productId: "shampoing-test", quantity: 2 }], { shipping: { mode: "pickup", pickupTiming: "appointment" } });
   assert.deepEqual(result.quote.lines.map((line) => [line.productId, line.name, line.unitPriceCents, line.subtotalCents]), [["shampoing-test", "Shampoing doux", 1500, 3000]]);
   assert.deepEqual(result.quote.availableShippingModes, ["pickup"]);
   assert.equal(result.quote.shipping.priceCents, 0);
@@ -99,7 +99,7 @@ function checkoutDeps(managerError) {
 }
 
 function checkoutInput(items) {
-  return { checkoutAttemptId: "123e4567-e89b-42d3-a456-426614174000", items, shipping: { mode: "pickup" }, customer: CUSTOMER, legalAcceptance: { version: "cgv-2026-10-07", accepted: true } };
+  return { checkoutAttemptId: "123e4567-e89b-42d3-a456-426614174000", items, shipping: { mode: "pickup", pickupTiming: "appointment" }, customer: CUSTOMER, legalAcceptance: { version: "cgv-2026-10-21", accepted: true } };
 }
 
 test("commande avec un produit du catalogue : prix Manager et session Stripe de 31 minutes", async () => {
@@ -149,7 +149,7 @@ test("croquettes achetables : retrait seul au prix du Manager, livraison refusé
     familyPriceCents: 1290, weightGrams: 1500, purchasable: true, maxOrderQuantity: 12, photos: [] });
   assert.equal(croquettes.purchasable, true);
   const source = catalogueSource([croquettes]);
-  const seul = await quote([{ productId: "croquettes-test", quantity: 2 }], { source, shipping: { mode: "pickup" } });
+  const seul = await quote([{ productId: "croquettes-test", quantity: 2 }], { source, shipping: { mode: "pickup", pickupTiming: "appointment" } });
   assert.equal(seul.quote.subtotalCents, 2980);
   assert.deepEqual(seul.quote.availableShippingModes, ["pickup"]);
   assert.equal(seul.quote.shipping.priceCents, 0);
@@ -158,5 +158,5 @@ test("croquettes achetables : retrait seul au prix du Manager, livraison refusé
   const mixte = await quote([{ productId: "croquettes-test", quantity: 1 }, { productId: "animoco", quantity: 1 }], { source });
   assert.deepEqual(mixte.quote.availableShippingModes, ["pickup"]);
   const animocoSeul = await quote([{ productId: "animoco", quantity: 1 }], { source });
-  assert.deepEqual(animocoSeul.quote.availableShippingModes, ["pickup", "animoco-light-fr", "animoco-light-be"]);
+  assert.deepEqual(animocoSeul.quote.availableShippingModes, ["pickup", "animoco-light-fr"]);
 });

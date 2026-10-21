@@ -231,13 +231,14 @@ test("le pays est un select stable limité à France et Belgique", () => {
   assert.doesNotMatch(cartPage, /<input name="country"/);
 });
 
-test("le panier filtre les modes Animoco par pays et présélectionne le pays du mode", () => {
-  const modes = ["pickup", "animoco-light-fr", "animoco-light-be", "red-dingo-free"];
-  assert.deepEqual(shippingModesForCountry(modes, "FR"), ["pickup", "animoco-light-fr", "red-dingo-free"]);
-  assert.deepEqual(shippingModesForCountry(modes, "BE"), ["pickup", "animoco-light-be", "red-dingo-free"]);
+test("phase 4 : l'envoi Animoco est réservé à la France et présélectionne ce pays", () => {
+  const modes = ["pickup", "animoco-light-fr"];
+  assert.deepEqual(shippingModesForCountry(modes, "FR"), modes);
+  assert.deepEqual(shippingModesForCountry(modes, "BE"), ["pickup"]);
   assert.deepEqual(shippingModesForCountry(modes, ""), modes);
+  assert.deepEqual(shippingModesForCountry(["red-dingo-free"], "DE"), ["red-dingo-free"]);
   assert.equal(countryForShippingMode("animoco-light-fr"), "FR");
-  assert.equal(countryForShippingMode("animoco-light-be"), "BE");
+  assert.equal(countryForShippingMode("red-dingo-free"), null);
   assert.equal(countryForShippingMode("pickup"), null);
   assert.equal(quoteStatusMessage({ error: "shipping_country_mismatch" }), "Le pays de l’adresse ne correspond pas au mode de livraison choisi. Vérifiez le pays ou choisissez le mode de livraison correspondant.");
 });
@@ -252,7 +253,7 @@ test("le checkout navigateur ne transmet aucun montant stocké", async () => {
   }, "123e4567-e89b-42d3-a456-426614174000");
   assert.doesNotMatch(JSON.stringify(payload), /priceCents|totalCents/);
   assert.equal(payload.items[0].options.chipNumber, "250123456789012");
-  assert.deepEqual(payload.legalAcceptance, { version: "cgv-2026-10-07", accepted: true });
+  assert.deepEqual(payload.legalAcceptance, { version: "cgv-2026-10-21", accepted: true });
 
   let request;
   const result = await requestCheckout(payload, { fetch: async (url, options) => {

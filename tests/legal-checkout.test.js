@@ -63,16 +63,17 @@ test("les anciennes URLs juridiques sont redirigées définitivement sans hôte 
 test("les libellés et délais de livraison restent stables", () => {
   assert.equal(MODE_LABELS.pickup, "Retrait à l’élevage (gratuit)");
   assert.equal(MODE_LABELS["animoco-light-be"], "Belgique — Mondial Relay, Point Relais ou Locker choisi par email après la commande");
-  assert.deepEqual(deliveryDelayLines({ hasRedDingo: true, hasOther: true, mode: "pickup" }), [
-    "Médailles gravées : transmission à Red Dingo sous 24 h ouvrées, fabrication sous 7 à 10 jours ouvrés (indicatif), puis retrait à l’élevage sur rendez-vous dès réception.",
+  // Phase 4 : une commande Red Dingo est séparée et toujours livrée par le fabricant ; Animoco en France ou retrait.
+  assert.deepEqual(deliveryDelayLines({ hasRedDingo: true, hasOther: false, mode: "red-dingo-free" }), [
+    "Médailles gravées : transmission à Red Dingo sous 24 h ouvrées, puis fabrication et expédition par Red Dingo sous 7 à 10 jours ouvrés (indicatif). Livraison comprise."
+  ]);
+  assert.deepEqual(deliveryDelayLines({ hasRedDingo: false, hasOther: true, mode: "pickup" }), [
     "Disponible à l’élevage sous 24 h ouvrées, sur rendez-vous. Vous êtes prévenu par email."
   ]);
-  assert.deepEqual(deliveryDelayLines({ hasRedDingo: true, hasOther: true, mode: "animoco-light-fr" }), [
-    "Médailles gravées : transmission à Red Dingo sous 24 h ouvrées, puis fabrication et expédition par Red Dingo sous 7 à 10 jours ouvrés (indicatif). Livraison comprise.",
-    "Préparation et expédition sous 48 h ouvrées, puis La Poste Lettre verte suivie : 3 à 5 jours ouvrés (indicatif).",
-    "Les médailles Red Dingo sont expédiées séparément, directement par Red Dingo."
+  assert.deepEqual(deliveryDelayLines({ hasRedDingo: false, hasOther: true, mode: "animoco-light-fr" }), [
+    "Préparation et expédition sous 48 h ouvrées, puis La Poste Lettre verte suivie : 3 à 5 jours ouvrés (indicatif)."
   ]);
-  assert.equal(deliveryDelayLines({ hasRedDingo: false, hasOther: true, mode: "animoco-light-be" })[0], "Pour une livraison en Belgique, le Point Relais ou Locker Mondial Relay est choisi avec le client par email après la commande. Préparation et expédition sous 48 h ouvrées après votre choix, puis Mondial Relay : 3 à 6 jours ouvrés (indicatif).");
+  assert.deepEqual(deliveryDelayLines({ hasRedDingo: false, hasOther: true, mode: "animoco-light-be" }), []);
 });
 
 test("les blocs juridiques produits reprennent les arbitrages validés", () => {
