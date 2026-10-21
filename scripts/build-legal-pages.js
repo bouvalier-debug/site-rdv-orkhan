@@ -2,9 +2,9 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
-// Phase 4 : CGV en vigueur (identifiant provisoire, fixé à la mise en application) ; les versions précédentes sont
+// Phase 4 : CGV en vigueur (cgv-2026-10-21) ; les versions précédentes sont
 // publiées comme archives, à l'identique de leur source.
-const document = require("../legal/cgv-phase4-projet.json");
+const document = require("../legal/cgv-2026-10-21.json");
 const ARCHIVES = ["cgv-2026-10-05", "cgv-2026-10-07"];
 
 function inline(value) {

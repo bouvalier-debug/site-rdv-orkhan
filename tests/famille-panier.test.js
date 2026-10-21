@@ -62,7 +62,7 @@ test("paiement : la puce du panier est revérifiée côté serveur ; le Manager 
     checkoutAttemptId: "123e4567-e89b-42d3-a456-426614174000", items: [{ productId: "croquettes-test", quantity: 1 }], shipping: { mode: "pickup", pickupTiming: "appointment" },
     familyChipNumber: CHIP,
     customer: { firstName: "Test", lastName: "Famille", email: "contact@dynastiedorkhan.com", phone: "0600000000", country: "FR" },
-    legalAcceptance: { version: "cgv-phase4-projet", accepted: true }
+    legalAcceptance: { version: "cgv-2026-10-21", accepted: true }
   }, {
     env: { ORKHAN_SHOP_ORDERS_SECRET: "secret-test" }, origin: "https://boutique.test",
     listCatalogue: async () => ({ available: true, products: [CROQUETTES] }), verifyFamilyChip: verifier(true, calls),
