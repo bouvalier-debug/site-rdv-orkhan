@@ -15,7 +15,7 @@
   const STORAGE_KEY = "orkhan-shop-cart-v1";
   const LEGACY_CUSTOMER_STORAGE_KEY = "orkhan-shop-customer-v1";
   const CUSTOMER_STORAGE_KEY = "orkhan-shop-customer-v2";
-  const SHOP_LEGAL_CURRENT_VERSION = "cgv-2026-10-21"; // Phase 4 : version des CGV en vigueur (identique côté serveur et Manager).
+  const SHOP_LEGAL_CURRENT_VERSION = "cgv-2026-10-21-2"; // Phase 5 : version des CGV en vigueur (identique côté serveur et Manager).
   const STORAGE_VERSION = 1;
   const MAX_QUANTITY = 20;
   const EMPTY_SHIPPING_MESSAGE = "Les modes de livraison disponibles s’afficheront selon le contenu de votre panier.";
@@ -86,10 +86,12 @@
     return `line-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
   }
 
-  // Vérification Familles Dynastie unique, au niveau du panier commun : un seul numéro de puce, conservé dans ce
-  // navigateur au plus 30 jours, envoyé seulement au calcul du devis et au paiement (jamais dans les lignes de commande).
+  // Vérification Familles Dynastie unique, au niveau du panier commun : un seul numéro de puce ou code Famille (phase 5),
+  // conservé dans ce navigateur au plus 30 jours, envoyé seulement au calcul du devis et au paiement (jamais dans les
+  // lignes de commande).
   const FAMILY_CHIP_STORAGE_KEY = "orkhan-shop-family-chip-v1";
   const FAMILY_CHIP_MAX_AGE_DAYS = 30;
+  const FAMILY_IDLE_MESSAGE = "Indiquez le numéro de puce d’un chien issu de l’élevage, ou le code Famille remis lors de votre réservation : les tarifs Famille s’appliquent aux articles qui en proposent un.";
 
   function cleanFamilyChip(value) {
     return typeof value === "string" ? value.trim().slice(0, 32) : "";
@@ -254,12 +256,18 @@
     };
   }
 
+  // Phase 5 (FAM-06) : un seul champ, une seule preuve. Une saisie avec des lettres est un code Famille
+  // (DYN-XXXX-XXXX), sinon un numéro de puce ; le serveur refuse les deux à la fois.
+  function familyProofPayload(value) {
+    const proof = cleanFamilyChip(value);
+    if (!proof) return {};
+    return /[a-z]/i.test(proof) ? { familyCode: proof } : { familyChipNumber: proof };
+  }
+
   function buildQuotePayload(items, shipping, familyChipNumber = "") {
     const payload = { items: items.map(quoteItem).filter(Boolean) };
     if (shipping && typeof shipping.mode === "string") payload.shipping = safeOptionValue(shipping);
-    const chip = cleanFamilyChip(familyChipNumber);
-    if (chip) payload.familyChipNumber = chip;
-    return payload;
+    return { ...payload, ...familyProofPayload(familyChipNumber) };
   }
 
   function buildCheckoutPayload(items, shipping, customer, checkoutAttemptId, familyChipNumber = "") {
@@ -295,10 +303,12 @@
       return "Pour cette commande, seul le retrait à l’élevage est proposé.";
     }
     if (code === "family_verification_unavailable") {
-      return "Le service de vérification du tarif Famille est momentanément indisponible. Réessayez dans quelques instants, ou retirez le numéro de puce pour commander au tarif public.";
+      return "Le service de vérification du tarif Famille est momentanément indisponible. Réessayez dans quelques instants, ou retirez le numéro de puce ou le code Famille pour commander au tarif public.";
     }
     if (code === "invalid_chip") return "Le numéro de puce Famille Dynastie saisi est invalide. Corrigez-le ou retirez-le pour continuer.";
+    if (code === "invalid_family_code") return "Le code Famille Dynastie saisi est invalide. Corrigez-le ou retirez-le pour continuer.";
     if (code === "multiple_family_chips") return "Un seul numéro de puce Famille Dynastie peut être utilisé par panier.";
+    if (code === "family_proof_conflict") return "Utilisez soit le code Famille, soit le numéro de puce, pas les deux.";
     if (code === "shipping_country_mismatch") {
       return "Le pays de l’adresse ne correspond pas au mode de livraison choisi. Vérifiez le pays ou choisissez le mode de livraison correspondant.";
     }
@@ -620,12 +630,14 @@
       if (!familyStatus) return;
       const chip = familyStore.get();
       if (familyRemove) familyRemove.hidden = !chip;
-      let text = "Indiquez le numéro de puce d’un chien issu de l’élevage : les tarifs Famille s’appliquent aux articles qui en proposent un.";
+      let text = FAMILY_IDLE_MESSAGE;
       let kind = "idle";
       if (chip && result?.error === "invalid_chip") { text = "Numéro de puce invalide : saisissez les 15 chiffres, ou retirez-le."; kind = "error"; }
+      else if (chip && result?.error === "invalid_family_code") { text = "Code Famille invalide : vérifiez sa saisie (DYN-XXXX-XXXX), ou retirez-le."; kind = "error"; }
+      else if (chip && result?.error === "family_proof_conflict") { text = "Utilisez soit le code Famille, soit le numéro de puce, pas les deux."; kind = "error"; }
       else if (chip && result?.error === "family_verification_unavailable") { text = "Vérification momentanément indisponible. Réessayez, ou retirez le numéro pour commander au tarif public."; kind = "error"; }
       else if (chip && result?.quote?.benefits?.dynastieFamily === true) { text = "Famille Dynastie reconnue : tarifs Famille appliqués aux articles concernés."; kind = "ok"; }
-      else if (chip && result?.quote) { text = "Puce non reconnue : les tarifs publics s’appliquent."; kind = "warn"; }
+      else if (chip && result?.quote) { text = familyProofPayload(chip).familyCode ? "Code Famille non reconnu ou expiré : les tarifs publics s’appliquent." : "Puce non reconnue : les tarifs publics s’appliquent."; kind = "warn"; }
       familyStatus.textContent = text;
       familyStatus.dataset.kind = kind;
     }

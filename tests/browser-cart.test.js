@@ -181,7 +181,7 @@ test("le rendu Animoco masque les options techniques et le numéro de puce", () 
 
 test("une indisponibilité Famille bloque le total et le paiement avec le message prévu", () => {
   const result = { error: "family_verification_unavailable", status: 503 };
-  assert.equal(quoteStatusMessage(result), "Le service de vérification du tarif Famille est momentanément indisponible. Réessayez dans quelques instants, ou retirez le numéro de puce pour commander au tarif public.");
+  assert.equal(quoteStatusMessage(result), "Le service de vérification du tarif Famille est momentanément indisponible. Réessayez dans quelques instants, ou retirez le numéro de puce ou le code Famille pour commander au tarif public.");
   const source = fs.readFileSync(path.join(__dirname, "..", "assets", "cart.js"), "utf8");
   assert.match(source, /checkoutButton\.disabled = result\?\.error === "family_verification_unavailable"/);
 });
@@ -253,7 +253,7 @@ test("le checkout navigateur ne transmet aucun montant stocké", async () => {
   }, "123e4567-e89b-42d3-a456-426614174000");
   assert.doesNotMatch(JSON.stringify(payload), /priceCents|totalCents/);
   assert.equal(payload.items[0].options.chipNumber, "250123456789012");
-  assert.deepEqual(payload.legalAcceptance, { version: "cgv-2026-10-21", accepted: true });
+  assert.deepEqual(payload.legalAcceptance, { version: "cgv-2026-10-21-2", accepted: true });
 
   let request;
   const result = await requestCheckout(payload, { fetch: async (url, options) => {
