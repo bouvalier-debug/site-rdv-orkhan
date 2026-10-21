@@ -183,14 +183,12 @@ function sceneHtml(scene) {
 function renderAccueil(catalogue) {
   const fiches = catalogue.available ? buildFiches(catalogue.products) : [];
   const nouveautes = fiches.filter((fiche) => fiche.isNew && fiche.shelf);
+  // Accès classiques aux six rayons : tuiles typographiques homogènes, sans illustration (la scène interactive viendra
+  // au-dessus lorsque l'image définitive sera validée).
   const tiles = RAYONS.map((rayon) => {
-    const inRayon = fiches.filter((fiche) => fiche.shelf === rayon.key && !fiche.onRequest);
-    const count = inRayon.length + (PARCOURS[rayon.key]?.length || 0);
-    const photo = inRayon.find((fiche) => fiche.photos.length)?.photos[0];
-    const visual = photo ? photoHtml(photo, "") : PARCOURS[rayon.key] ? `<img src="${PARCOURS[rayon.key][0].photo}" alt="" loading="lazy">` : "";
-    return `<a class="rayon-tile${visual ? "" : " rayon-tile-text"}" href="/rayons/${rayon.slug}/">${visual ? `<span class="rayon-tile-visual">${visual}</span>` : ""}`
-      + `<span class="rayon-tile-body"><strong>${rayon.label}</strong><span>${Object.values(rayon.subcategories).join(" · ")}</span>`
-      + `<em>${count ? `${count} ${count > 1 ? "articles" : "article"}` : "Prochainement"}</em></span></a>`;
+    const count = fiches.filter((fiche) => fiche.shelf === rayon.key && !fiche.onRequest).length + (PARCOURS[rayon.key]?.length || 0);
+    return `<a class="rayon-tile" href="/rayons/${rayon.slug}/"><strong>${rayon.label}</strong><span>${Object.values(rayon.subcategories).join(" · ")}</span>`
+      + `<em>${count ? `${count} ${count > 1 ? "articles" : "article"}` : "Prochainement"}<b aria-hidden="true">→</b></em></a>`;
   }).join("");
   const body = sceneHtml(SCENE)
     + `<section class="home-section" aria-labelledby="rayons-title"><h2 id="rayons-title">Nos rayons</h2><div class="rayon-grid">${tiles}</div></section>`

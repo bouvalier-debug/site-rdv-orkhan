@@ -11,19 +11,16 @@
 .home-section>h2,.subcategory-title{margin:0 0 20px;font-size:clamp(1.5rem,2.6vw,2rem)}
 .subcategory-title{margin-top:36px}
 
-/* Accès aux six rayons */
+/* Accès aux six rayons : tuiles typographiques homogènes */
 .rayon-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
-.rayon-tile{display:flex;flex-direction:column;overflow:hidden;min-height:100%;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);text-decoration:none;box-shadow:0 10px 30px rgba(78,18,34,.05);transition:transform .18s,box-shadow .18s,border-color .18s}
+.rayon-tile{display:flex;flex-direction:column;gap:8px;min-height:176px;padding:26px 26px 22px;border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:14px;background:linear-gradient(160deg,#fff 0%,var(--cream) 100%);color:var(--ink);text-decoration:none;transition:transform .18s,box-shadow .18s,border-color .18s}
 .rayon-tile:hover,.rayon-tile:focus-visible{transform:translateY(-3px);border-color:var(--gold);box-shadow:var(--shadow)}
 .rayon-tile:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-.rayon-tile-visual{display:block;aspect-ratio:16/10;background:var(--cream)}
-.rayon-tile-visual img{display:block;width:100%;height:100%;object-fit:cover}
-.rayon-tile-body{display:flex;flex:1;flex-direction:column;gap:6px;padding:18px 20px 20px}
-.rayon-tile-body strong{color:var(--wine);font-family:"Lora",Georgia,serif;font-size:1.35rem;line-height:1.2}
-.rayon-tile-body span{color:var(--muted);font-size:.92rem;line-height:1.45}
-.rayon-tile-body em{margin-top:auto;padding-top:8px;color:var(--gold);font-size:.82rem;font-style:normal;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-.rayon-tile-text{background:linear-gradient(160deg,#fff 0%,var(--cream) 100%)}
-.rayon-tile-text .rayon-tile-body{justify-content:center;min-height:190px;padding:28px 24px;border-top:3px solid var(--gold)}
+.rayon-tile strong{color:var(--wine);font-family:"Lora",Georgia,serif;font-size:1.45rem;line-height:1.2}
+.rayon-tile span{color:var(--muted);font-size:.93rem;line-height:1.5}
+.rayon-tile em{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:10px;color:var(--gold);font-size:.8rem;font-style:normal;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.rayon-tile b{color:var(--wine);font-size:1.2rem;transition:transform .18s}
+.rayon-tile:hover b{transform:translateX(4px)}
 
 /* Cartes produits compactes (C1 à C4) */
 .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px}
@@ -109,10 +106,9 @@
 @media(max-width:700px){
   .home-section{margin-top:40px}
   .rayon-grid{grid-template-columns:1fr 1fr;gap:12px}
-  .rayon-tile-body{padding:14px}
-  .rayon-tile-body strong{font-size:1.1rem}
-  .rayon-tile-body span{display:none}
-  .rayon-tile-text .rayon-tile-body{min-height:120px;padding:18px 14px}
+  .rayon-tile{min-height:128px;padding:18px 16px 14px}
+  .rayon-tile strong{font-size:1.15rem}
+  .rayon-tile span{display:none}
   .product-grid{grid-template-columns:1fr 1fr;gap:12px}
   .product-tile-body{padding:12px}
   .product-tile h3{font-size:1rem}
@@ -122,3 +118,4 @@
 @media(max-width:380px){.product-grid{grid-template-columns:1fr}}
 .btn-primary{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 26px;border:0;border-radius:999px;background:var(--wine);color:#fff;font-weight:800;font-size:1rem;text-decoration:none;cursor:pointer;box-shadow:0 8px 20px rgba(78,18,34,.18)}
 .btn-primary:hover,.btn-primary:focus-visible{background:var(--wine-dark);color:#fff}
+.product-tile-photo,.product-tile-photo:hover{text-decoration:none}
