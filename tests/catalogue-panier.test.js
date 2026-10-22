@@ -25,10 +25,12 @@ function quote(items, extra = {}) {
   });
 }
 
-test("un panier uniquement historique n'interroge pas le catalogue Manager", async () => {
+test("un panier Animoco ou Red Dingo n'interroge pas le catalogue Manager ; un panier cosmétiques l'interroge seulement pour la bascule Artero (phase 7) et garde ses prix historiques", async () => {
   const source = catalogueSource();
-  const result = await quoteCartRequest({ items: [{ productId: "animoco", quantity: 1 }, { productId: "cosmetics:samba", quantity: 1 }] }, { listCatalogue: source.listCatalogue });
+  const animoco = await quoteCartRequest({ items: [{ productId: "animoco", quantity: 1 }] }, { listCatalogue: source.listCatalogue });
   assert.equal(source.calls.length, 0);
+  assert.equal(animoco.quote.lines[0].unitPriceCents, 1999);
+  const result = await quoteCartRequest({ items: [{ productId: "animoco", quantity: 1 }, { productId: "cosmetics:samba", quantity: 1 }] }, { listCatalogue: source.listCatalogue });
   assert.deepEqual(result.quote.lines.map((line) => [line.productId, line.unitPriceCents]), [["animoco", 1999], ["cosmetics:samba", 1145]]);
   assert.ok(result.quote.availableShippingModes.length >= 1);
 });

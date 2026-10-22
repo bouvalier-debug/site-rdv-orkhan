@@ -40,6 +40,26 @@ const PARCOURS = {
   ]
 };
 
+// Phase 7 : photographies Artero d'origine (déjà publiées sur l'ancienne page cosmétiques), utilisées tant qu'un produit
+// du catalogue n'a pas de photo téléversée dans le Manager ; les photos du Manager ont toujours priorité.
+const ARTERO_PHOTOS = Object.freeze({
+  "artero-block": [["/cosmetiques/assets/artero-block.webp", "Spray solaire Artero Block"], ["/cosmetiques/assets/artero-block-ete.jpg", "Artero Block en situation, protection du pelage au soleil"]],
+  "artero-bye-bye-300-ml": [["/cosmetiques/assets/artero-bye-bye.jpg", "Shampooing répulsif Artero Bye Bye 300 ml"], ["/cosmetiques/assets/bye-bye-usage.jpg", "Shampooing Artero Bye Bye en usage"]],
+  "artero-samba": [["/cosmetiques/assets/artero-samba.jpg", "Serviette ultra-absorbante Artero Samba"], ["/cosmetiques/assets/artero-samba-ete.jpg", "Serviette Artero Samba après la baignade"]],
+  "artero-dfender": [["/cosmetiques/assets/artero-dfender.jpg", "Baume Artero Dfender pour coussinets et truffe"], ["/cosmetiques/assets/dfender-usage.jpg", "Artero Dfender en usage"], ["/cosmetiques/assets/dfender-ingredients.jpg", "Composition du baume Artero Dfender"]],
+  "artero-pack-ete-complet": [["/assets/artero/routine-ete-artero.webp", "Pack Été complet : Artero Block, Bye Bye, Samba et Dfender"]]
+});
+
+function fallbackPhotos(reference) {
+  return (ARTERO_PHOTOS[reference] || []).map(([url, altText]) => ({ url, width: null, height: null, altText }));
+}
+
+// Le produit « Cosmétiques Artero » de l'ancien parcours disparaît du rayon dès que le catalogue contient des produits
+// Artero (même parcours, un seul système commercial).
+function hasCatalogueArtero(fiches) {
+  return fiches.some((fiche) => fiche.variants.some((variant) => /^artero-/.test(variant.reference)));
+}
+
 const AVAILABILITY_LABELS = {
   in_stock: "En stock",
   low_stock: "Stock limité",
@@ -97,7 +117,7 @@ function buildFiches(products) {
       onRequest: variants.every((variant) => variant.onRequest),
       isNew: variants.some((variant) => variant.isNew && !variant.onRequest),
       description: variants.find((variant) => variant.description)?.description || "",
-      photos: variants.find((variant) => variant.photos.length)?.photos || [],
+      photos: variants.find((variant) => variant.photos.length)?.photos || fallbackPhotos(first.reference),
       variants,
       price: Math.min(...prices),
       priceFrom: new Set(prices).size > 1,
@@ -250,7 +270,7 @@ function renderRayon(catalogue, slug) {
   const rayon = rayonBySlug(slug);
   if (!rayon) return null;
   const fiches = catalogue.available ? buildFiches(catalogue.products).filter((fiche) => fiche.shelf === rayon.key && !fiche.onRequest) : [];
-  const parcours = PARCOURS[rayon.key] || [];
+  const parcours = (PARCOURS[rayon.key] || []).filter((item) => !(item.href === "/cosmetiques/" && hasCatalogueArtero(catalogue.available ? buildFiches(catalogue.products) : [])));
   let listing;
   if (!catalogue.available && !parcours.length) listing = '<p class="rayon-empty">Le catalogue est momentanément indisponible. Merci de réessayer dans quelques instants.</p>';
   else if (!fiches.length && !parcours.length) listing = emptyRayon();
@@ -346,6 +366,6 @@ function renderNotFound() {
 }
 
 module.exports = {
-  AVAILABILITY_LABELS, PARCOURS, SCENE, buildFiches, descriptionHtml, escapeHtml, findFiche, ficheCard, money, rayonBySlug,
+  ARTERO_PHOTOS, AVAILABILITY_LABELS, PARCOURS, SCENE, buildFiches, descriptionHtml, escapeHtml, findFiche, ficheCard, money, rayonBySlug,
   renderAccueil, renderFiche, renderNotFound, renderRayon, renderSurDemande, sceneHtml, variantAvailability
 };

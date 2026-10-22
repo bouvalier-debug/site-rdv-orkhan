@@ -1,0 +1,8 @@
+{
+  "note": "Phase 7 : à appliquer UNIQUEMENT le jour de la bascule validée (produits Artero publiés et ouverts à l'achat dans le Manager de Production). Ajouter ces redirections au début du tableau redirects de vercel.json et retirer l'adresse du sitemap Boutique. Les images /cosmetiques/assets/ restent servies.",
+  "redirects": [
+    { "source": "/cosmetiques", "destination": "/rayons/hygiene-et-soins/", "permanent": true },
+    { "source": "/cosmetiques/", "destination": "/rayons/hygiene-et-soins/", "permanent": true }
+  ],
+  "sitemapRemove": "https://boutique.dynastiedorkhan.com/cosmetiques/"
+}

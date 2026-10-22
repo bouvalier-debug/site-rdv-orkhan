@@ -139,7 +139,7 @@ async function executeCheckout(input, options = {}) {
   const catalogue = await (options.cartCatalog || cartCatalog)(input.items, options);
   if (catalogue.error) return catalogue;
   const quoteResult = (options.quoteCart || quoteCart)({
-    items: input.items,
+    items: catalogue.items || input.items,
     shipping: input.shipping,
     benefits: { dynastieFamily: familyEligible }
   }, { ...options.quoteOptions, ...(catalogue.catalog ? { catalog: catalogue.catalog } : {}) });
