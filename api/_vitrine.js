@@ -196,8 +196,9 @@ ${scripts}
 `;
 }
 
-function heroHtml(title, subtitle, compact) {
-  return `<section class="hero${compact ? " hero-compact" : ""}"><div class="hero-copy"><p class="eyebrow">Élevage de la Dynastie d’Orkhan</p><h1>${escapeHtml(title)}</h1>${subtitle ? `<p>${escapeHtml(subtitle)}</p>` : ""}</div></section>`;
+function heroHtml(title, subtitle, compact, subtitleHtml) {
+  const banner = compact ? '<img class="hero-banner" src="/assets/banniere-dynastie-orkhan.webp" alt="Cavaliers King Charles et Bullmastiffs de l’élevage dans le parc" width="2032" height="774" decoding="async">' : "";
+  return `<section class="hero${compact ? " hero-compact" : ""}"><div class="hero-copy"><p class="eyebrow">Élevage de la Dynastie d’Orkhan</p><h1>${escapeHtml(title)}</h1>${subtitle ? `<p>${subtitleHtml || escapeHtml(subtitle)}</p>` : ""}</div>${banner}</section>`;
 }
 
 function rayonsNav(current) {
@@ -235,7 +236,7 @@ function renderAccueil(catalogue) {
   const body = sceneHtml(SCENE)
     + `<section class="home-section" aria-labelledby="rayons-title"><h2 id="rayons-title">Nos rayons</h2><div class="rayon-grid">${tiles}</div></section>`
     + (nouveautes.length ? `<section class="home-section" id="nouveautes" aria-labelledby="nouveautes-title"><h2 id="nouveautes-title">Nos nouveautés</h2><div class="product-grid">${nouveautes.map(ficheCard).join("")}</div></section>` : "")
-    + '<section class="home-section home-on-request"><div><h2>Produits sur commande</h2><p>Des produits à consulter ici, mais non achetables directement en ligne.</p></div><a class="btn-voir" href="/sur-demande/">Voir la rubrique</a></section>'
+    + '<section class="home-section home-on-request"><div><h2>Produits sur commande</h2><p>Découvrez les produits proposés sur commande. Pour connaître les disponibilités et les modalités, <a href="https://www.dynastiedorkhan.com/contact/">contactez l’élevage</a>.</p></div><a class="btn-voir" href="/sur-demande/">Voir la rubrique</a></section>'
     + '<section class="home-section home-promises"><p><strong>Retrait gratuit à l’élevage</strong> pour les articles de la boutique</p><p><strong>Tarif Famille Dynastie</strong> avec votre numéro de puce ou votre code Famille</p><p><strong>Paiement sécurisé</strong> en ligne</p></section>';
   return page({
     title: "Boutique de l'Élevage de la Dynastie d'Orkhan | Alimentation, sellerie, médailles et soins",
@@ -279,7 +280,7 @@ function renderSurDemande(catalogue) {
     title: "Produits sur commande | Boutique Dynastie d'Orkhan",
     description: "Produits sur commande de l'Élevage de la Dynastie d'Orkhan : à consulter en ligne, non achetables directement sur la boutique.",
     canonical: "/sur-demande/",
-    hero: heroHtml("Produits sur commande", "Des produits à consulter ici, mais non achetables directement en ligne : contactez-nous pour en parler.", true),
+    hero: heroHtml("Produits sur commande", "Découvrez les produits proposés sur commande. Pour connaître les disponibilités et les modalités, contactez l’élevage.", true, 'Découvrez les produits proposés sur commande. Pour connaître les disponibilités et les modalités, <a href="https://www.dynastiedorkhan.com/contact/">contactez l’élevage</a>.'),
     body: `${rayonsNav(null)}<section class="rayon-listing">${fiches.length ? `<div class="product-grid">${fiches.map(ficheCard).join("")}</div>` : '<p class="rayon-empty">Aucun produit sur commande pour le moment.</p>'}</section>`
   });
 }

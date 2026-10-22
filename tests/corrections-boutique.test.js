@@ -108,11 +108,37 @@ test("B7 : le guide des tailles est près du sélecteur de taille, discret, limi
   for (const size of ["20 mm", "30 mm", "38 mm"]) assert.ok(html.includes(size), size);
 });
 
-test("B8 : bannières de rayons cadrées sur les têtes, plus compactes que l'accueil, accueil inchangé", () => {
+test("D3 : bannières de rayons = photo entière (jamais recadrée) à côté du titre, accueil inchangé", () => {
   const css = read("assets/vitrine.css");
-  assert.match(css, /\.vitrine>\.hero\.hero-compact\{height:clamp\(260px,24vw,400px\)!important;[^}]*background-position:center 20%!important/);
-  assert.match(css, /@media\(max-width:700px\)\{\.vitrine>\.hero\.hero-compact\{[^}]*background-size:100% auto!important/);
-  assert.doesNotMatch(css, /\.vitrine>\.hero:not\(\.hero-compact\)\{/);
+  assert.match(css, /\.vitrine>\.hero\.hero-compact\{display:flex!important;[^}]*background-image:none!important/);
+  assert.match(css, /\.hero-banner\{[^}]*aspect-ratio:2032\/774/);
+  assert.doesNotMatch(css, /background-position:center 20%/);
+  const html = vitrine.renderRayon({ available: true, products: [] }, "identification");
+  assert.match(html, /<img class="hero-banner" src="\/assets\/banniere-dynastie-orkhan\.webp"[^>]*width="2032" height="774"/);
+  assert.doesNotMatch(vitrine.renderAccueil({ available: true, products: [] }), /hero-banner/, "l'accueil garde sa bannière validée");
+});
+
+test("D4 : panier vide = un seul bouton « Continuer mes achats » vers Nos rayons", () => {
+  const page = read("panier/index.html");
+  assert.match(page, /<p class="cart-actions"><a href="\/#rayons-title">Continuer mes achats<\/a><\/p>/);
+  assert.doesNotMatch(page, /Médailles Red Dingo<\/a> ·/);
+  assert.match(vitrine.renderAccueil({ available: true, products: [] }), /<h2 id="rayons-title">Nos rayons<\/h2>/);
+});
+
+test("D5 : formulation unique de « Produits sur commande » avec lien vers Contact", () => {
+  const text = "Découvrez les produits proposés sur commande. Pour connaître les disponibilités et les modalités, ";
+  for (const html of [vitrine.renderAccueil({ available: true, products: [] }), vitrine.renderSurDemande({ available: true, products: [] })]) {
+    assert.ok(html.includes(text + '<a href="https://www.dynastiedorkhan.com/contact/">contactez l’élevage</a>.'));
+    assert.doesNotMatch(html, /non achetables directement en ligne\./);
+  }
+});
+
+test("D1 D2 : pied de page et marque communs", () => {
+  const { SHOP_FOOTER, SHOP_HEADER } = require("../scripts/shop-layout");
+  assert.match(SHOP_FOOTER, /<p class="nowrap">SIRET : 421 173 824 00028<\/p>/);
+  for (const part of ['class="footer-id"', 'aria-label="Espaces du site"', 'aria-label="Informations légales"', "/conditions-generales-de-vente/", "/contact/", "/documents-elevage/"]) assert.ok(SHOP_FOOTER.includes(part), part);
+  assert.ok(SHOP_HEADER.includes("<span><strong>Dynastie d’Orkhan</strong><small>La boutique</small></span>"));
+  assert.match(read("assets/orkhan-design.css"), /\.shop-brand strong\{color:var\(--wine\);font-family:"Lora",Georgia,serif;font-size:1\.08rem;font-weight:700\}/);
 });
 
 test("B7 : le guide utilise les trois photographies originales Red Dingo (rondes émaillées S, M, L)", () => {
