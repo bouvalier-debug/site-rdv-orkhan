@@ -439,6 +439,7 @@
     const familyVerify = container.querySelector("[data-family-chip-verify]");
     const familyRemove = container.querySelector("[data-family-chip-remove]");
     const familyStatus = container.querySelector("[data-family-status]");
+    const familyHelp = container.querySelector("[data-family-help]");
     if (familyInput) familyInput.value = familyStore.get();
     const delaysNode = container.querySelector("[data-delivery-delays]");
     const countryField = customerForm.querySelector('[name="country"]');
@@ -663,6 +664,7 @@
       else if (chip && result?.quote) { text = familyProofPayload(chip).familyCode ? "Code Famille non reconnu ou expiré : les tarifs publics s’appliquent." : "Puce non reconnue : les tarifs publics s’appliquent."; kind = "warn"; }
       familyStatus.textContent = text;
       familyStatus.dataset.kind = kind;
+      if (familyHelp) familyHelp.hidden = kind !== "error" && kind !== "warn";
     }
     if (familyVerify) familyVerify.addEventListener("click", () => {
       familyStore.set(familyInput ? familyInput.value : "");
