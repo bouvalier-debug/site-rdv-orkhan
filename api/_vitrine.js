@@ -52,8 +52,8 @@ function fallbackPhotos(reference) {
 
 const AVAILABILITY_LABELS = {
   in_stock: "En stock",
-  low_stock: "Stock limité",
-  out_of_stock: "Indisponible pour le moment",
+  low_stock: "Stock faible",
+  out_of_stock: "Rupture de stock",
   on_request: "Sur commande",
   soon: "Bientôt disponible"
 };
@@ -75,9 +75,10 @@ function rayonByKey(key) {
   return RAYONS.find((rayon) => rayon.key === key) || null;
 }
 
-// Disponibilité d'une variante : achetable avec stock (état du Manager), sans stock, sur demande, ou pas encore en vente.
+// L'état transmis par le Manager fait foi ; le repli conserve les anciennes réponses dépourvues d'availability.
 function variantAvailability(product) {
   if (product.onRequest) return "on_request";
+  if (["in_stock", "low_stock", "out_of_stock", "on_request"].includes(product.availability)) return product.availability;
   if (!product.purchasable) return "soon";
   if (product.maxOrderQuantity <= 0) return "out_of_stock";
   return product.availability === "low_stock" ? "low_stock" : "in_stock";
@@ -101,6 +102,7 @@ function buildFiches(products) {
         if (orderA === null) return 1;
         if (orderB === null) return -1;
         if (orderA !== orderB) return orderA - orderB;
+        return 0;
       }
       return a.publicPriceCents - b.publicPriceCents || a.reference.localeCompare(b.reference);
     })
@@ -341,7 +343,7 @@ function renderFiche(catalogue, slug) {
     familyPrice: Number.isInteger(variant.familyPriceCents) ? money(variant.familyPriceCents) : null,
     state: variant.state,
     availability: AVAILABILITY_LABELS[variant.state],
-    maxQuantity: variant.state === "in_stock" || variant.state === "low_stock" ? variant.maxOrderQuantity : 0,
+    maxQuantity: variant.purchasable && (variant.state === "in_stock" || variant.state === "low_stock") ? variant.maxOrderQuantity : 0,
     variantOptions: variant.variantOptions,
     photos: variant.photos.length ? variant.photos : fiche.photos
   }));

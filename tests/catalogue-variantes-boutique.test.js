@@ -52,6 +52,16 @@ test("la fiche regroupe le modèle, sépare les axes et grise les combinaisons a
   assert.deepEqual(variants[2].photos.map((item) => item.altText), ["Collier bleu", "Collier bleu de côté"]);
   assert.deepEqual(variants[1].photos.map((item) => item.altText), ["Collier rouge", "Collier rouge de côté"], "une variante sans photo reprend la galerie du groupe");
   assert.equal(variants[1].maxQuantity, 0, "une variante publiée sans stock reste visible mais non achetable");
+  assert.equal(variants[1].availability, "Rupture de stock");
+});
+
+test("la disponibilité du Manager est affichée sans rouvrir l'achat lorsque purchasable est faux", () => {
+  const locked = product({ reference: "collier-verrouille", variantLabel: "Verrouillé",
+    variantOptions: [{ axis: "Couleur", value: "Noir" }, { axis: "Taille", value: "M" }],
+    availability: "in_stock", purchasable: false, maxOrderQuantity: 5 });
+  const [variant] = variantData(renderFiche({ available: true, products: [locked] }, "collier-cuir"));
+  assert.equal(variant.availability, "En stock");
+  assert.equal(variant.maxQuantity, 0);
 });
 
 test("formats historiques, produits simples et liste de plus de dix variantes restent pris en charge", () => {
