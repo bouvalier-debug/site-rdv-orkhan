@@ -94,7 +94,16 @@ function buildFiches(products) {
     groups.get(key).push(product);
   }
   return [...groups.values()].map((items) => {
-    const variants = items.slice().sort((a, b) => a.publicPriceCents - b.publicPriceCents || a.reference.localeCompare(b.reference))
+    const variants = items.slice().sort((a, b) => {
+      const orderA = Number.isSafeInteger(a.displayOrder) ? a.displayOrder : null;
+      const orderB = Number.isSafeInteger(b.displayOrder) ? b.displayOrder : null;
+      if (orderA !== null || orderB !== null) {
+        if (orderA === null) return 1;
+        if (orderB === null) return -1;
+        if (orderA !== orderB) return orderA - orderB;
+      }
+      return a.publicPriceCents - b.publicPriceCents || a.reference.localeCompare(b.reference);
+    })
       .map((product) => ({ ...product, state: variantAvailability(product) }));
     const first = variants[0];
     const prices = variants.map((variant) => variant.publicPriceCents);
@@ -126,6 +135,30 @@ function findFiche(fiches, slug) {
 
 function priceText(cents, from) {
   return `${from ? "À partir de " : ""}${money(cents)}`;
+}
+
+function variantAxes(variants) {
+  const first = variants[0]?.variantOptions;
+  if (!Array.isArray(first) || !first.length) return null;
+  const axes = first.map((option) => option.axis);
+  if (!variants.every((variant) => Array.isArray(variant.variantOptions) && variant.variantOptions.length === axes.length
+    && variant.variantOptions.every((option, index) => option.axis === axes[index]))) return null;
+  const combinations = variants.map((variant) => JSON.stringify(variant.variantOptions.map((option) => option.value)));
+  return new Set(combinations).size === variants.length ? axes : null;
+}
+
+function variantChoices(variants, current) {
+  if (variants.length < 2) return "";
+  const axes = variantAxes(variants);
+  if (!axes) return `<fieldset class="fiche-variants"><legend>Format</legend>${variants.map((variant) => `<label><input type="radio" name="variant" value="${escapeHtml(variant.reference)}"${variant.reference === current.reference ? " checked" : ""}><span>${escapeHtml(variant.label)}</span><small>${variant.price}</small></label>`).join("")}</fieldset>`;
+  return `<div class="fiche-variant-axes" data-variant-axes>${axes.map((axis, index) => {
+    const values = [...new Set(variants.map((variant) => variant.variantOptions[index].value))];
+    return `<fieldset class="fiche-variants" data-variant-axis="${index}"><legend>${escapeHtml(axis)}</legend>${values.map((value) => {
+      const possible = variants.some((variant) => variant.variantOptions[index].value === value
+        && variant.variantOptions.slice(0, index).every((option, previous) => option.value === current.variantOptions[previous].value));
+      return `<label><input type="radio" name="variant-axis-${index}" value="${escapeHtml(value)}"${value === current.variantOptions[index].value ? " checked" : ""}${possible ? "" : " disabled"}><span>${escapeHtml(value)}</span></label>`;
+    }).join("")}</fieldset>`;
+  }).join("")}</div>`;
 }
 
 // B6 : la description du Manager (un seul champ texte) peut contenir des paragraphes, des intertitres (ligne courte se
@@ -294,8 +327,7 @@ function renderSurDemande(catalogue) {
   });
 }
 
-// C5 / CAT-02 : fiche détaillée. Le choix du format et l'ajout au panier n'existent qu'ici ; chaque format garde sa
-// référence, son prix et son stock. Les données des formats sont transmises au script de la page en JSON.
+// C5 / CAT-02 : chaque variante garde sa référence, son prix, son stock et sa galerie résolue par le Manager.
 function renderFiche(catalogue, slug) {
   if (!catalogue.available || typeof slug !== "string" || !FICHE_SLUG.test(slug)) return null;
   const fiche = findFiche(buildFiches(catalogue.products), slug);
@@ -309,16 +341,16 @@ function renderFiche(catalogue, slug) {
     familyPrice: Number.isInteger(variant.familyPriceCents) ? money(variant.familyPriceCents) : null,
     state: variant.state,
     availability: AVAILABILITY_LABELS[variant.state],
-    maxQuantity: variant.state === "in_stock" || variant.state === "low_stock" ? variant.maxOrderQuantity : 0
+    maxQuantity: variant.state === "in_stock" || variant.state === "low_stock" ? variant.maxOrderQuantity : 0,
+    variantOptions: variant.variantOptions,
+    photos: variant.photos.length ? variant.photos : fiche.photos
   }));
   const current = variants.find((variant) => variant.reference === selected.reference);
-  const photos = fiche.photos;
+  const photos = current.photos;
   const gallery = photos.length
-    ? `<div class="fiche-gallery">${photoHtml(photos[0], "fiche-photo", "eager").replace("<img", '<img data-fiche-photo')}${photos.length > 1 ? `<div class="fiche-thumbs">${photos.map((photo, index) => `<button type="button" data-photo="${escapeHtml(photo.url)}" data-alt="${escapeHtml(photo.altText)}"${index === 0 ? ' aria-current="true"' : ""}>${photoHtml(photo, "")}</button>`).join("")}</div>` : ""}</div>`
+    ? `<div class="fiche-gallery">${photoHtml(photos[0], "fiche-photo", "eager").replace("<img", '<img data-fiche-photo')}<div class="fiche-thumbs" data-fiche-thumbs${photos.length > 1 ? "" : " hidden"}>${photos.map((photo, index) => `<button type="button" data-photo-index="${index}"${index === 0 ? ' aria-current="true"' : ""}>${photoHtml(photo, "")}</button>`).join("")}</div></div>`
     : `<div class="fiche-gallery"><span class="product-tile-placeholder fiche-photo">Photo à venir</span></div>`;
-  const choice = variants.length > 1
-    ? `<fieldset class="fiche-variants"><legend>Format</legend>${variants.map((variant) => `<label><input type="radio" name="variant" value="${escapeHtml(variant.reference)}"${variant.reference === current.reference ? " checked" : ""}><span>${escapeHtml(variant.label)}</span><small>${variant.price}</small></label>`).join("")}</fieldset>`
-    : "";
+  const choice = variantChoices(variants, current);
   const purchase = fiche.onRequest
     ? '<p class="fiche-on-request">Produit sur commande, non achetable directement en ligne. <a href="https://www.dynastiedorkhan.com/contact/">Contactez-nous</a> pour en parler.</p>'
     : `<div class="fiche-buy"><label>Quantité<input type="number" data-fiche-quantity min="1" max="${Math.max(current.maxQuantity, 1)}" value="1"${current.maxQuantity ? "" : " disabled"}></label><button type="button" class="btn-primary" data-fiche-add${current.maxQuantity ? "" : " disabled"}>Ajouter au panier</button></div><p class="fiche-pickup">Retrait gratuit à l’élevage, sur rendez-vous.</p>`;
