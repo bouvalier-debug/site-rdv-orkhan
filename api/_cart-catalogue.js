@@ -19,6 +19,9 @@ function catalogueCartProduct(product) {
   return {
     id: product.reference,
     name: product.name,
+    variantGroup: product.variantGroup,
+    variantLabel: product.variantLabel,
+    variantOptions: product.variantOptions,
     family: "catalogue",
     catalogue: true,
     catalogueFamily: product.family,

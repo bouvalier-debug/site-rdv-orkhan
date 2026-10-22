@@ -52,6 +52,45 @@ test("le prix famille Dynastie du Manager s'applique quand le panier y a droit",
   assert.deepEqual(publicPrice.quote.lines.map((line) => line.unitPriceCents), [1999, 1500]);
 });
 
+test("le panier distingue les deux formats Wellness sans doubler le format déjà présent ni changer les totaux", async () => {
+  const variants = [
+    { reference: "wellness-core-puppy-original-1-5kg", name: "Wellness CORE Puppy Original – Dinde et Poulet – 1,5 kg",
+      variantGroup: "wellness-core-puppy", variantLabel: "1,5 kg", variantOptions: null,
+      family: "CROQUETTES", publicPriceCents: 1490, familyPriceCents: 1290, weightGrams: 1500,
+      purchasable: true, maxOrderQuantity: 5 },
+    { reference: "wellness-core-puppy-10kg", name: "Wellness CORE Puppy Original – Dinde et Poulet",
+      variantGroup: "wellness-core-puppy", variantLabel: "10kg", variantOptions: null,
+      family: "CROQUETTES", publicPriceCents: 6490, familyPriceCents: 6190, weightGrams: 10000,
+      purchasable: true, maxOrderQuantity: 5 }
+  ];
+  const input = { items: variants.map((product) => ({ productId: product.reference, quantity: 1 })),
+    shipping: { mode: "pickup", pickupTiming: "appointment" } };
+  const listCatalogue = async () => ({ available: true, products: variants });
+  const publicResult = await quoteCartRequest(input, { listCatalogue });
+  assert.deepEqual(publicResult.quote.lines.map((line) => line.displayName || line.name), [
+    "Wellness CORE Puppy Original – Dinde et Poulet – 1,5 kg",
+    "Wellness CORE Puppy Original – Dinde et Poulet – 10 kg"
+  ]);
+  assert.deepEqual(publicResult.quote.lines.map((line) => line.productId), variants.map((product) => product.reference));
+  assert.equal(publicResult.quote.lines[1].name, variants[1].name, "le nom commercial du devis reste inchangé");
+  assert.equal(publicResult.quote.totalCents, 7980);
+  const familyResult = await quoteCartRequest({ ...input, familyCode: "DYN-TEST-TEST" }, {
+    listCatalogue, verifyFamilyCode: async () => ({ status: "ok", recognized: true })
+  });
+  assert.equal(familyResult.quote.totalCents, 7480);
+});
+
+test("les autres axes de variante complètent le nom sans répéter une valeur déjà écrite", async () => {
+  const product = { reference: "collier-rouge-m", name: "Collier Rouge", variantGroup: "collier",
+    variantLabel: "Rouge · M", variantOptions: [{ axis: "Couleur", value: "Rouge" }, { axis: "Taille", value: "M" }],
+    family: "COLIS", publicPriceCents: 2490, familyPriceCents: null, weightGrams: 200,
+    purchasable: true, maxOrderQuantity: 5 };
+  const result = await quote([{ productId: product.reference, quantity: 1 }], { source: catalogueSource([product]) });
+  assert.equal(result.quote.lines[0].displayName, "Collier Rouge – M");
+  const simple = await quote([{ productId: "shampoing-test", quantity: 1 }]);
+  assert.equal(simple.quote.lines[0].displayName, undefined);
+});
+
 test("panier mixte : historiques et catalogue ensemble, retrait sur place uniquement", async () => {
   const result = await quote([{ productId: "animoco", quantity: 1 }, { productId: "cosmetics:samba", quantity: 2 }, { productId: "shampoing-test", quantity: 1 }]);
   assert.deepEqual(result.quote.lines.map((line) => line.unitPriceCents), [1999, 1145, 1500]);
