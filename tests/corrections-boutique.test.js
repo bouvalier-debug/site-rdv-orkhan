@@ -108,14 +108,15 @@ test("B7 : le guide des tailles est près du sélecteur de taille, discret, limi
   for (const size of ["20 mm", "30 mm", "38 mm"]) assert.ok(html.includes(size), size);
 });
 
-test("D3 : bannières de rayons = photo entière (jamais recadrée) à côté du titre, accueil inchangé", () => {
+test("D3 : bannières de rayons = grande photo pleine largeur comme l'accueil, titre superposé, hauteur adaptée, accueil inchangé", () => {
   const css = read("assets/vitrine.css");
-  assert.match(css, /\.vitrine>\.hero\.hero-compact\{display:flex!important;[^}]*background-image:none!important/);
-  assert.match(css, /\.hero-banner\{[^}]*aspect-ratio:2032\/774/);
-  assert.doesNotMatch(css, /background-position:center 20%/);
-  const html = vitrine.renderRayon({ available: true, products: [] }, "identification");
-  assert.match(html, /<img class="hero-banner" src="\/assets\/banniere-dynastie-orkhan\.webp"[^>]*width="2032" height="774"/);
-  assert.doesNotMatch(vitrine.renderAccueil({ available: true, products: [] }), /hero-banner/, "l'accueil garde sa bannière validée");
+  assert.match(css, /\.vitrine>\.hero\.hero-compact\{display:flex!important;align-items:flex-end!important;height:clamp\(300px,36vw,600px\)!important;[^}]*background-position:center 35%!important/);
+  assert.match(css, /@media\(max-width:700px\)\{\.vitrine>\.hero\.hero-compact\{[^}]*background-size:100% auto!important/);
+  assert.doesNotMatch(css, /hero-banner|background-image:none/);
+  for (const html of [vitrine.renderRayon({ available: true, products: [] }, "identification"), vitrine.renderSurDemande({ available: true, products: [] })]) {
+    assert.doesNotMatch(html, /hero-banner/);
+    assert.match(html, /<section class="hero hero-compact"><div class="hero-copy"><p class="eyebrow">/);
+  }
 });
 
 test("D4 : panier vide = un seul bouton « Continuer mes achats » vers Nos rayons", () => {
