@@ -36,7 +36,6 @@ test("le sitemap Boutique ne liste que des pages Boutique publiques et indexable
     ...vitrine,
     "https://boutique.dynastiedorkhan.com/medailles-gravees/",
     "https://boutique.dynastiedorkhan.com/medailles-connectees/",
-    "https://boutique.dynastiedorkhan.com/cosmetiques/",
     "https://boutique.dynastiedorkhan.com/conditions-generales-de-vente/",
     "https://boutique.dynastiedorkhan.com/renoncer-au-contrat/",
     "https://boutique.dynastiedorkhan.com/mentions-legales/",

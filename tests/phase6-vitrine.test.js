@@ -61,7 +61,7 @@ test("rayons : six URL stables, rayon vide sobre, parcours Animoco / Red Dingo e
   assert.match(identification, /href="\/medailles-connectees\/"/);
   assert.match(identification, /href="\/medailles-gravees\/"/);
   assert.match(identification, /19,99/); assert.match(identification, /16,95/);
-  assert.match(vitrine.renderRayon(CATALOGUE, "hygiene-et-soins"), /href="\/cosmetiques\/"/);
+  assert.doesNotMatch(vitrine.renderRayon(CATALOGUE, "hygiene-et-soins"), /href="\/cosmetiques\/"|Cosmétiques Artero/, "Artero retiré de la vente");
   assert.doesNotMatch(vitrine.renderRayon(CATALOGUE, "accessoires"), /Panier en osier/, "un article sur demande reste hors des rayons achetables");
   assert.equal(vitrine.renderRayon(CATALOGUE, "inconnu"), null);
   for (const rayon of RAYONS) assert.ok(vitrine.renderRayon({ available: true, products: [] }, rayon.slug).includes(SHOP_HEADER), rayon.slug);
