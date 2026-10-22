@@ -63,6 +63,13 @@ function getProduct(productId, catalog = buildCatalog()) {
   return null;
 }
 
+// Retrait de la vente des cosmétiques Artero (aucun stock à l'élevage) : les anciens identifiants « cosmetics:* » sont
+// refusés côté serveur (devis et commande), y compris pour un panier déjà enregistré. Les produits restent dans cette
+// liste et dans les commandes historiques. Interrupteur réservé aux tests ; ne pas le poser en Production.
+function legacyCosmeticsForSale() {
+  return process.env.ORKHAN_LEGACY_COSMETICS_FOR_SALE === "true";
+}
+
 // Identifiants historiques servis par ce fichier ; tout autre identifiant est une référence du catalogue Manager.
 function isLegacyProductId(productId) {
   if (productId === "animoco") return true;
@@ -83,6 +90,7 @@ module.exports = {
   buildCatalog,
   getProduct,
   isLegacyProductId,
+  legacyCosmeticsForSale,
   modelsForReference,
   normalizeReference,
   redDingoModels,

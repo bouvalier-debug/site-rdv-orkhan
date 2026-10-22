@@ -1,5 +1,5 @@
 const engravingConfig = require("../data/red-dingo-engraving.json");
-const { allowedRedDingoColours, buildCatalog, getProduct } = require("./_catalog");
+const { allowedRedDingoColours, buildCatalog, getProduct, legacyCosmeticsForSale } = require("./_catalog");
 const { availableShippingModes, calculateShipping, mondialRelayConfigured, shippingProfile } = require("./_shipping");
 
 function validQuantity(value) {
@@ -68,6 +68,8 @@ function validateCart(input, options = {}) {
     const product = getProduct(item.productId, catalog);
     if (!product) return { error: "unknown_product" };
     if (product.family === "croquettes") return { error: "kibble_not_available_v1" };
+    // Artero retiré de la vente : aucun nouvel achat d'une ancienne référence cosmétique, même depuis un ancien panier.
+    if (typeof product.id === "string" && product.id.startsWith("cosmetics:") && !legacyCosmeticsForSale()) return { error: "product_not_purchasable", productId: product.id };
 
     // Produit du catalogue Manager : achetable seulement si le Manager l'indique, dans la limite du stock disponible.
     if (product.catalogue) {

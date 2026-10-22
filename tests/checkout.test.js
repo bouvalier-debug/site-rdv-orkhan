@@ -1,3 +1,4 @@
+process.env.ORKHAN_LEGACY_COSMETICS_FOR_SALE = "true"; // fixture historique : ces tests utilisent cosmetics:* comme colis générique (le refus Artero est testé dans retrait-artero.test.js)
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { executeCheckout } = require("../api/_checkout");

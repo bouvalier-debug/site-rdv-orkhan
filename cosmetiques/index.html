@@ -5,7 +5,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&amp;family=Manrope:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/orkhan-design.css">
-  <meta charset="utf-8">
+  <meta charset="utf-8"><meta name="robots" content="noindex">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cosmétiques chien Artero | Dynastie d'Orkhan</title>
   <meta name="description" content="Sélection Artero pour l'entretien de votre chien : Block, Bye Bye 300 ml, Samba et Dfender. Retrait gratuit à l'élevage.">
@@ -28,7 +28,7 @@
     <img src="/cosmetiques/assets/routine-ete-artero.png" alt="Routine Artero pour chien avec Block, Bye Bye, Samba et Dfender">
   </section>
 
-  <div class="notice"><p><strong>Retrait à l’élevage uniquement</strong>, gratuit, sur rendez-vous, au 52 rue de Masny, 59234 Monchecourt. Paiement en ligne à la commande.</p><p><strong>Droit de rétractation de 14 jours</strong>, sauf pour un produit descellé après la remise qui ne peut pas être repris pour des raisons d’hygiène ou de protection de la santé (seulement si la fiche du produit l’indique). Frais de retour à votre charge, sauf erreur de notre part. <a href="/conditions-generales-de-vente/">Conditions générales de vente</a></p></div>
+  <div class="notice"><p><strong>Les produits Artero ne sont pas disponibles à la vente pour le moment.</strong> Ils seront proposés de nouveau lorsqu’ils seront disponibles à l’élevage.</p><p><strong>Retrait à l’élevage uniquement</strong>, gratuit, sur rendez-vous, au 52 rue de Masny, 59234 Monchecourt. Paiement en ligne à la commande.</p><p><strong>Droit de rétractation de 14 jours</strong>, sauf pour un produit descellé après la remise qui ne peut pas être repris pour des raisons d’hygiène ou de protection de la santé (seulement si la fiche du produit l’indique). Frais de retour à votre charge, sauf erreur de notre part. <a href="/conditions-generales-de-vente/">Conditions générales de vente</a></p></div>
 
   <section class="routine" aria-label="Routine recommandée">
     <article class="step"><span>1</span><strong>Protéger</strong>Avant la sortie avec Block.</article>
@@ -39,7 +39,7 @@
 
   <section class="pack" aria-labelledby="pack-title">
     <div><h2 id="pack-title">Pack Été complet</h2><p>La routine complète pour protéger, laver, sécher et hydrater votre chien. Comprend Block + Bye Bye 300 ml + Samba + Dfender.</p></div>
-    <div><div class="pack-price">69,95 €</div><div class="old-price">75,45 € séparément</div><button type="button" data-add="pack-ete">Ajouter le pack</button></div>
+    <div><div class="pack-price">69,95 €</div><div class="old-price">75,45 € séparément</div><p class="unavailable">Non disponible à la vente pour le moment.</p></div>
   </section>
 
   <h2 class="section-title" id="selection">Produits disponibles séparément</h2>
@@ -71,7 +71,7 @@ const packProduct={id:'pack-ete',name:'Pack Été complet',category:'Pack',descr
 const sharedCart=window.OrkhanCart.createCartStore();
 const euro=value=>value.toLocaleString('fr-FR',{style:'currency',currency:'EUR'});
 const escapeHtml=value=>String(value).replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
-function renderProducts(){document.getElementById('products').innerHTML=cosmeticsProducts.map(product=>`<article class="product-card"><img loading="lazy" src="${product.image}" alt="${escapeHtml(product.name)}"><div class="product-body"><span class="category">${escapeHtml(product.category)}</span><h3>${escapeHtml(product.name)}</h3><p>${escapeHtml(product.description)}</p><p class="usage"><strong>Utilisation conseillée :</strong> ${escapeHtml(product.usage)}</p><ul class="benefits">${product.benefits.map(item=>`<li>${escapeHtml(item)}</li>`).join('')}</ul><p class="price">${euro(product.price)}</p><button type="button" data-add="${product.id}">${product.ctaLabel}</button></div></article>`).join('')}
+function renderProducts(){document.getElementById('products').innerHTML=cosmeticsProducts.map(product=>`<article class="product-card"><img loading="lazy" src="${product.image}" alt="${escapeHtml(product.name)}"><div class="product-body"><span class="category">${escapeHtml(product.category)}</span><h3>${escapeHtml(product.name)}</h3><p>${escapeHtml(product.description)}</p><p class="usage"><strong>Utilisation conseillée :</strong> ${escapeHtml(product.usage)}</p><ul class="benefits">${product.benefits.map(item=>`<li>${escapeHtml(item)}</li>`).join('')}</ul><p class="price">${euro(product.price)}</p><p class="unavailable">Non disponible à la vente pour le moment.</p></div></article>`).join('')}
 function findProduct(id){return id===packProduct.id?packProduct:cosmeticsProducts.find(product=>product.id===id)}
 function addToCart(id,button){const product=findProduct(id);try{window.OrkhanProductCart.addLineGuarded(sharedCart,window.OrkhanProductCart.cosmeticLine(id,1),{button,onAdded(){window.OrkhanCart.updateCounters(document,sharedCart.count());window.OrkhanProductCart.showAddConfirmation(button,`${product.name} ajouté au panier.`)}})}catch(error){window.OrkhanProductCart.showAddConfirmation(button,error.message||'Impossible d’ajouter ce produit.')}}
 document.addEventListener('click',event=>{const add=event.target.closest('[data-add]');if(add)addToCart(add.dataset.add,add)});

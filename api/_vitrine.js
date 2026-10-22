@@ -28,15 +28,11 @@ const SCENE = {
   }
 };
 
-// Parcours spéciaux conservés (Identification) et accès temporaire aux cosmétiques actuels jusqu'à la phase 7.
-const AMOUNT_COSMETICS = Math.min(...CATALOG_CONFIG.parcelProducts.filter((product) => product.id.startsWith("cosmetics:")).map((product) => product.priceCents));
+// Parcours spéciaux conservés (Identification). Les cosmétiques Artero ne sont plus proposés (aucun stock à l'élevage).
 const PARCOURS = {
   IDENTIFICATION: [
     { href: "/medailles-connectees/", name: "Médaille connectée Animoco", photo: "/medailles-connectees/assets/medaille-animoco-recto-verso.webp", price: CATALOG_CONFIG.animoco.publicPriceCents, familyPrice: CATALOG_CONFIG.animoco.familyPriceCents, note: "Livraison en France ou retrait à l’élevage" },
     { href: "/medailles-gravees/", name: "Médaille gravée Red Dingo", photo: "/medailles-gravees/assets/medaille-chien-plage-red-dingo.jpg", price: RED_DINGO_PRICE_CENTS, note: "Gravure et livraison comprises" }
-  ],
-  HYGIENE_SOINS: [
-    { href: "/cosmetiques/", name: "Cosmétiques Artero", photo: "/cosmetiques/assets/artero-samba-ete.jpg", price: AMOUNT_COSMETICS, fromPrice: true, note: "Gamme actuelle de la boutique" }
   ]
 };
 
@@ -52,12 +48,6 @@ const ARTERO_PHOTOS = Object.freeze({
 
 function fallbackPhotos(reference) {
   return (ARTERO_PHOTOS[reference] || []).map(([url, altText]) => ({ url, width: null, height: null, altText }));
-}
-
-// Le produit « Cosmétiques Artero » de l'ancien parcours disparaît du rayon dès que le catalogue contient des produits
-// Artero (même parcours, un seul système commercial).
-function hasCatalogueArtero(fiches) {
-  return fiches.some((fiche) => fiche.variants.some((variant) => /^artero-/.test(variant.reference)));
 }
 
 const AVAILABILITY_LABELS = {
@@ -270,7 +260,7 @@ function renderRayon(catalogue, slug) {
   const rayon = rayonBySlug(slug);
   if (!rayon) return null;
   const fiches = catalogue.available ? buildFiches(catalogue.products).filter((fiche) => fiche.shelf === rayon.key && !fiche.onRequest) : [];
-  const parcours = (PARCOURS[rayon.key] || []).filter((item) => !(item.href === "/cosmetiques/" && hasCatalogueArtero(catalogue.available ? buildFiches(catalogue.products) : [])));
+  const parcours = PARCOURS[rayon.key] || [];
   let listing;
   if (!catalogue.available && !parcours.length) listing = '<p class="rayon-empty">Le catalogue est momentanément indisponible. Merci de réessayer dans quelques instants.</p>';
   else if (!fiches.length && !parcours.length) listing = emptyRayon();
