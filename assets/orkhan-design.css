@@ -263,7 +263,7 @@ body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]::after{cont
 .shop-header{position:relative;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:112px}
 .shop-brand{display:inline-flex;align-items:center;gap:12px;color:var(--wine);text-decoration:none}
 .shop-brand img{width:76px;height:76px;object-fit:contain;flex:0 0 auto}
-.shop-brand span{display:flex;flex-direction:column;font-family:"Lora",Georgia,serif;font-size:1.08rem;font-weight:700;line-height:1.2}
+.shop-brand span{display:flex;flex-direction:column;font-family:"Lora",Georgia,serif;line-height:1.2}.shop-brand strong{color:var(--wine);font-family:"Lora",Georgia,serif;font-size:1.08rem;font-weight:700}
 .shop-brand small{color:var(--gold);font-family:"Manrope",Arial,sans-serif;font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
 .shop-menu{display:flex;align-items:center;gap:6px}
 .shop-menu>a,.shop-rayons>summary{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:8px 14px;border-radius:999px;color:var(--wine);font-weight:800;font-size:.95rem;text-decoration:none;cursor:pointer}
@@ -295,3 +295,14 @@ body:has(> .ecosystem-nav)>.ecosystem-nav a[href="/demande-de-rdv/"]::after{cont
 .ecosystem-nav a.nav-shop{order:5;min-height:42px;padding:9px 16px;border:1px solid var(--gold);border-radius:999px;color:var(--wine-dark);background:var(--gold);font-weight:800;box-shadow:0 6px 16px rgba(189,148,82,.28)}
 .ecosystem-nav a.nav-shop:hover{background:#c9a465;color:var(--wine-dark)}
 body>footer .footer-links{margin-top:14px;font-size:.92rem}
+
+/* D1 : pied de page commun (identique sur le site principal et la Boutique) */
+.site-footer .footer-inner{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:28px 48px;align-items:start}
+.site-footer .footer-id p,.site-footer .footer-nav a,.site-footer .footer-legal a{margin:0;font-size:.95rem;line-height:1.55}
+.site-footer .footer-id p{margin-top:4px}.site-footer .nowrap{white-space:nowrap}
+.site-footer .footer-nav,.site-footer .footer-legal{display:flex;flex-direction:column;gap:2px}
+.site-footer .footer-title{margin-bottom:6px;color:#e3c58a;font-size:.74rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.site-footer .footer-nav a,.site-footer .footer-legal a{display:block;padding:5px 0;font-weight:600;text-decoration:none}
+.site-footer .footer-nav a:hover,.site-footer .footer-legal a:hover{text-decoration:underline}
+@media(max-width:860px){.site-footer .footer-inner{grid-template-columns:1fr 1fr}.site-footer .footer-id{grid-column:1/-1}}
+@media(max-width:520px){.site-footer .footer-inner{grid-template-columns:1fr;gap:22px}}
