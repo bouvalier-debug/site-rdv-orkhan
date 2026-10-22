@@ -197,8 +197,7 @@ ${scripts}
 }
 
 function heroHtml(title, subtitle, compact, subtitleHtml) {
-  const banner = compact ? '<img class="hero-banner" src="/assets/banniere-dynastie-orkhan.webp" alt="Cavaliers King Charles et Bullmastiffs de l’élevage dans le parc" width="2032" height="774" decoding="async">' : "";
-  return `<section class="hero${compact ? " hero-compact" : ""}"><div class="hero-copy"><p class="eyebrow">Élevage de la Dynastie d’Orkhan</p><h1>${escapeHtml(title)}</h1>${subtitle ? `<p>${subtitleHtml || escapeHtml(subtitle)}</p>` : ""}</div>${banner}</section>`;
+  return `<section class="hero${compact ? " hero-compact" : ""}"><div class="hero-copy"><p class="eyebrow">Élevage de la Dynastie d’Orkhan</p><h1>${escapeHtml(title)}</h1>${subtitle ? `<p>${subtitleHtml || escapeHtml(subtitle)}</p>` : ""}</div></section>`;
 }
 
 function rayonsNav(current) {

@@ -4,8 +4,11 @@
 /* B8 : la photo (2,6 : 1) est cadrée sur les têtes des Bullmastiffs et des Cavaliers ; la hauteur suit la largeur de l'écran
    (260 à 400 px) pour rester plus compacte que l'accueil sans couper les têtes. Sur mobile, la photo entière s'affiche en
    haut du bandeau et le titre passe dessous. */
-@media(min-width:701px){.vitrine>.hero.hero-compact{display:flex!important;align-items:center;justify-content:space-between;gap:32px;height:auto!important;min-height:0!important;max-height:none!important;padding:24px max(20px,calc(50vw - 590px))!important;background-image:none!important;background-color:var(--cream)!important}.vitrine>.hero.hero-compact .hero-copy{flex:1 1 0;min-width:0}.vitrine>.hero.hero-compact .hero-banner{flex:0 1 clamp(300px,52%,620px);width:clamp(300px,52%,620px);height:auto;aspect-ratio:2032/774;border-radius:14px;box-shadow:0 8px 24px rgba(78,18,34,.12)}}
-@media(max-width:700px){.vitrine>.hero.hero-compact{display:flex!important;flex-direction:column;gap:14px;height:auto!important;min-height:0!important;padding:16px 20px 22px!important;background-image:none!important;background-color:var(--cream)!important}.vitrine>.hero.hero-compact .hero-banner{order:-1;width:100%;height:auto;aspect-ratio:2032/774;border-radius:12px}}
+/* Bannière des rayons : même grande photographie pleine largeur que l'accueil, titre en superposition à gauche. La hauteur suit la
+   largeur (photo 2032 x 774) : de 300 à 600 px, cadrée à 35 % pour garder les têtes des Bullmastiffs (haut) et des Cavaliers (bas). Sur
+   mobile, la photo entière occupe le haut du bandeau et le titre passe dessous (même logique que l'accueil, sans recadrage latéral). */
+@media(min-width:701px){.vitrine>.hero.hero-compact{height:clamp(300px,36vw,600px)!important;min-height:300px!important;max-height:600px!important;padding-block:28px!important;background-position:center 35%!important}}
+@media(max-width:700px){.vitrine>.hero.hero-compact{min-height:0!important;padding:calc(100vw * .38 + 14px) 22px 26px!important;background-size:100% auto!important;background-position:center top!important;background-image:linear-gradient(to bottom,rgba(255,253,249,0) 0,rgba(255,253,249,0) calc(100vw * .38),rgba(255,253,249,.94) calc(100vw * .38 + 26px)),url("/assets/banniere-dynastie-orkhan.webp")!important}}
 .vitrine>.hero .hero-copy{max-width:640px}
 .vitrine>.hero h1{margin:.1em 0 .25em;font-size:clamp(2rem,4.2vw,3.2rem)}
 .vitrine>.hero p:not(.eyebrow){margin:0;font-size:1.05rem;font-weight:600}
