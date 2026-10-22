@@ -498,8 +498,8 @@
         const card = element(document, "article", "cart-line");
         card.dataset.lineId = item.lineId;
         const info = element(document, "div", "cart-line__info");
-        if (serverLine?.name) knownNames.set(item.productId, serverLine.name);
-        const lineName = serverLine?.name || knownNames.get(item.productId) || fallbackLineName(item.productId);
+        if (serverLine?.name) knownNames.set(item.productId, serverLine.displayName || serverLine.name);
+        const lineName = serverLine?.displayName || serverLine?.name || knownNames.get(item.productId) || fallbackLineName(item.productId);
         info.append(element(document, "h2", "cart-line__title", lineName));
         const optionsList = element(document, "dl", "cart-line__options");
         displayOptionRows(item).forEach(([label, value]) => {
