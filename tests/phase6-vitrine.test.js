@@ -48,7 +48,7 @@ test("carte compacte : photo, nom, prix, prix Famille, disponibilité et seul bo
   assert.match(card, /href="\/produits\/croquettes-test\/">Voir le produit<\/a>/);
   assert.doesNotMatch(card, /Ajouter au panier|<button|<form|Sans céréales|Retrait gratuit/, "ni achat, ni description, ni badge de retrait (C1–C3)");
   assert.match(vitrine.ficheCard(laisse), /Laisse &lt;cuir&gt;/);
-  assert.match(vitrine.ficheCard(laisse), /Stock limité/);
+  assert.match(vitrine.ficheCard(laisse), /Stock faible/);
   assert.doesNotMatch(vitrine.ficheCard(panier), /product-price/, "pas de prix affiché pour un article sur demande");
 });
 

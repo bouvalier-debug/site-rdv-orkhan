@@ -65,6 +65,10 @@ function publicProduct(raw) {
   const purchasable = raw.purchasable === true && !onRequest && ["COLIS", "ANIMOCO", "CROQUETTES"].includes(raw.family) && publicPriceCents > 0;
   const shelf = SHELVES.has(raw.shelf) ? raw.shelf : null;
   const variantGroup = typeof raw.variantGroup === "string" && raw.variantGroup.length <= 80 && SLUG.test(raw.variantGroup) ? raw.variantGroup : null;
+  const variantOptions = variantGroup && Array.isArray(raw.variantOptions) && raw.variantOptions.length > 0 && raw.variantOptions.length <= 3
+    ? raw.variantOptions.map((option) => ({ axis: text(option?.axis, 60), value: text(option?.value, 60) })) : null;
+  const validVariantOptions = variantOptions && variantOptions.every((option) => option.axis && option.value)
+    && new Set(variantOptions.map((option) => option.axis)).size === variantOptions.length ? variantOptions : null;
   const photos = (Array.isArray(raw.photos) ? raw.photos : []).map((photo) => {
     const match = typeof photo?.url === "string" ? photo.url.match(MANAGER_PHOTO_PATH) : null;
     if (!match) return null;
@@ -93,6 +97,8 @@ function publicProduct(raw) {
     subcategory: shelf ? text(raw.subcategory, 60) : null,
     variantGroup,
     variantLabel: variantGroup ? text(raw.variantLabel, 60) : null,
+    variantOptions: validVariantOptions,
+    displayOrder: Number.isSafeInteger(raw.displayOrder) ? raw.displayOrder : null,
     onRequest,
     isNew: raw.isNew === undefined ? true : raw.isNew === true,
     availability: AVAILABILITIES.has(raw.availability) ? raw.availability : null,
