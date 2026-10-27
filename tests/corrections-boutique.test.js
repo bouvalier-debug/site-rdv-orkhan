@@ -111,7 +111,9 @@ test("B7 : le guide des tailles est près du sélecteur de taille, discret, limi
 test("D3 : bannières de rayons = grande photo pleine largeur comme l'accueil, titre superposé, hauteur adaptée, accueil inchangé", () => {
   const css = read("assets/vitrine.css");
   assert.match(css, /\.vitrine>\.hero\.hero-compact\{display:flex!important;align-items:flex-end!important;height:clamp\(300px,36vw,600px\)!important;[^}]*background-position:center 35%!important/);
-  assert.match(css, /@media\(max-width:700px\)\{\.vitrine>\.hero\.hero-compact\{[^}]*background-size:100% auto!important/);
+  // Mobile : accueil et rayons partagent la photo entière en haut, titre dessous.
+  assert.match(css, /@media\(max-width:700px\)\{\.vitrine>\.hero\{[^}]*background-size:100% auto!important/);
+  assert.doesNotMatch(css, /\.vitrine>\.hero:not\(\.hero-compact\) \.hero-copy\{background/);
   assert.doesNotMatch(css, /hero-banner|background-image:none/);
   for (const html of [vitrine.renderRayon({ available: true, products: [] }, "identification"), vitrine.renderSurDemande({ available: true, products: [] })]) {
     assert.doesNotMatch(html, /hero-banner/);
