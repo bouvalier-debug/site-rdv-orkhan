@@ -90,7 +90,7 @@
 .nouveautes-arrow:hover:not(:disabled){background:var(--wine-dark)}
 .nouveautes-arrow:disabled{opacity:.35;cursor:not-allowed}
 .nouveautes-arrow:focus-visible,.nouveautes-carousel:focus-visible,.nouveautes-all:focus-visible,.pagination a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
-.nouveautes-carousel{display:flex;gap:20px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:2px 2px 12px;max-width:100%;scrollbar-color:var(--gold) var(--cream)}
+.nouveautes-carousel{display:flex;gap:20px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:0 0 12px;max-width:100%;scrollbar-color:var(--gold) var(--cream)}
 .nouveautes-carousel>.product-tile{flex:0 0 calc((100% - 60px)/4);min-width:0;scroll-snap-align:start}
 .nouveautes-all{display:inline-flex;margin-top:20px;color:var(--wine);font-weight:800;text-underline-offset:4px}
 .pagination{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:16px;margin:32px 0}
