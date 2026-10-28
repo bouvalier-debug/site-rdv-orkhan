@@ -31,7 +31,7 @@ test("le sitemap Boutique ne liste que des pages Boutique publiques et indexable
   const { RAYONS } = require("../scripts/shop-layout");
   // Phase 6 : accueil, rayons et Sur demande sont rendus côté serveur (réécritures vers /api/vitrine) ; les autres
   // pages sont des fichiers statiques.
-  const vitrine = ["https://boutique.dynastiedorkhan.com/", ...RAYONS.map((rayon) => `https://boutique.dynastiedorkhan.com/rayons/${rayon.slug}/`), "https://boutique.dynastiedorkhan.com/sur-demande/"];
+  const vitrine = ["https://boutique.dynastiedorkhan.com/", "https://boutique.dynastiedorkhan.com/nouveautes/", ...RAYONS.map((rayon) => `https://boutique.dynastiedorkhan.com/rayons/${rayon.slug}/`), "https://boutique.dynastiedorkhan.com/sur-demande/"];
   assert.deepEqual(urls, [
     ...vitrine,
     "https://boutique.dynastiedorkhan.com/medailles-gravees/",
@@ -47,7 +47,7 @@ test("le sitemap Boutique ne liste que des pages Boutique publiques et indexable
     assert.doesNotMatch(html, /http-equiv="refresh"/i, url);
   }
   assert.equal(fs.existsSync(path.join(root, "index.html")), false, "l'accueil n'est plus un fichier statique");
-  assert.equal(urls.some((url) => /\/panier\/|\/demande-de-rdv\/|\/nouveautes\//.test(url)), false);
+  assert.equal(urls.some((url) => /\/panier\/|\/demande-de-rdv\//.test(url)), false);
 });
 
 test("le sitemap RDV ne liste que la demande de rendez-vous", () => {
@@ -78,7 +78,8 @@ test("phase 6 : la page Red Dingo est servie sur /medailles-gravees/, sans redir
   assert.ok(html.includes('<link rel="canonical" href="https://boutique.dynastiedorkhan.com/medailles-gravees/">'));
   assert.doesNotMatch(html, /http-equiv="refresh"/);
   for (const source of ["/nouveautes", "/nouveautes/"]) {
-    assert.deepEqual(config.redirects.find((entry) => entry.source === source), { source, destination: "/#nouveautes", permanent: true });
+    assert.equal(config.redirects.some((entry) => entry.source === source), false);
+    assert.deepEqual(config.rewrites.find((entry) => entry.source === source), { source, destination: "/api/vitrine?vue=nouveautes" });
   }
 });
 

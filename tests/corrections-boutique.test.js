@@ -92,7 +92,7 @@ test("B4 B5 : « Produits sur commande » et photo à venir compacte", () => {
   const { SHOP_HEADER } = require("../scripts/shop-layout");
   assert.ok(SHOP_HEADER.includes('<a href="/sur-demande/">Produits sur commande</a>'), "la route /sur-demande/ est conservée");
   assert.match(read("api/_vitrine.js"), /<span class="product-tile-placeholder">Photo à venir<\/span>/);
-  assert.match(read("assets/vitrine.css"), /\.product-tile-photo:has\(\.product-tile-placeholder\)\{aspect-ratio:auto;height:76px\}/);
+  assert.match(read("assets/vitrine.css"), /\.product-tile-photo\{display:block;aspect-ratio:1/);
 });
 
 test("B6 : la description du Manager reste un seul champ, présenté en paragraphes, intertitres et listes", () => {
@@ -128,12 +128,14 @@ test("D4 : panier vide = un seul bouton « Continuer mes achats » vers Nos rayo
   assert.match(vitrine.renderAccueil({ available: true, products: [] }), /<h2 id="rayons-title">Nos rayons<\/h2>/);
 });
 
-test("D5 : formulation unique de « Produits sur commande » avec lien vers Contact", () => {
+test("D5 : accès direct depuis l'accueil et lien vers Contact sur la rubrique", () => {
   const text = "Découvrez les produits proposés sur commande. Pour connaître les disponibilités et les modalités, ";
-  for (const html of [vitrine.renderAccueil({ available: true, products: [] }), vitrine.renderSurDemande({ available: true, products: [] })]) {
-    assert.ok(html.includes(text + '<a href="https://www.dynastiedorkhan.com/contact/">contactez l’élevage</a>.'));
-    assert.doesNotMatch(html, /non achetables directement en ligne\./);
-  }
+  const accueil = vitrine.renderAccueil({ available: true, products: [] });
+  assert.match(accueil, /href="\/sur-demande\/"[^>]*><strong>Produits sur commande<\/strong><span>Découvrez les produits proposés sur commande\.<\/span>/);
+  assert.doesNotMatch(accueil, /home-on-request/);
+  const rubrique = vitrine.renderSurDemande({ available: true, products: [] });
+  assert.ok(rubrique.includes(text + '<a href="https://www.dynastiedorkhan.com/contact/">contactez l’élevage</a>.'));
+  assert.doesNotMatch(rubrique, /non achetables directement en ligne\./);
 });
 
 test("D1 D2 : pied de page et marque communs", () => {

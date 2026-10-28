@@ -117,6 +117,7 @@ function buildFiches(products) {
       subcategory: first.subcategory,
       onRequest: variants.every((variant) => variant.onRequest),
       isNew: variants.some((variant) => variant.isNew && !variant.onRequest),
+      publishedAt: variants.map((variant) => variant.publishedAt).filter(Boolean).sort().at(-1) || null,
       description: variants.find((variant) => variant.description)?.description || "",
       photos: variants.find((variant) => variant.photos.length)?.photos || fallbackPhotos(first.reference),
       variants,
@@ -267,27 +268,48 @@ function sceneHtml(scene) {
     + `<div class="scene-frame"><img src="${scene.image}"${srcset ? ` srcset="${srcset}" sizes="(max-width: 1220px) calc(100vw - 28px), 1180px"` : ""} alt="${escapeHtml(scene.alt)}" width="${scene.width}" height="${scene.height}" decoding="async">${zones}</div></section>`;
 }
 
+function latestFiches(fiches) {
+  return fiches.filter((fiche) => fiche.isNew && fiche.shelf && !fiche.onRequest)
+    .sort((a, b) => (b.publishedAt || "").localeCompare(a.publishedAt || ""));
+}
+
 function renderAccueil(catalogue) {
   const fiches = catalogue.available ? buildFiches(catalogue.products) : [];
-  const nouveautes = fiches.filter((fiche) => fiche.isNew && fiche.shelf);
-  // Accès classiques aux six rayons : tuiles typographiques homogènes, sans illustration (la scène interactive viendra
-  // au-dessus lorsque l'image définitive sera validée).
+  const nouveautes = latestFiches(fiches).slice(0, 12);
   const tiles = RAYONS.map((rayon) => {
-    const count = fiches.filter((fiche) => fiche.shelf === rayon.key && !fiche.onRequest).length + (PARCOURS[rayon.key]?.length || 0);
     return `<a class="rayon-tile" href="/rayons/${rayon.slug}/"><strong>${rayon.label}</strong><span>${Object.values(rayon.subcategories).join(" · ")}</span>`
-      + `<em>${count ? `${count} ${count > 1 ? "articles" : "article"}` : "Prochainement"}<b aria-hidden="true">→</b></em></a>`;
+      + '<em aria-hidden="true"><b>→</b></em></a>';
   }).join("");
   const body = sceneHtml(SCENE)
-    + `<section class="home-section" aria-labelledby="rayons-title"><h2 id="rayons-title">Nos rayons</h2><div class="rayon-grid">${tiles}</div></section>`
-    + (nouveautes.length ? `<section class="home-section" id="nouveautes" aria-labelledby="nouveautes-title"><h2 id="nouveautes-title">Nos nouveautés</h2><div class="product-grid">${nouveautes.map(ficheCard).join("")}</div></section>` : "")
-    + '<section class="home-section home-on-request"><div><h2>Produits sur commande</h2><p>Découvrez les produits proposés sur commande. Pour connaître les disponibilités et les modalités, <a href="https://www.dynastiedorkhan.com/contact/">contactez l’élevage</a>.</p></div><a class="btn-voir" href="/sur-demande/">Voir la rubrique</a></section>'
-    + '<section class="home-section home-promises"><p><strong>Retrait gratuit à l’élevage</strong> pour les articles de la boutique</p><p><strong>Tarif Famille Dynastie</strong> avec votre numéro de puce ou votre code Famille</p><p><strong>Paiement sécurisé</strong> en ligne</p></section>';
+    + '<section class="home-section home-promises"><p><strong>Retrait gratuit à l’élevage</strong> pour les articles de la boutique</p><p><strong>Tarif Famille Dynastie</strong> avec votre numéro de puce ou votre code Famille</p><p><strong>Paiement sécurisé</strong> en ligne</p></section>'
+    + `<section class="home-section" aria-labelledby="rayons-title"><h2 id="rayons-title">Nos rayons</h2><div class="rayon-grid">${tiles}<a class="rayon-tile" href="/sur-demande/"><strong>Produits sur commande</strong><span>Découvrez les produits proposés sur commande.</span><em aria-hidden="true"><b>→</b></em></a></div></section>`
+    + (nouveautes.length ? `<section class="home-section" id="nouveautes" aria-labelledby="nouveautes-title"><div class="nouveautes-heading"><h2 id="nouveautes-title">Nos nouveautés</h2><div class="nouveautes-controls"><button type="button" class="nouveautes-arrow" data-carousel-prev aria-label="Nouveautés précédentes" aria-controls="nouveautes-list" disabled>←</button><button type="button" class="nouveautes-arrow" data-carousel-next aria-label="Nouveautés suivantes" aria-controls="nouveautes-list">→</button></div></div><div class="nouveautes-carousel" id="nouveautes-list" role="region" aria-label="Derniers produits publiés" tabindex="0">${nouveautes.map(ficheCard).join("")}</div><a class="nouveautes-all" href="/nouveautes/">Voir toutes les nouveautés</a></section>` : "");
   return page({
     title: "Boutique de l'Élevage de la Dynastie d'Orkhan | Alimentation, sellerie, médailles et soins",
     description: "La boutique de l'Élevage de la Dynastie d'Orkhan : alimentation, sellerie, identification, jouets, accessoires, hygiène et soins pour votre chien. Retrait gratuit à l'élevage.",
     canonical: "/",
     hero: heroHtml("La boutique de l’élevage", "Les produits que nous utilisons et recommandons pour nos Cavaliers King Charles et nos Bullmastiffs."),
-    body
+    body,
+    scripts: nouveautes.length ? '<script src="/assets/nouveautes-carousel.js" defer></script>' : ""
+  });
+}
+
+function renderNouveautes(catalogue, requestedPage = 1) {
+  const items = catalogue.available ? latestFiches(buildFiches(catalogue.products)) : [];
+  const pageNumber = Number(requestedPage);
+  if (!Number.isSafeInteger(pageNumber) || pageNumber < 1) return null;
+  const pageSize = 24;
+  const pages = Math.max(1, Math.ceil(items.length / pageSize));
+  if (pageNumber > pages) return null;
+  const pageItems = items.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
+  const link = (number, label) => `<a href="/nouveautes/${number > 1 ? `?page=${number}` : ""}">${label}</a>`;
+  const pagination = pages > 1 ? `<nav class="pagination" aria-label="Pages des nouveautés">${pageNumber > 1 ? link(pageNumber - 1, "← Précédente") : ""}<span>Page ${pageNumber} sur ${pages}</span>${pageNumber < pages ? link(pageNumber + 1, "Suivante →") : ""}</nav>` : "";
+  return page({
+    title: `Toutes les nouveautés${pageNumber > 1 ? ` — page ${pageNumber}` : ""} | Boutique Dynastie d'Orkhan`,
+    description: "Retrouvez tous les produits récemment publiés dans la boutique de l'Élevage de la Dynastie d'Orkhan.",
+    canonical: `/nouveautes/${pageNumber > 1 ? `?page=${pageNumber}` : ""}`,
+    hero: heroHtml("Toutes les nouveautés", "Les derniers produits publiés dans la boutique.", true),
+    body: `<section class="rayon-listing"><h2>Nos nouveautés</h2>${pageItems.length ? `<div class="product-grid">${pageItems.map(ficheCard).join("")}</div>` : '<p class="rayon-empty">Aucune nouveauté pour le moment.</p>'}${pagination}</section>`
   });
 }
 
@@ -391,5 +413,5 @@ function renderNotFound() {
 
 module.exports = {
   ARTERO_PHOTOS, AVAILABILITY_LABELS, PARCOURS, SCENE, buildFiches, descriptionHtml, escapeHtml, findFiche, ficheCard, money, rayonBySlug,
-  renderAccueil, renderFiche, renderNotFound, renderRayon, renderSurDemande, sceneHtml, variantAvailability
+  renderAccueil, renderFiche, renderNotFound, renderNouveautes, renderRayon, renderSurDemande, sceneHtml, variantAvailability
 };
