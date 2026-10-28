@@ -50,6 +50,12 @@ function cents(value) {
   return Number.isSafeInteger(value) && value >= 0 && value <= MAX_PRICE_CENTS ? value : null;
 }
 
+function catalogueDate(value) {
+  if (typeof value !== "string" || !/^\d{4}-\d\d-\d\dT/.test(value)) return null;
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) ? new Date(timestamp).toISOString() : null;
+}
+
 // Liste blanche des champs affichés : tout autre champ renvoyé par le Manager est ignoré.
 function publicProduct(raw) {
   if (!raw || typeof raw !== "object") return null;
@@ -101,6 +107,7 @@ function publicProduct(raw) {
     displayOrder: Number.isSafeInteger(raw.displayOrder) ? raw.displayOrder : null,
     onRequest,
     isNew: raw.isNew === undefined ? true : raw.isNew === true,
+    publishedAt: catalogueDate(raw.publishedAt) || catalogueDate(raw.createdAt),
     availability: AVAILABILITIES.has(raw.availability) ? raw.availability : null,
     listed: raw.listed === undefined ? true : raw.listed === true
   };

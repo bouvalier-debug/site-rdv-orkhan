@@ -72,16 +72,6 @@
       "permanent": true
     },
     {
-      "source": "/nouveautes",
-      "destination": "/#nouveautes",
-      "permanent": true
-    },
-    {
-      "source": "/nouveautes/",
-      "destination": "/#nouveautes",
-      "permanent": true
-    },
-    {
       "source": "/medailles-gravees/conditions-vente.html",
       "destination": "/conditions-generales-de-vente/",
       "permanent": true
@@ -150,6 +140,14 @@
     {
       "source": "/",
       "destination": "/api/vitrine?vue=accueil"
+    },
+    {
+      "source": "/nouveautes",
+      "destination": "/api/vitrine?vue=nouveautes"
+    },
+    {
+      "source": "/nouveautes/",
+      "destination": "/api/vitrine?vue=nouveautes"
     },
     {
       "source": "/rayons/:rayon",

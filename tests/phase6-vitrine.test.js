@@ -80,6 +80,40 @@ test("accueil : scène interactive puis six accès classiques aux rayons, nouvea
   assert.match(vitrine.renderAccueil({ available: false, products: [] }), /Nos rayons/, "les rayons restent accessibles si le catalogue est indisponible");
 });
 
+test("accueil : engagements, sept rayons et au plus douze nouveautés triées, puis liste paginée", async () => {
+  const products = Array.from({ length: 50 }, (_, index) => product({
+    reference: `nouveau-${index + 1}`, name: `Nouveau ${index + 1}`, variantGroup: null,
+    isNew: true, publishedAt: new Date(Date.UTC(2026, 9, 1 + index)).toISOString()
+  }));
+  products.push(product({ reference: "brouillon", name: "Brouillon", variantGroup: null, listed: false, isNew: true }));
+  products.push(product({ reference: "sur-commande", name: "Sur commande", variantGroup: null, onRequest: true, isNew: true }));
+  const catalogue = { available: true, products };
+  const home = vitrine.renderAccueil(catalogue);
+  assert.ok(home.indexOf("home-scene") < home.indexOf("home-promises"));
+  assert.ok(home.indexOf("home-promises") < home.indexOf('id="rayons-title"'));
+  assert.ok(home.indexOf('id="rayons-title"') < home.indexOf('id="nouveautes-title"'));
+  assert.equal((home.match(/class="rayon-tile"/g) || []).length, 7);
+  assert.equal((home.match(/class="product-tile"/g) || []).length, 12);
+  assert.match(home, /href="\/sur-demande\/"[^>]*><strong>Produits sur commande<\/strong>/);
+  assert.doesNotMatch(home, /home-on-request|Brouillon|Sur commande<\/h3>/);
+  assert.ok(home.indexOf("Nouveau 50") < home.indexOf("Nouveau 39"));
+  assert.doesNotMatch(home, /Nouveau 38/);
+  assert.match(home, /href="\/nouveautes\/">Voir toutes les nouveautés/);
+  const first = vitrine.renderNouveautes(catalogue);
+  const second = vitrine.renderNouveautes(catalogue, 2);
+  const third = vitrine.renderNouveautes(catalogue, 3);
+  assert.equal((first.match(/class="product-tile"/g) || []).length, 24);
+  assert.equal((second.match(/class="product-tile"/g) || []).length, 24);
+  assert.equal((third.match(/class="product-tile"/g) || []).length, 2);
+  assert.match(second, /Nouveau 26/);
+  assert.match(third, /Nouveau 1/);
+  assert.equal(vitrine.renderNouveautes(catalogue, 4), null);
+  const response = recorder();
+  await handler({ method: "GET", query: { vue: "nouveautes", page: "3" } }, response, { listCatalogue: async () => catalogue });
+  assert.equal(response.statusCode, 200);
+  assert.match(response.body, /Nouveau 1/);
+});
+
 test("scène interactive : zones cliquables en HTML, indépendantes de l'image, une par rayon", () => {
   const zones = Object.fromEntries(RAYONS.map((rayon, index) => [rayon.key, { left: index * 15, top: 50, width: 12, height: 30 }]));
   const html = vitrine.sceneHtml({ image: "/assets/scene.webp", width: 1600, height: 900, alt: "Deux chiots et six produits", zones });
