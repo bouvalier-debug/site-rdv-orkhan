@@ -90,6 +90,11 @@ test("accueil : engagements, sept rayons et au plus douze nouveautés triées, p
   const catalogue = { available: true, products };
   const home = vitrine.renderAccueil(catalogue);
   assert.ok(home.indexOf("home-scene") < home.indexOf("home-promises"));
+  assert.match(home, /Un tarif réduit pour nos familles adoptantes/);
+  assert.match(home, /Activez votre Tarif Famille Dynastie avec le numéro de puce de votre chien ou votre code Famille\./);
+  assert.match(home, /class="home-promise-badge" aria-hidden="true"/);
+  assert.match(home, /Retrait gratuit à l’élevage<\/strong> pour les articles de la boutique/);
+  assert.match(home, /Paiement sécurisé<\/strong> en ligne/);
   assert.ok(home.indexOf("home-promises") < home.indexOf('id="rayons-title"'));
   assert.ok(home.indexOf('id="rayons-title"') < home.indexOf('id="nouveautes-title"'));
   assert.equal((home.match(/class="rayon-tile"/g) || []).length, 7);
