@@ -93,6 +93,9 @@ test("accueil : engagements, sept rayons et au plus douze nouveautés triées, p
   assert.ok(home.indexOf("home-promises") < home.indexOf('id="rayons-title"'));
   assert.ok(home.indexOf('id="rayons-title"') < home.indexOf('id="nouveautes-title"'));
   assert.equal((home.match(/class="rayon-tile"/g) || []).length, 7);
+  const rayonGrid = home.match(/<div class="rayon-grid">([\s\S]*?)<\/div>/)[1];
+  assert.doesNotMatch(rayonGrid, /\d+ articles?|Prochainement|Découvrir/i);
+  assert.equal((rayonGrid.match(/<em aria-hidden="true"><b>→<\/b><\/em>/g) || []).length, 7);
   assert.equal((home.match(/class="product-tile"/g) || []).length, 12);
   assert.match(home, /href="\/sur-demande\/"[^>]*><strong>Produits sur commande<\/strong>/);
   assert.doesNotMatch(home, /home-on-request|Brouillon|Sur commande<\/h3>/);

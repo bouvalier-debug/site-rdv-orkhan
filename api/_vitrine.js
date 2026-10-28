@@ -277,13 +277,12 @@ function renderAccueil(catalogue) {
   const fiches = catalogue.available ? buildFiches(catalogue.products) : [];
   const nouveautes = latestFiches(fiches).slice(0, 12);
   const tiles = RAYONS.map((rayon) => {
-    const count = fiches.filter((fiche) => fiche.shelf === rayon.key && !fiche.onRequest).length + (PARCOURS[rayon.key]?.length || 0);
     return `<a class="rayon-tile" href="/rayons/${rayon.slug}/"><strong>${rayon.label}</strong><span>${Object.values(rayon.subcategories).join(" · ")}</span>`
-      + `<em>${count ? `${count} ${count > 1 ? "articles" : "article"}` : "Prochainement"}<b aria-hidden="true">→</b></em></a>`;
+      + '<em aria-hidden="true"><b>→</b></em></a>';
   }).join("");
   const body = sceneHtml(SCENE)
     + '<section class="home-section home-promises"><p><strong>Retrait gratuit à l’élevage</strong> pour les articles de la boutique</p><p><strong>Tarif Famille Dynastie</strong> avec votre numéro de puce ou votre code Famille</p><p><strong>Paiement sécurisé</strong> en ligne</p></section>'
-    + `<section class="home-section" aria-labelledby="rayons-title"><h2 id="rayons-title">Nos rayons</h2><div class="rayon-grid">${tiles}<a class="rayon-tile" href="/sur-demande/"><strong>Produits sur commande</strong><span>Découvrez les produits proposés sur commande.</span><em>Découvrir<b aria-hidden="true">→</b></em></a></div></section>`
+    + `<section class="home-section" aria-labelledby="rayons-title"><h2 id="rayons-title">Nos rayons</h2><div class="rayon-grid">${tiles}<a class="rayon-tile" href="/sur-demande/"><strong>Produits sur commande</strong><span>Découvrez les produits proposés sur commande.</span><em aria-hidden="true"><b>→</b></em></a></div></section>`
     + (nouveautes.length ? `<section class="home-section" id="nouveautes" aria-labelledby="nouveautes-title"><div class="nouveautes-heading"><h2 id="nouveautes-title">Nos nouveautés</h2><div class="nouveautes-controls"><button type="button" class="nouveautes-arrow" data-carousel-prev aria-label="Nouveautés précédentes" aria-controls="nouveautes-list" disabled>←</button><button type="button" class="nouveautes-arrow" data-carousel-next aria-label="Nouveautés suivantes" aria-controls="nouveautes-list">→</button></div></div><div class="nouveautes-carousel" id="nouveautes-list" role="region" aria-label="Derniers produits publiés" tabindex="0">${nouveautes.map(ficheCard).join("")}</div><a class="nouveautes-all" href="/nouveautes/">Voir toutes les nouveautés</a></section>` : "");
   return page({
     title: "Boutique de l'Élevage de la Dynastie d'Orkhan | Alimentation, sellerie, médailles et soins",
