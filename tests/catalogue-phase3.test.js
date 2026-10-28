@@ -26,6 +26,12 @@ test("un produit Sur demande n'est jamais achetable, même si la réponse l'indi
   assert.deepEqual([product({ onRequest: true, purchasable: true })].map((p) => [p.purchasable, p.maxOrderQuantity]), [[false, 0]]);
 });
 
+test("la date de publication est utilisée si le Manager l'expose, jamais la date de création", () => {
+  assert.equal(product({ firstPublishedAt: "2026-10-24T10:00:00.000Z" }).publishedAt, "2026-10-24T10:00:00.000Z");
+  assert.equal(product({ publishedAt: "2026-10-25T10:00:00.000Z" }).publishedAt, "2026-10-25T10:00:00.000Z");
+  assert.equal(product({ createdAt: "2026-10-26T10:00:00.000Z" }).publishedAt, null);
+});
+
 test("un Manager antérieur à la phase 3 garde l'affichage actuel", () => {
   const legacy = { ...BASE };
   for (const key of ["shelf", "subcategory", "variantGroup", "variantLabel", "onRequest", "isNew", "availability", "listed"]) delete legacy[key];

@@ -107,7 +107,8 @@ function publicProduct(raw) {
     displayOrder: Number.isSafeInteger(raw.displayOrder) ? raw.displayOrder : null,
     onRequest,
     isNew: raw.isNew === undefined ? true : raw.isNew === true,
-    publishedAt: catalogueDate(raw.publishedAt) || catalogueDate(raw.createdAt),
+    // La date de création ne garantit pas l'ordre de publication ; le Manager possède firstPublishedAt.
+    publishedAt: catalogueDate(raw.publishedAt) || catalogueDate(raw.firstPublishedAt),
     availability: AVAILABILITIES.has(raw.availability) ? raw.availability : null,
     listed: raw.listed === undefined ? true : raw.listed === true
   };
