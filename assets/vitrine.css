@@ -83,6 +83,14 @@
 .home-promises{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .home-promises p{margin:0;padding:18px 20px;border-top:3px solid var(--gold);background:#fff;color:var(--muted);font-size:.95rem}
 .home-promises strong{display:block;color:var(--wine)}
+.home-promises .home-promise-family{display:flex;align-items:center;gap:14px;padding:16px 18px;border:1px solid var(--gold);border-top-width:3px;border-radius:10px;background:linear-gradient(135deg,#fffdf8,var(--cream));line-height:1.45}
+.home-promise-badge{display:block;flex:0 0 54px;width:54px;height:54px;color:var(--wine)}
+.home-promise-badge svg{display:block;width:100%;height:100%}
+.home-promise-badge path{fill:currentColor}
+.home-promise-badge circle,.home-promise-badge text{fill:var(--gold)}
+.home-promise-badge text{font:800 29px Arial,sans-serif}
+.home-promise-copy{display:block;min-width:0}
+.home-promise-copy>span{display:block}
 .nouveautes-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
 .nouveautes-heading h2{margin:0;font-size:clamp(1.5rem,2.6vw,2rem)}
 .nouveautes-controls{display:flex;gap:10px}
@@ -163,11 +171,12 @@
   .rayon-grid{grid-template-columns:1fr 1fr;gap:12px}
   .rayon-tile{min-height:120px;padding:16px 14px 13px;gap:4px}
   .rayon-tile strong{font-size:1.15rem}
-  .rayon-tile span{display:none}
+  .rayon-tile span{font-size:.82rem;line-height:1.35}
   .product-grid{grid-template-columns:1fr 1fr;gap:12px}
   .product-tile-body{padding:12px}
   .product-tile h3{font-size:1rem}
   .home-promises{grid-template-columns:1fr}
+  .home-promises .home-promise-family{gap:12px;padding:15px 16px}
   .nouveautes-carousel{gap:12px}
   .nouveautes-carousel>.product-tile{flex-basis:calc((100% - 12px)/2)}
 }
