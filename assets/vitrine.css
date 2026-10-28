@@ -171,7 +171,7 @@
   .rayon-grid{grid-template-columns:1fr 1fr;gap:12px}
   .rayon-tile{min-height:120px;padding:16px 14px 13px;gap:4px}
   .rayon-tile strong{font-size:1.15rem}
-  .rayon-tile span{display:none}
+  .rayon-tile span{font-size:.82rem;line-height:1.35}
   .product-grid{grid-template-columns:1fr 1fr;gap:12px}
   .product-tile-body{padding:12px}
   .product-tile h3{font-size:1rem}
