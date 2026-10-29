@@ -75,7 +75,9 @@ test("ne garde que les champs publics et relaie les photos par la Boutique", asy
     publicPriceCents: 3490, familyPriceCents: 2990, weightGrams: 900, purchasable: false, maxOrderQuantity: 0,
     photos: [{ url: `/api/catalogue-photo?id=${PHOTO}`, width: 640, height: 480, altText: "Pack ouvert" }],
     shelf: null, subcategory: null, variantGroup: null, variantLabel: null, variantOptions: null, displayOrder: 0,
-    onRequest: false, isNew: true, publishedAt: null, availability: null, listed: true
+    onRequest: false, isNew: true, publishedAt: null, availability: null, listed: true,
+    // Profil de recette : vide tant que le Manager ne l'envoie pas.
+    brand: null, lifeStages: [], traits: [], dogSize: null, energyKcalPerKg: null
   }]);
   const serialized = JSON.stringify(result);
   for (const forbidden of [SECRET, BYPASS, "supabase", "storage", "priceChanges", "uuid-interne", "manager-preview", "DRAFT"]) assert.equal(serialized.includes(forbidden), false, forbidden);
