@@ -58,13 +58,18 @@ test("un nom de marque est échappé dans la page", () => {
   assert.doesNotMatch(html, /<script>1<\/script>/);
 });
 
-test("la logique de filtre : Tous, marque, profils cumulables, produits non renseignés", () => {
+test("la logique de filtre : Tous, marque, profils en OU, produits non renseignés", () => {
   const tiles = { puppy: { brand: "Opti Life", profile: "puppy" }, active: { brand: "Opti Life", profile: "adult active" }, light: { brand: "Primordial", profile: "adult senior diet" }, vide: {} };
   const keep = (brand, profiles) => Object.entries(tiles).filter(([, tile]) => matches(tile, brand, profiles)).map(([key]) => key);
   assert.deepEqual(keep("", []), ["puppy", "active", "light", "vide"]);
   assert.deepEqual(keep("Opti Life", []), ["puppy", "active"]);
   assert.deepEqual(keep("", ["adult"]), ["active", "light"]);
-  assert.deepEqual(keep("", ["adult", "active"]), ["active"]);
+  assert.deepEqual(keep("", ["adult", "active"]), ["active", "light"]);
   assert.deepEqual(keep("Primordial", ["diet", "senior"]), ["light"]);
+  assert.deepEqual(keep("", ["puppy", "adult"]), ["puppy", "active", "light"]);
+  assert.deepEqual(keep("", ["puppy", "senior"]), ["puppy", "light"]);
+  assert.deepEqual(keep("", ["puppy", "adult", "diet", "senior"]), ["puppy", "active", "light"]);
+  assert.deepEqual(keep("Opti Life", ["puppy", "senior"]), ["puppy"]);
+  assert.deepEqual(keep("Primordial", ["puppy"]), []);
   assert.deepEqual(keep("Opti Life", ["diet"]), []);
 });

@@ -1,12 +1,12 @@
 (function recipeFilters(root) {
   "use strict";
 
-  // Un produit sans marque ni profil (non renseigné) n'est visible que lorsqu'aucun filtre n'est actif.
+  // Profils cochés : logique OU entre eux, ET avec la marque. Un produit sans marque ni profil (non renseigné) n'est visible que lorsqu'aucun filtre n'est actif.
   function matches(tile, brand, profiles) {
     if (!brand && !profiles.length) return true;
     if (brand && (tile.brand || "") !== brand) return false;
     const own = (tile.profile || "").split(/\s+/).filter(Boolean);
-    return profiles.every((token) => own.includes(token));
+    return !profiles.length || profiles.some((token) => own.includes(token));
   }
 
   if (typeof module !== "undefined" && module.exports) module.exports = { matches };
