@@ -150,6 +150,14 @@
       "destination": "/api/vitrine?vue=nouveautes"
     },
     {
+      "source": "/budget-croquettes",
+      "destination": "/api/vitrine?vue=budget"
+    },
+    {
+      "source": "/budget-croquettes/",
+      "destination": "/api/vitrine?vue=budget"
+    },
+    {
       "source": "/rayons/:rayon",
       "destination": "/api/vitrine?vue=rayon&rayon=:rayon"
     },

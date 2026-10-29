@@ -1,6 +1,7 @@
 const { listCatalogue } = require("./_orkhan-catalog");
 const { renderAccueil, renderFiche, renderNotFound, renderNouveautes, renderRayon, renderSurDemande } = require("./_vitrine");
 const { boutiqueSitemap } = require("./_sitemap");
+const { renderBudget } = require("./_budget-croquettes");
 
 // Phase 6 : accueil, rayons, Sur demande et fiches produit, rendus côté serveur (référencement) et mis en cache
 // brièvement au CDN. Les routes publiques sont déclarées dans vercel.json (rewrites).
@@ -13,7 +14,7 @@ function send(res, status, html, cacheable) {
 async function handler(req, res, options = {}) {
   if (req.method !== "GET" && req.method !== "HEAD") return send(res, 405, renderNotFound(), false);
   const vue = req.query?.vue;
-  if (!["accueil", "rayon", "sur-demande", "produit", "nouveautes", "sitemap"].includes(vue)) return send(res, 404, renderNotFound(), false);
+  if (!["accueil", "rayon", "sur-demande", "produit", "nouveautes", "budget", "sitemap"].includes(vue)) return send(res, 404, renderNotFound(), false);
   const catalogue = await (options.listCatalogue || listCatalogue)();
   if (vue === "sitemap") {
     res.setHeader("Content-Type", "application/xml; charset=utf-8");
@@ -22,6 +23,7 @@ async function handler(req, res, options = {}) {
   }
   const html = vue === "accueil" ? renderAccueil(catalogue)
     : vue === "nouveautes" ? renderNouveautes(catalogue, req.query.page || 1)
+    : vue === "budget" ? renderBudget(catalogue)
     : vue === "rayon" ? renderRayon(catalogue, req.query.rayon)
       : vue === "sur-demande" ? renderSurDemande(catalogue)
         : renderFiche(catalogue, req.query.fiche);

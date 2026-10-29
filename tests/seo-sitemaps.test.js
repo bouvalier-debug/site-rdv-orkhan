@@ -31,7 +31,7 @@ test("le sitemap Boutique ne liste que des pages Boutique publiques et indexable
   const { RAYONS } = require("../scripts/shop-layout");
   // Phase 6 : accueil, rayons et Sur demande sont rendus côté serveur (réécritures vers /api/vitrine) ; les autres
   // pages sont des fichiers statiques.
-  const vitrine = ["https://boutique.dynastiedorkhan.com/", "https://boutique.dynastiedorkhan.com/nouveautes/", ...RAYONS.map((rayon) => `https://boutique.dynastiedorkhan.com/rayons/${rayon.slug}/`), "https://boutique.dynastiedorkhan.com/sur-demande/"];
+  const vitrine = ["https://boutique.dynastiedorkhan.com/", "https://boutique.dynastiedorkhan.com/nouveautes/", ...RAYONS.map((rayon) => `https://boutique.dynastiedorkhan.com/rayons/${rayon.slug}/`), "https://boutique.dynastiedorkhan.com/sur-demande/", "https://boutique.dynastiedorkhan.com/budget-croquettes/"];
   assert.deepEqual(urls, [
     ...vitrine,
     "https://boutique.dynastiedorkhan.com/medailles-gravees/",

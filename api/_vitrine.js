@@ -18,14 +18,28 @@ function rationEnergy(energyKcalPerKg) {
   return Number.isSafeInteger(energyKcalPerKg) && energyKcalPerKg >= 2500 && energyKcalPerKg <= 5500 ? energyKcalPerKg : null;
 }
 
-function rationCalculatorHref(energyKcalPerKg) {
+// La référence du format accompagne le lien : elle identifie la recette pour un retour vers « Mon budget croquettes »,
+// sans jamais la déduire de l'énergie (plusieurs recettes peuvent avoir la même valeur).
+function rationCalculatorHref(energyKcalPerKg, reference) {
+  const params = new URLSearchParams();
   const energy = rationEnergy(energyKcalPerKg);
-  return energy ? `${RATION_CALCULATOR_URL}?energie=${energy}&unite=kcal-kg` : RATION_CALCULATOR_URL;
+  if (energy) { params.set("energie", String(energy)); params.set("unite", "kcal-kg"); }
+  if (reference) params.set("format", reference);
+  const query = params.toString();
+  return query ? `${RATION_CALCULATOR_URL}?${query}` : RATION_CALCULATOR_URL;
+}
+
+// Mon budget croquettes (api/_budget-croquettes.js) : seule la référence du format est transmise, les prix sont relus.
+const BUDGET_PATH = "/budget-croquettes/";
+
+function budgetHref(reference) {
+  return `${BUDGET_PATH}?format=${encodeURIComponent(reference)}`;
 }
 
 function rationLinkHtml(variant) {
   return `<div class="fiche-ration"><a class="btn-voir" href="${escapeHtml(variant.rationHref)}" data-fiche-ration>Calculer la ration avec ces croquettes</a>`
-    + `<p data-fiche-ration-manual${variant.rationEnergy ? " hidden" : ""}>L’énergie de cette recette n’est pas encore renseignée : saisissez la valeur indiquée sur l’emballage (kcal/kg ou kcal/100 g).</p></div>`;
+    + `<p data-fiche-ration-manual${variant.rationEnergy ? " hidden" : ""}>L’énergie de cette recette n’est pas encore renseignée : saisissez la valeur indiquée sur l’emballage (kcal/kg ou kcal/100 g).</p>`
+    + `<a class="fiche-budget-link" href="${escapeHtml(variant.budgetHref)}" data-fiche-budget>Calculer mon budget croquettes</a></div>`;
 }
 
 // Scène interactive de l'accueil (VIS-02), image validée par le porteur le 21/10/2026 et conservée telle quelle
@@ -425,7 +439,7 @@ function renderFiche(catalogue, slug) {
     variantOptions: variant.variantOptions,
     photos: variant.photos.length ? variant.photos : fiche.photos,
     // Énergie du format affiché, jamais déduite d'un autre format ni du poids du sac.
-    ...(croquettes ? { rationHref: rationCalculatorHref(variant.energyKcalPerKg), rationEnergy: rationEnergy(variant.energyKcalPerKg) } : {})
+    ...(croquettes ? { rationHref: rationCalculatorHref(variant.energyKcalPerKg, variant.reference), rationEnergy: rationEnergy(variant.energyKcalPerKg), budgetHref: budgetHref(variant.reference) } : {})
   }));
   const current = variants.find((variant) => variant.reference === selected.reference);
   const photos = current.photos;
@@ -471,6 +485,6 @@ function renderNotFound() {
 }
 
 module.exports = {
-  ARTERO_PHOTOS, AVAILABILITY_LABELS, PARCOURS, RATION_CALCULATOR_URL, SCENE, buildFiches, descriptionHtml, escapeHtml, findFiche, ficheCard, money,
-  rationCalculatorHref, rayonBySlug, renderAccueil, renderFiche, renderNotFound, renderNouveautes, renderRayon, renderSurDemande, sceneHtml, variantAvailability
+  ARTERO_PHOTOS, AVAILABILITY_LABELS, BUDGET_PATH, PARCOURS, RATION_CALCULATOR_URL, SCENE, budgetHref, buildFiches, descriptionHtml, escapeHtml, findFiche, ficheCard, heroHtml, money,
+  page, rationCalculatorHref, rayonBySlug, renderAccueil, renderFiche, renderNotFound, renderNouveautes, renderRayon, renderSurDemande, sceneHtml, variantAvailability
 };
