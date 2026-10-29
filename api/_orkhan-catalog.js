@@ -12,6 +12,11 @@ const FAMILIES = new Set(["ANIMOCO", "RED_DINGO", "COLIS", "CROQUETTES"]);
 const MAX_PRICE_CENTS = 10_000_000;
 const MAX_ORDER_QUANTITY = 20;
 const MAX_WEIGHT_GRAMS = 100_000;
+// Profil de recette (croquettes) publié par le Manager ; tout est facultatif et tolère un Manager antérieur.
+const LIFE_STAGES = ["puppy", "adult", "senior"];
+const TRAITS = ["active", "sterilised", "light"];
+const DOG_SIZES = ["mini", "small", "medium", "large", "giant"];
+const codeList = (value, allowed) => (Array.isArray(value) ? allowed.filter((code) => value.includes(code)) : []);
 // Phase 3 : référentiel des rayons et états de disponibilité calculés par le Manager.
 const SHELVES = new Set(["ALIMENTATION", "SELLERIE", "IDENTIFICATION", "JOUETS", "ACCESSOIRES", "HYGIENE_SOINS"]);
 const AVAILABILITIES = new Set(["in_stock", "low_stock", "out_of_stock", "on_request"]);
@@ -106,6 +111,11 @@ function publicProduct(raw) {
     variantOptions: validVariantOptions,
     displayOrder: Number.isSafeInteger(raw.displayOrder) ? raw.displayOrder : null,
     onRequest,
+    brand: text(raw.brand, 60),
+    lifeStages: codeList(raw.lifeStages, LIFE_STAGES),
+    traits: codeList(raw.traits, TRAITS),
+    dogSize: DOG_SIZES.includes(raw.dogSize) ? raw.dogSize : null,
+    energyKcalPerKg: Number.isSafeInteger(raw.energyKcalPerKg) && raw.energyKcalPerKg >= 2500 && raw.energyKcalPerKg <= 5500 ? raw.energyKcalPerKg : null,
     isNew: raw.isNew === undefined ? true : raw.isNew === true,
     // La date de création ne garantit pas l'ordre de publication ; le Manager possède firstPublishedAt.
     publishedAt: catalogueDate(raw.publishedAt) || catalogueDate(raw.firstPublishedAt),

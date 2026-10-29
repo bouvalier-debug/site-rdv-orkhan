@@ -121,6 +121,7 @@ function buildFiches(products) {
       description: variants.find((variant) => variant.description)?.description || "",
       photos: variants.find((variant) => variant.photos.length)?.photos || fallbackPhotos(first.reference),
       variants,
+      recipe: recipeOf(variants),
       price: Math.min(...prices),
       priceFrom: new Set(prices).size > 1,
       familyPrice: familyPrices.length ? Math.min(...familyPrices) : null,
@@ -128,6 +129,33 @@ function buildFiches(products) {
       state: AVAILABILITY_RANK.find((state) => variants.some((variant) => variant.state === state))
     };
   });
+}
+
+// Filtres Marque et Profil des croquettes. Un produit non renseigné n'a ni marque ni profil : il reste visible sous « Tous ».
+const PROFILE_CHIPS = [["puppy", "Chiot"], ["adult", "Adulte"], ["diet", "Stérilisé / light"], ["senior", "Senior"], ["active", "Actif"]];
+
+function profileTokens(recipe) {
+  const tokens = [...recipe.lifeStages];
+  if (recipe.traits.includes("sterilised") || recipe.traits.includes("light")) tokens.push("diet");
+  if (recipe.traits.includes("active")) tokens.push("active");
+  return tokens;
+}
+
+function recipeOf(variants) {
+  const source = variants.find((variant) => variant.brand || variant.lifeStages.length || variant.traits.length) || variants[0];
+  return { brand: source.brand || null, lifeStages: source.lifeStages || [], traits: source.traits || [], dogSize: source.dogSize || null, energyKcalPerKg: source.energyKcalPerKg || null };
+}
+
+function recipeFilters(fiches) {
+  if (!fiches.length || !fiches.every((fiche) => fiche.subcategory === "croquettes")) return "";
+  const brands = [...new Set(fiches.map((fiche) => fiche.recipe.brand).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr"));
+  const present = new Set(fiches.flatMap((fiche) => profileTokens(fiche.recipe)));
+  const chips = PROFILE_CHIPS.filter(([token]) => present.has(token));
+  if (!brands.length && !chips.length) return "";
+  return `<form class="recipe-filters" data-recipe-filters hidden aria-label="Filtrer les croquettes">`
+    + (brands.length ? `<label class="recipe-filter-brand"><span>Marque</span><select name="brand"><option value="">Toutes</option>${brands.map((brand) => `<option value="${escapeHtml(brand)}">${escapeHtml(brand)}</option>`).join("")}</select></label>` : "")
+    + (chips.length ? `<fieldset class="recipe-filter-profile"><legend>Profil</legend>${chips.map(([token, label]) => `<label class="recipe-chip"><input type="checkbox" name="profile" value="${token}"><span>${label}</span></label>`).join("")}</fieldset>` : "")
+    + `<button class="recipe-filter-reset" type="button" data-recipe-reset>Réinitialiser</button><p class="recipe-filter-count" data-recipe-count role="status" aria-live="polite"></p></form>`;
 }
 
 function findFiche(fiches, slug) {
@@ -197,7 +225,10 @@ function photoHtml(photo, className, loading = "lazy") {
 function ficheCard(fiche) {
   const href = `/produits/${encodeURIComponent(fiche.slug)}/`;
   const photo = fiche.photos[0];
-  return `<article class="product-tile"><a class="product-tile-photo" href="${href}" tabindex="-1" aria-hidden="true">${photo ? photoHtml(photo, "") : `<span class="product-tile-placeholder">Photo à venir</span>`}</a>`
+  const recipe = fiche.recipe;
+  const filterData = recipe && recipe.brand ? ` data-brand="${escapeHtml(recipe.brand)}"` : "";
+  const profileData = recipe && profileTokens(recipe).length ? ` data-profile="${profileTokens(recipe).join(" ")}"` : "";
+  return `<article class="product-tile"${filterData}${profileData}><a class="product-tile-photo" href="${href}" tabindex="-1" aria-hidden="true">${photo ? photoHtml(photo, "") : `<span class="product-tile-placeholder">Photo à venir</span>`}</a>`
     + `<div class="product-tile-body"><h3><a href="${href}">${escapeHtml(fiche.name)}</a></h3>`
     + (fiche.onRequest ? "" : `<p class="product-price">${priceText(fiche.price, fiche.priceFrom)}</p>`)
     + (fiche.familyPrice !== null && !fiche.onRequest ? `<p class="family-price">Prix Famille Dynastie : ${priceText(fiche.familyPrice, fiche.familyPriceFrom)}</p>` : "")
@@ -313,6 +344,10 @@ function renderNouveautes(catalogue, requestedPage = 1) {
   });
 }
 
+function recipeEmpty(fiches) {
+  return recipeFilters(fiches) ? '<p class="rayon-empty" data-recipe-empty hidden>Aucune recette ne correspond à ces filtres. Réinitialisez-les pour revoir toutes les croquettes.</p>' : "";
+}
+
 function renderRayon(catalogue, slug) {
   const rayon = rayonBySlug(slug);
   if (!rayon) return null;
@@ -327,16 +362,17 @@ function renderRayon(catalogue, slug) {
     const grouped = sections.length > 1 || (sections.length === 1 && others.length);
     listing = (parcours.length ? `<div class="product-grid">${parcours.map(parcoursCard).join("")}</div>` : "")
       + (grouped
-        ? sections.map(([label, items]) => `<h2 class="subcategory-title">${escapeHtml(label)}</h2><div class="product-grid">${items.map(ficheCard).join("")}</div>`).join("")
+        ? sections.map(([label, items]) => `<h2 class="subcategory-title">${escapeHtml(label)}</h2>${recipeFilters(items)}<div class="product-grid">${items.map(ficheCard).join("")}</div>${recipeEmpty(items)}`).join("")
           + (others.length ? `<h2 class="subcategory-title">Autres articles</h2><div class="product-grid">${others.map(ficheCard).join("")}</div>` : "")
-        : fiches.length ? `<div class="product-grid">${fiches.map(ficheCard).join("")}</div>` : "");
+        : fiches.length ? `${recipeFilters(fiches)}<div class="product-grid">${fiches.map(ficheCard).join("")}</div>${recipeEmpty(fiches)}` : "");
   }
   return page({
     title: `${rayon.label} | Boutique Dynastie d'Orkhan`,
     description: `Rayon ${rayon.label} de la boutique de l'Élevage de la Dynastie d'Orkhan : ${Object.values(rayon.subcategories).join(", ").toLocaleLowerCase("fr")}.`,
     canonical: `/rayons/${rayon.slug}/`,
     hero: heroHtml(rayon.label, Object.values(rayon.subcategories).join(" · "), true),
-    body: `${rayonsNav(rayon.key)}<section class="rayon-listing" aria-label="Articles du rayon ${escapeHtml(rayon.label)}">${listing}</section>`
+    body: `${rayonsNav(rayon.key)}<section class="rayon-listing" aria-label="Articles du rayon ${escapeHtml(rayon.label)}">${listing}</section>`,
+    scripts: listing.includes("data-recipe-filters") ? '<script src="/assets/recipe-filters.js" defer></script>' : ""
   });
 }
 

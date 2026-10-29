@@ -185,3 +185,18 @@
 .btn-primary{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 26px;border:0;border-radius:999px;background:var(--wine);color:#fff;font-weight:800;font-size:1rem;text-decoration:none;cursor:pointer;box-shadow:0 8px 20px rgba(78,18,34,.18)}
 .btn-primary:hover,.btn-primary:focus-visible{background:var(--wine-dark);color:#fff}
 .product-tile-photo,.product-tile-photo:hover{text-decoration:none}
+
+/* Filtres Marque et Profil des croquettes (révélés par assets/recipe-filters.js) */
+.recipe-filters{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 20px;margin:0 0 20px;padding:14px 16px;border:1px solid var(--line,#e3d9d4);border-radius:12px;background:#fff}
+.recipe-filters[hidden],.product-tile[hidden],.rayon-empty[hidden]{display:none}
+.recipe-filter-brand{display:flex;flex-direction:column;gap:4px;font-weight:700}
+.recipe-filter-brand select{min-height:44px;padding:8px 12px;border:1px solid var(--wine);border-radius:8px;background:#fff;font:inherit}
+.recipe-filter-profile{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;border:0}
+.recipe-filter-profile legend{padding:0;margin-bottom:4px;font-weight:700}
+.recipe-chip{position:relative}
+.recipe-chip input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.recipe-chip span{display:inline-flex;align-items:center;min-height:44px;padding:8px 16px;border:1px solid var(--wine);border-radius:999px;color:var(--wine);font-weight:700}
+.recipe-chip input:checked+span{background:var(--wine);color:#fff}
+.recipe-chip input:focus-visible+span{outline:3px solid var(--wine);outline-offset:2px}
+.recipe-filter-reset{min-height:44px;padding:8px 16px;border:0;background:none;color:var(--wine);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.recipe-filter-count{flex-basis:100%;margin:0;color:#5b4a46}
