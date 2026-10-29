@@ -159,6 +159,9 @@
 .fiche-buy .btn-primary:disabled{opacity:.5;cursor:not-allowed}
 .fiche-pickup{margin:16px 0 0;color:var(--ink);font-weight:700}
 .fiche-on-request{margin:20px 0 0;padding:16px 18px;border-left:3px solid var(--gold);background:var(--cream)}
+.fiche-ration{margin:20px 0 0}
+.fiche-ration .btn-voir{margin-top:0;text-align:center}
+.fiche-ration p{margin:8px 0 0;color:var(--muted);font-size:.86rem}
 .fiche-family-note,.fiche-ref{margin:12px 0 0;color:var(--muted);font-size:.86rem}
 .fiche-description{max-width:820px;margin:48px 0 0}
 

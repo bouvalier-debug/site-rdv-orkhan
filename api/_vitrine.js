@@ -9,6 +9,25 @@ const { BACK_TO_TOP, FACEBOOK_FAB, RAYONS, SHOP_FOOTER, SHOP_HEADER } = require(
 const ORIGIN = "https://boutique.dynastiedorkhan.com";
 const FICHE_SLUG = /^[a-z0-9]+([-:][a-z0-9]+)*$/;
 
+// Calculateur de ration du site public. L'énergie métabolisable est une donnée de la recette (kcal/kg, recopiée par le
+// Manager sur tous ses formats) et non du sac : seule une valeur renseignée et plausible est transmise ; sinon le
+// calculateur s'ouvre sans préremplissage, pour une saisie manuelle.
+const RATION_CALCULATOR_URL = "https://www.dynastiedorkhan.com/outils/calculateur-ration/";
+
+function rationEnergy(energyKcalPerKg) {
+  return Number.isSafeInteger(energyKcalPerKg) && energyKcalPerKg >= 2500 && energyKcalPerKg <= 5500 ? energyKcalPerKg : null;
+}
+
+function rationCalculatorHref(energyKcalPerKg) {
+  const energy = rationEnergy(energyKcalPerKg);
+  return energy ? `${RATION_CALCULATOR_URL}?energie=${energy}&unite=kcal-kg` : RATION_CALCULATOR_URL;
+}
+
+function rationLinkHtml(variant) {
+  return `<div class="fiche-ration"><a class="btn-voir" href="${escapeHtml(variant.rationHref)}" data-fiche-ration>Calculer la ration avec ces croquettes</a>`
+    + `<p data-fiche-ration-manual${variant.rationEnergy ? " hidden" : ""}>L’énergie de cette recette n’est pas encore renseignée : saisissez la valeur indiquée sur l’emballage (kcal/kg ou kcal/100 g).</p></div>`;
+}
+
 // Scène interactive de l'accueil (VIS-02), image validée par le porteur le 21/10/2026 et conservée telle quelle
 // (seulement recompressée). Les zones, en % de l'image, entourent le produit représentatif de chaque rayon ; les
 // libellés et interactions sont dans le code, jamais sur l'image. labelAt : position du libellé dans la zone.
@@ -393,6 +412,7 @@ function renderFiche(catalogue, slug) {
   const fiche = findFiche(buildFiches(catalogue.products), slug);
   if (!fiche) return null;
   const rayon = rayonByKey(fiche.shelf);
+  const croquettes = fiche.subcategory === "croquettes";
   const selected = fiche.variants.find((variant) => variant.reference === slug) || fiche.variants.find((variant) => variant.state === "in_stock" || variant.state === "low_stock") || fiche.variants[0];
   const variants = fiche.variants.map((variant) => ({
     reference: variant.reference,
@@ -403,7 +423,9 @@ function renderFiche(catalogue, slug) {
     availability: AVAILABILITY_LABELS[variant.state],
     maxQuantity: variant.purchasable && (variant.state === "in_stock" || variant.state === "low_stock") ? variant.maxOrderQuantity : 0,
     variantOptions: variant.variantOptions,
-    photos: variant.photos.length ? variant.photos : fiche.photos
+    photos: variant.photos.length ? variant.photos : fiche.photos,
+    // Énergie du format affiché, jamais déduite d'un autre format ni du poids du sac.
+    ...(croquettes ? { rationHref: rationCalculatorHref(variant.energyKcalPerKg), rationEnergy: rationEnergy(variant.energyKcalPerKg) } : {})
   }));
   const current = variants.find((variant) => variant.reference === selected.reference);
   const photos = current.photos;
@@ -424,6 +446,7 @@ function renderFiche(catalogue, slug) {
     + `<article class="fiche" data-fiche><div class="fiche-media">${gallery}</div><div class="fiche-info"><h1>${escapeHtml(fiche.name)}</h1>${choice}`
     + (fiche.onRequest ? "" : `<p class="product-price fiche-price" data-fiche-price>${current.price}</p><p class="family-price" data-fiche-family${current.familyPrice ? "" : " hidden"}>Prix Famille Dynastie : <span>${current.familyPrice || ""}</span></p>`)
     + `<p class="availability availability-${current.state}" data-fiche-availability>${current.availability}</p>${purchase}`
+    + (croquettes ? rationLinkHtml(current) : "")
     + (fiche.familyPrice !== null && !fiche.onRequest ? '<p class="fiche-family-note">Le prix Famille s’applique au panier après vérification de votre numéro de puce ou de votre code Famille.</p>' : "")
     + `<p class="fiche-ref">Référence : <span data-fiche-ref>${escapeHtml(current.reference)}</span></p></div></article>`
     + (fiche.description ? `<section class="fiche-description"><h2>Description</h2>${descriptionHtml(fiche.description)}</section>` : "")
@@ -448,6 +471,6 @@ function renderNotFound() {
 }
 
 module.exports = {
-  ARTERO_PHOTOS, AVAILABILITY_LABELS, PARCOURS, SCENE, buildFiches, descriptionHtml, escapeHtml, findFiche, ficheCard, money, rayonBySlug,
-  renderAccueil, renderFiche, renderNotFound, renderNouveautes, renderRayon, renderSurDemande, sceneHtml, variantAvailability
+  ARTERO_PHOTOS, AVAILABILITY_LABELS, PARCOURS, RATION_CALCULATOR_URL, SCENE, buildFiches, descriptionHtml, escapeHtml, findFiche, ficheCard, money,
+  rationCalculatorHref, rayonBySlug, renderAccueil, renderFiche, renderNotFound, renderNouveautes, renderRayon, renderSurDemande, sceneHtml, variantAvailability
 };
