@@ -15,7 +15,7 @@ const MAX_WEIGHT_GRAMS = 100_000;
 // Profil de recette (croquettes) publié par le Manager ; tout est facultatif et tolère un Manager antérieur.
 const LIFE_STAGES = ["puppy", "adult", "senior"];
 const TRAITS = ["active", "sterilised", "light"];
-const DOG_SIZES = ["mini", "small", "medium", "large", "giant"];
+const DOG_SIZES = ["small", "medium", "large", "giant"];
 const codeList = (value, allowed) => (Array.isArray(value) ? allowed.filter((code) => value.includes(code)) : []);
 // Phase 3 : référentiel des rayons et états de disponibilité calculés par le Manager.
 const SHELVES = new Set(["ALIMENTATION", "SELLERIE", "IDENTIFICATION", "JOUETS", "ACCESSOIRES", "HYGIENE_SOINS"]);
