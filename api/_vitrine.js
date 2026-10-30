@@ -225,6 +225,22 @@ function variantChoices(variants, current) {
   }).join("")}</div>`;
 }
 
+const YOUTUBE_HOSTS = new Set(["youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be", "www.youtube-nocookie.com"]);
+
+// Les adresses https:// de la description deviennent des liens (nouvel onglet) ; tout le reste du texte reste échappé.
+// La ponctuation finale (« . », « ) », « » »…) n'est pas incluse dans le lien ; une vidéo YouTube reçoit un libellé propre.
+function linkedText(text) {
+  return String(text).split(/(https:\/\/[^\s<>"'«»]+)/).map((part, index) => {
+    if (index % 2 === 0) return escapeHtml(part);
+    const [, address, trailing] = part.match(/^(.*?)([.,;:!?)\]]*)$/);
+    let url;
+    try { url = new URL(address); } catch { return escapeHtml(part); }
+    if (url.protocol !== "https:" || !url.hostname) return escapeHtml(part);
+    const label = YOUTUBE_HOSTS.has(url.hostname.toLowerCase()) ? "Voir la vidéo de démonstration" : address;
+    return `<a href="${escapeHtml(url.href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>${escapeHtml(trailing)}`;
+  }).join("");
+}
+
 // B6 : la description du Manager (un seul champ texte) peut contenir des paragraphes, des intertitres (ligne courte se
 // terminant par « : ») et des listes (« - » ou « • »), pour présenter caractéristiques, composition et conseils.
 function descriptionHtml(text) {
@@ -234,8 +250,8 @@ function descriptionHtml(text) {
     const out = [];
     let list = [];
     const paragraph = [];
-    const flush = () => { if (list.length) out.push(`<ul>${list.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`); list = []; };
-    const flushParagraph = () => { if (paragraph.length) out.push(`<p>${paragraph.map(escapeHtml).join("<br>")}</p>`); paragraph.length = 0; };
+    const flush = () => { if (list.length) out.push(`<ul>${list.map((item) => `<li>${linkedText(item)}</li>`).join("")}</ul>`); list = []; };
+    const flushParagraph = () => { if (paragraph.length) out.push(`<p>${paragraph.map(linkedText).join("<br>")}</p>`); paragraph.length = 0; };
     for (const line of lines) {
       const item = line.match(/^[-•*]\s+(.*)$/);
       if (item) { flushParagraph(); list.push(item[1]); continue; }

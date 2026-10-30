@@ -55,7 +55,7 @@
 .product-tile-photo img{display:block;width:100%;height:100%;aspect-ratio:1;object-fit:contain;padding:10px}
 .product-tile-placeholder{display:grid;width:100%;height:100%;min-height:0;place-items:center;padding:10px;background:linear-gradient(160deg,#fff,var(--cream));color:var(--muted);font-family:"Lora",Georgia,serif;font-size:.95rem;font-style:italic;text-align:center}
 .fiche-gallery .product-tile-placeholder.fiche-photo{aspect-ratio:auto;height:96px;padding:0;border:1px solid var(--line);border-radius:12px}
-.fiche-description h3{margin:22px 0 6px;color:var(--wine);font-size:1.05rem}.fiche-description ul{margin:6px 0 0;padding-left:20px}.fiche-description li{margin:3px 0}.fiche-description p{white-space:normal;margin:0 0 12px}
+.fiche-description h3{margin:22px 0 6px;color:var(--wine);font-size:1.05rem}.fiche-description ul{margin:6px 0 0;padding-left:20px}.fiche-description li{margin:3px 0}.fiche-description p{white-space:normal;margin:0 0 12px}.fiche-description a{color:var(--wine);font-weight:700;overflow-wrap:anywhere}
 .product-tile-body{display:flex;flex:1;flex-direction:column;gap:4px;padding:16px 18px 18px}
 .product-tile h3{margin:0 0 6px;font-size:1.12rem;line-height:1.3}
 .product-tile h3 a{color:var(--ink);text-decoration:none}
