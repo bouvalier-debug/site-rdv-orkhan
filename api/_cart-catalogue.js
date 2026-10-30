@@ -26,6 +26,7 @@ function catalogueCartProduct(product) {
     catalogue: true,
     catalogueFamily: product.family,
     purchasable: product.purchasable === true,
+    onRequest: product.onRequest === true,
     publicPriceCents: product.publicPriceCents,
     familyPriceCents: product.familyPriceCents,
     weightGrams: product.weightGrams,

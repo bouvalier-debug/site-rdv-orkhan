@@ -71,9 +71,9 @@ function publicProduct(raw) {
   // Achetable uniquement sur indication explicite du Manager, pour une famille vendable et un prix non nul.
   // Familles vendables : les mêmes que dans le Manager (CATALOG_SELLABLE_FAMILIES) ; Red Dingo reste exclu.
   const maxOrderQuantity = Number.isSafeInteger(raw.maxOrderQuantity) ? Math.min(Math.max(raw.maxOrderQuantity, 0), MAX_ORDER_QUANTITY) : 0;
-  // Phase 3 (CAT-09) : un produit « Sur demande » n'est jamais achetable, quoi qu'indique le reste de la réponse.
+  // « Sur commande » : achetable si le Manager l'a ouvert à l'achat, sans stock (le Manager transmet la quantité commandable).
   const onRequest = raw.onRequest === true;
-  const purchasable = raw.purchasable === true && !onRequest && ["COLIS", "ANIMOCO", "CROQUETTES"].includes(raw.family) && publicPriceCents > 0;
+  const purchasable = raw.purchasable === true && ["COLIS", "ANIMOCO", "CROQUETTES"].includes(raw.family) && publicPriceCents > 0;
   const shelf = SHELVES.has(raw.shelf) ? raw.shelf : null;
   const variantGroup = typeof raw.variantGroup === "string" && raw.variantGroup.length <= 80 && SLUG.test(raw.variantGroup) ? raw.variantGroup : null;
   const variantOptions = variantGroup && Array.isArray(raw.variantOptions) && raw.variantOptions.length > 0 && raw.variantOptions.length <= 3

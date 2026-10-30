@@ -158,7 +158,7 @@
 .fiche-buy .btn-primary{min-height:48px;padding:12px 28px}
 .fiche-buy .btn-primary:disabled{opacity:.5;cursor:not-allowed}
 .fiche-pickup{margin:16px 0 0;color:var(--ink);font-weight:700}
-.fiche-on-request{margin:20px 0 0;padding:16px 18px;border-left:3px solid var(--gold);background:var(--cream)}
+.fiche-on-request{margin:20px 0 0;padding:16px 18px;border-left:3px solid var(--gold);background:var(--cream)}.fiche-on-request[hidden]{display:none}.fiche-on-request p{margin:0 0 6px}.fiche-on-request p:last-child{margin:0}
 .fiche-ration{display:grid;justify-content:start;margin:20px 0 0}
 .fiche-ration .btn-voir{margin-top:0;text-align:center}
 .fiche-ration p{margin:8px 0 0;color:var(--muted);font-size:.86rem}

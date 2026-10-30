@@ -442,6 +442,7 @@
     const familyHelp = container.querySelector("[data-family-help]");
     if (familyInput) familyInput.value = familyStore.get();
     const delaysNode = container.querySelector("[data-delivery-delays]");
+    const onRequestNotice = container.querySelector("[data-on-request-notice]");
     const countryField = customerForm.querySelector('[name="country"]');
     const knownNames = new Map();
     let selectedShipping = null;
@@ -506,6 +507,7 @@
           optionsList.append(element(document, "dt", "", label), element(document, "dd", "", value));
         });
         if (optionsList.children.length) info.append(optionsList);
+        if (serverLine?.onRequest) info.append(element(document, "p", "on-request-line", "Produit sur commande"));
         if (/^red-dingo:/i.test(item.productId)) info.append(element(document, "p", "engraving-warning", "Produit personnalisé : pas de droit de rétractation. Vérifiez le texte de gravure, il sera reproduit exactement."));
         const controls = element(document, "div", "cart-line__controls");
         const quantityLabel = element(document, "label", "cart-quantity", "Quantité");
@@ -611,6 +613,8 @@
       const hasOther = items.some((item) => !/^red-dingo:/i.test(item.productId));
       if (engravingWrap) engravingWrap.hidden = !hasRedDingo;
       container.querySelectorAll("[data-red-dingo-only]").forEach((node) => { node.hidden = !hasRedDingo; });
+      // Rappel avant le paiement dès qu'une ligne est « Sur commande » (information fournie par le devis du serveur).
+      if (onRequestNotice) onRequestNotice.hidden = !quote?.lines?.some((line) => line.onRequest);
       if (delaysNode) {
         const delays = selectedShipping ? deliveryDelayLines({ hasRedDingo, hasOther, mode: selectedShipping.mode }) : [];
         delaysNode.textContent = delays.join(" ");
@@ -632,6 +636,7 @@
         statusNode.hidden = true;
         if (engravingWrap) engravingWrap.hidden = true;
         container.querySelectorAll("[data-red-dingo-only]").forEach((node) => { node.hidden = true; });
+        if (onRequestNotice) onRequestNotice.hidden = true;
         subtotalNode.textContent = money(0);
         shippingNode.textContent = "—";
         totalNode.textContent = money(0);

@@ -22,8 +22,9 @@ test("lit rayon, variante, Nouveauté, disponibilité et visibilité, avec des v
   assert.equal(product({ listed: "false" }).listed, false);
 });
 
-test("un produit Sur demande n'est jamais achetable, même si la réponse l'indique", () => {
-  assert.deepEqual([product({ onRequest: true, purchasable: true })].map((p) => [p.purchasable, p.maxOrderQuantity]), [[false, 0]]);
+test("un produit Sur commande est achetable seulement si le Manager l'a ouvert à l'achat", () => {
+  assert.deepEqual([product({ onRequest: true, purchasable: true, maxOrderQuantity: 20 }), product({ onRequest: true, purchasable: false, maxOrderQuantity: 20 })]
+    .map((p) => [p.purchasable, p.maxOrderQuantity]), [[true, 20], [false, 0]]);
 });
 
 test("la date de publication est utilisée si le Manager l'expose, jamais la date de création", () => {
@@ -60,11 +61,11 @@ test("Nouveautés : visibles, de moins de 14 jours et hors Sur demande ; un prod
   assert.deepEqual(res.body.products.map((item) => item.reference), ["jouet-corde-grand", "rupture"]);
 });
 
-test("devis : Sur demande refusé côté serveur ; chaque variante garde sa référence, son prix et son stock", async () => {
+test("devis : Sur commande fermé à l'achat refusé côté serveur ; chaque variante garde sa référence, son prix et son stock", async () => {
   const catalogue = [
     product({ reference: "croquettes-1-5kg", name: "Croquettes", family: "CROQUETTES", publicPriceCents: 1490, maxOrderQuantity: 2, variantGroup: "croquettes", variantLabel: "1,5 kg", shelf: "ALIMENTATION", subcategory: "croquettes" }),
     product({ reference: "croquettes-10kg", name: "Croquettes", family: "CROQUETTES", publicPriceCents: 6490, maxOrderQuantity: 1, variantGroup: "croquettes", variantLabel: "10 kg", shelf: "ALIMENTATION", subcategory: "croquettes" }),
-    product({ reference: "vitrine-test", purchasable: true, onRequest: true, maxOrderQuantity: 5 })
+    product({ reference: "vitrine-test", purchasable: false, onRequest: true, maxOrderQuantity: 5 })
   ];
   const quote = (items) => quoteCartRequest({ items, shipping: { mode: "pickup", pickupTiming: "appointment" } }, {
     listCatalogue: async () => ({ available: true, products: catalogue }),

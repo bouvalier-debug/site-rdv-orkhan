@@ -92,6 +92,17 @@ const AVAILABILITY_LABELS = {
 };
 const AVAILABILITY_RANK = ["in_stock", "low_stock", "out_of_stock", "soon", "on_request"];
 
+// Message commun à tous les produits « Sur commande », sur la fiche et au panier ; aucune date ni délai calculé.
+const ON_REQUEST_NOTICE = [
+  "Produit sur commande",
+  "Cet article est disponible sur commande, sous réserve de disponibilité auprès de notre fournisseur.",
+  "La date de disponibilité pour le retrait à l'élevage vous sera communiquée par SMS ou par e-mail."
+];
+
+function onRequestNoticeHtml(hidden) {
+  return `<div class="fiche-on-request" data-fiche-on-request${hidden ? " hidden" : ""}><p><strong>${ON_REQUEST_NOTICE[0]}</strong></p><p>${escapeHtml(ON_REQUEST_NOTICE[1])}</p><p>${escapeHtml(ON_REQUEST_NOTICE[2])}</p></div>`;
+}
+
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
 }
@@ -149,6 +160,8 @@ function buildFiches(products) {
       shelf: first.shelf,
       subcategory: first.subcategory,
       onRequest: variants.every((variant) => variant.onRequest),
+      // Vitrine sans paiement : Sur commande sans aucune variante ouverte à l'achat (prise de contact).
+      showcase: variants.every((variant) => variant.onRequest) && !variants.some((variant) => variant.purchasable),
       isNew: variants.some((variant) => variant.isNew && !variant.onRequest),
       publishedAt: variants.map((variant) => variant.publishedAt).filter(Boolean).sort().at(-1) || null,
       description: variants.find((variant) => variant.description)?.description || "",
@@ -279,8 +292,8 @@ function ficheCard(fiche) {
   const profileData = recipe && profileTokens(recipe).length ? ` data-profile="${profileTokens(recipe).join(" ")}"` : "";
   return `<article class="product-tile"${filterData}${profileData}><a class="product-tile-photo" href="${href}" tabindex="-1" aria-hidden="true">${photo ? photoHtml(photo, "") : `<span class="product-tile-placeholder">Photo à venir</span>`}</a>`
     + `<div class="product-tile-body"><h3><a href="${href}">${escapeHtml(fiche.name)}</a></h3>`
-    + (fiche.onRequest ? "" : `<p class="product-price">${priceText(fiche.price, fiche.priceFrom)}</p>`)
-    + (fiche.familyPrice !== null && !fiche.onRequest ? `<p class="family-price">Prix Famille Dynastie : ${priceText(fiche.familyPrice, fiche.familyPriceFrom)}</p>` : "")
+    + (fiche.showcase ? "" : `<p class="product-price">${priceText(fiche.price, fiche.priceFrom)}</p>`)
+    + (fiche.familyPrice !== null && !fiche.showcase ? `<p class="family-price">Prix Famille Dynastie : ${priceText(fiche.familyPrice, fiche.familyPriceFrom)}</p>` : "")
     + `<p class="availability availability-${fiche.state}">${AVAILABILITY_LABELS[fiche.state]}</p>`
     + `<a class="btn-voir" href="${href}">Voir le produit</a></div></article>`;
 }
@@ -400,7 +413,7 @@ function recipeEmpty(fiches) {
 function renderRayon(catalogue, slug) {
   const rayon = rayonBySlug(slug);
   if (!rayon) return null;
-  const fiches = catalogue.available ? buildFiches(catalogue.products).filter((fiche) => fiche.shelf === rayon.key && !fiche.onRequest) : [];
+  const fiches = catalogue.available ? buildFiches(catalogue.products).filter((fiche) => fiche.shelf === rayon.key && !fiche.showcase) : [];
   const parcours = PARCOURS[rayon.key] || [];
   let listing;
   if (!catalogue.available && !parcours.length) listing = '<p class="rayon-empty">Le catalogue est momentanément indisponible. Merci de réessayer dans quelques instants.</p>';
@@ -429,7 +442,7 @@ function renderSurDemande(catalogue) {
   const fiches = catalogue.available ? buildFiches(catalogue.products).filter((fiche) => fiche.onRequest) : [];
   return page({
     title: "Produits sur commande | Boutique Dynastie d'Orkhan",
-    description: "Produits sur commande de l'Élevage de la Dynastie d'Orkhan : à consulter en ligne, non achetables directement sur la boutique.",
+    description: "Produits sur commande de l'Élevage de la Dynastie d'Orkhan : commandés auprès de notre fournisseur après votre achat, retrait à l'élevage.",
     canonical: "/sur-demande/",
     hero: heroHtml("Produits sur commande", "Découvrez les produits proposés sur commande. Pour connaître les disponibilités et les modalités, contactez l’élevage.", true, 'Découvrez les produits proposés sur commande. Pour connaître les disponibilités et les modalités, <a href="https://www.dynastiedorkhan.com/contact/">contactez l’élevage</a>.'),
     body: `${rayonsNav(null)}<section class="rayon-listing">${fiches.length ? `<div class="product-grid">${fiches.map(ficheCard).join("")}</div>` : '<p class="rayon-empty">Aucun produit sur commande pour le moment.</p>'}</section>`
@@ -451,7 +464,7 @@ function renderFiche(catalogue, slug) {
     familyPrice: Number.isInteger(variant.familyPriceCents) ? money(variant.familyPriceCents) : null,
     state: variant.state,
     availability: AVAILABILITY_LABELS[variant.state],
-    maxQuantity: variant.purchasable && (variant.state === "in_stock" || variant.state === "low_stock") ? variant.maxOrderQuantity : 0,
+    maxQuantity: variant.purchasable && ["in_stock", "low_stock", "on_request"].includes(variant.state) ? variant.maxOrderQuantity : 0,
     variantOptions: variant.variantOptions,
     photos: variant.photos.length ? variant.photos : fiche.photos,
     // Énergie du format affiché, jamais déduite d'un autre format ni du poids du sac.
@@ -463,21 +476,23 @@ function renderFiche(catalogue, slug) {
     ? `<div class="fiche-gallery">${photoHtml(photos[0], "fiche-photo", "eager").replace("<img", '<img data-fiche-photo')}<div class="fiche-thumbs" data-fiche-thumbs${photos.length > 1 ? "" : " hidden"}>${photos.map((photo, index) => `<button type="button" data-photo-index="${index}"${index === 0 ? ' aria-current="true"' : ""}>${photoHtml(photo, "")}</button>`).join("")}</div></div>`
     : `<div class="fiche-gallery"><span class="product-tile-placeholder fiche-photo">Photo à venir</span></div>`;
   const choice = variantChoices(variants, current);
-  const purchase = fiche.onRequest
+  const purchase = fiche.showcase
     ? '<p class="fiche-on-request">Produit sur commande, non achetable directement en ligne. <a href="https://www.dynastiedorkhan.com/contact/">Contactez-nous</a> pour en parler.</p>'
-    : `<div class="fiche-buy"><label>Quantité<input type="number" data-fiche-quantity min="1" max="${Math.max(current.maxQuantity, 1)}" value="1"${current.maxQuantity ? "" : " disabled"}></label><button type="button" class="btn-primary" data-fiche-add${current.maxQuantity ? "" : " disabled"}>Ajouter au panier</button></div><p class="fiche-pickup">Retrait gratuit à l’élevage, sur rendez-vous.</p>`;
+    : `<div class="fiche-buy"><label>Quantité<input type="number" data-fiche-quantity min="1" max="${Math.max(current.maxQuantity, 1)}" value="1"${current.maxQuantity ? "" : " disabled"}></label><button type="button" class="btn-primary" data-fiche-add${current.maxQuantity ? "" : " disabled"}>Ajouter au panier</button></div>`
+      + (fiche.variants.some((variant) => variant.onRequest) ? onRequestNoticeHtml(current.state !== "on_request") : "")
+      + '<p class="fiche-pickup">Retrait gratuit à l’élevage, sur rendez-vous.</p>';
   const jsonLd = {
     "@context": "https://schema.org", "@type": "Product", name: fiche.name, sku: current.reference,
     ...(fiche.description ? { description: fiche.description.slice(0, 500) } : {}),
     ...(photos.length ? { image: photos.map((photo) => `${ORIGIN}${photo.url}`) } : {}),
-    ...(fiche.onRequest ? {} : { offers: { "@type": "AggregateOffer", priceCurrency: "EUR", lowPrice: (fiche.price / 100).toFixed(2), highPrice: (Math.max(...fiche.variants.map((variant) => variant.publicPriceCents)) / 100).toFixed(2), offerCount: fiche.variants.length } })
+    ...(fiche.showcase ? {} : { offers: { "@type": "AggregateOffer", priceCurrency: "EUR", lowPrice: (fiche.price / 100).toFixed(2), highPrice: (Math.max(...fiche.variants.map((variant) => variant.publicPriceCents)) / 100).toFixed(2), offerCount: fiche.variants.length } })
   };
   const body = `<nav class="breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a>${rayon ? ` › <a href="/rayons/${rayon.slug}/">${rayon.label}</a>` : fiche.onRequest ? ' › <a href="/sur-demande/">Produits sur commande</a>' : ""} › <span>${escapeHtml(fiche.name)}</span></nav>`
     + `<article class="fiche" data-fiche><div class="fiche-media">${gallery}</div><div class="fiche-info"><h1>${escapeHtml(fiche.name)}</h1>${choice}`
-    + (fiche.onRequest ? "" : `<p class="product-price fiche-price" data-fiche-price>${current.price}</p><p class="family-price" data-fiche-family${current.familyPrice ? "" : " hidden"}>Prix Famille Dynastie : <span>${current.familyPrice || ""}</span></p>`)
+    + (fiche.showcase ? "" : `<p class="product-price fiche-price" data-fiche-price>${current.price}</p><p class="family-price" data-fiche-family${current.familyPrice ? "" : " hidden"}>Prix Famille Dynastie : <span>${current.familyPrice || ""}</span></p>`)
     + `<p class="availability availability-${current.state}" data-fiche-availability>${current.availability}</p>${purchase}`
     + (croquettes ? rationLinkHtml(current) : "")
-    + (fiche.familyPrice !== null && !fiche.onRequest ? '<p class="fiche-family-note">Le prix Famille s’applique au panier après vérification de votre numéro de puce ou de votre code Famille.</p>' : "")
+    + (fiche.familyPrice !== null && !fiche.showcase ? '<p class="fiche-family-note">Le prix Famille s’applique au panier après vérification de votre numéro de puce ou de votre code Famille.</p>' : "")
     + `<p class="fiche-ref">Référence : <span data-fiche-ref>${escapeHtml(current.reference)}</span></p></div></article>`
     + (fiche.description ? `<section class="fiche-description"><h2>Description</h2>${descriptionHtml(fiche.description)}</section>` : "")
     + `<script type="application/json" id="fiche-variants">${JSON.stringify(variants).replace(/</g, "\\u003c")}</script>`
@@ -501,6 +516,6 @@ function renderNotFound() {
 }
 
 module.exports = {
-  ARTERO_PHOTOS, AVAILABILITY_LABELS, BUDGET_PATH, PARCOURS, RATION_CALCULATOR_URL, SCENE, budgetHref, buildFiches, descriptionHtml, escapeHtml, findFiche, ficheCard, heroHtml, money,
+  ARTERO_PHOTOS, AVAILABILITY_LABELS, BUDGET_PATH, ON_REQUEST_NOTICE, PARCOURS, RATION_CALCULATOR_URL, SCENE, budgetHref, buildFiches, descriptionHtml, escapeHtml, findFiche, ficheCard, heroHtml, money,
   page, rationCalculatorHref, rayonBySlug, renderAccueil, renderFiche, renderNotFound, renderNouveautes, renderRayon, renderSurDemande, sceneHtml, variantAvailability
 };

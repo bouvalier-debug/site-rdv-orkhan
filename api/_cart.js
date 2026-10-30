@@ -101,6 +101,8 @@ function validateCart(input, options = {}) {
       unitPriceCents,
       subtotalCents: unitPriceCents * item.quantity,
       weightGrams: product.weightGrams,
+      // Affichage seulement (rappel « Produit sur commande » au panier) : non transmis au Manager.
+      ...(product.catalogue && product.onRequest ? { onRequest: true } : {}),
       ...(validatedOptions ? { options: validatedOptions } : {})
     });
   }

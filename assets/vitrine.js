@@ -19,6 +19,7 @@
   const rationLink = fiche.querySelector("[data-fiche-ration]");
   const rationManual = fiche.querySelector("[data-fiche-ration-manual]");
   const budgetLink = fiche.querySelector("[data-fiche-budget]");
+  const onRequestNotice = fiche.querySelector("[data-fiche-on-request]");
   let current = byReference.get(referenceNode?.textContent) || variants[0];
 
   function showPhoto(photo) {
@@ -74,6 +75,7 @@
       quantityInput.disabled = !variant.maxQuantity;
     }
     if (addButton) addButton.disabled = !variant.maxQuantity;
+    if (onRequestNotice) onRequestNotice.hidden = variant.state !== "on_request";
     if (rationLink && variant.rationHref) rationLink.href = variant.rationHref;
     if (rationManual) rationManual.hidden = Boolean(variant.rationEnergy);
     if (budgetLink && variant.budgetHref) budgetLink.href = variant.budgetHref;
