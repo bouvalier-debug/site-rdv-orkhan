@@ -64,7 +64,8 @@ function renderBudget(catalogue) {
       + `<label>Recette<select name="recette">${recipeOptions(recipes)}</select></label>`
       + `<label>Format du sac<select name="format">${first.formats.map((format) => `<option value="${escapeHtml(format.reference)}">${escapeHtml(format.label)} — ${money(format.publicPriceCents)}</option>`).join("")}</select></label>`
       + `<label>Ration quotidienne (g/jour)<input name="ration" inputmode="decimal" autocomplete="off" placeholder="150"></label>`
-      + `<p class="budget-hint">Vous ne la connaissez pas ? <a data-budget-out="ration-link" href="${escapeHtml(first.formats[0].rationHref)}">Calculer la ration de mon chien</a></p>`
+      + `<p class="budget-hint">Vous ne la connaissez pas ?</p>`
+      + `<a class="btn-voir" data-budget-out="ration-link" href="${escapeHtml(first.formats[0].rationHref)}">Calculer la ration de mon chien</a>`
       + `<p class="availability" data-budget-out="availability"></p>`
       + `<p class="budget-message" data-budget-message role="status" aria-live="polite">Indiquez la ration quotidienne de votre chien pour obtenir son budget.</p>`
       + `<div class="budget-results" data-budget-results hidden aria-live="polite">`
