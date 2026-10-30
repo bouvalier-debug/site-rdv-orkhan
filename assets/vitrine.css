@@ -159,10 +159,10 @@
 .fiche-buy .btn-primary:disabled{opacity:.5;cursor:not-allowed}
 .fiche-pickup{margin:16px 0 0;color:var(--ink);font-weight:700}
 .fiche-on-request{margin:20px 0 0;padding:16px 18px;border-left:3px solid var(--gold);background:var(--cream)}
-.fiche-ration{margin:20px 0 0}
+.fiche-ration{display:grid;justify-content:start;margin:20px 0 0}
 .fiche-ration .btn-voir{margin-top:0;text-align:center}
 .fiche-ration p{margin:8px 0 0;color:var(--muted);font-size:.86rem}
-.fiche-budget-link{display:inline-block;margin-top:10px;color:var(--wine);font-weight:700}
+.fiche-ration .fiche-budget-link{margin-top:10px}
 
 .budget{max-width:760px;margin:36px auto 0}
 .budget-form{display:grid;gap:14px}

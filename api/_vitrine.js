@@ -39,7 +39,7 @@ function budgetHref(reference) {
 function rationLinkHtml(variant) {
   return `<div class="fiche-ration"><a class="btn-voir" href="${escapeHtml(variant.rationHref)}" data-fiche-ration>Calculer la ration avec ces croquettes</a>`
     + `<p data-fiche-ration-manual${variant.rationEnergy ? " hidden" : ""}>L’énergie de cette recette n’est pas encore renseignée : saisissez la valeur indiquée sur l’emballage (kcal/kg ou kcal/100 g).</p>`
-    + `<a class="fiche-budget-link" href="${escapeHtml(variant.budgetHref)}" data-fiche-budget>Calculer mon budget croquettes</a></div>`;
+    + `<a class="btn-voir fiche-budget-link" href="${escapeHtml(variant.budgetHref)}" data-fiche-budget>Calculer mon budget croquettes</a></div>`;
 }
 
 // Scène interactive de l'accueil (VIS-02), image validée par le porteur le 21/10/2026 et conservée telle quelle

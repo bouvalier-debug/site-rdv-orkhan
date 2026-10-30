@@ -123,7 +123,7 @@ test("page Mon budget croquettes : rendu serveur, aucun prix lu dans l'adresse",
 
 test("fiche croquettes : lien budget prérempli avec le format affiché, mis à jour au changement de format", () => {
   const html = renderFiche(catalogue, "wc-10");
-  assert.match(html, /<a class="fiche-budget-link" href="\/budget-croquettes\/\?format=wc-10" data-fiche-budget>Calculer mon budget croquettes<\/a>/);
+  assert.match(html, /<a class="btn-voir fiche-budget-link" href="\/budget-croquettes\/\?format=wc-10" data-fiche-budget>Calculer mon budget croquettes<\/a>/);
   const variants = JSON.parse(html.match(/<script type="application\/json" id="fiche-variants">(.*?)<\/script>/s)[1]);
   assert.deepEqual(variants.map((variant) => variant.budgetHref), ["/budget-croquettes/?format=wc-1-5", "/budget-croquettes/?format=wc-10"]);
   // Produit en rupture : budget consultable, commande toujours impossible.
