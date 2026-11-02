@@ -1,7 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { publicProduct } = require("../api/_orkhan-catalog");
-const { buildFiches, renderRayon } = require("../api/_vitrine");
+const { buildFiches, renderAlimentation, renderRayon } = require("../api/_vitrine");
 const { matches } = require("../assets/recipe-filters.js");
 
 const base = { family: "CROQUETTES", shelf: "ALIMENTATION", subcategory: "croquettes", publicPriceCents: 4990, familyPriceCents: 4490,
@@ -33,8 +33,8 @@ test("une fiche regroupe ses formats et garde un seul profil", () => {
   assert.equal(fiches.find((fiche) => fiche.slug === "wl-vide").recipe.brand, null);
 });
 
-test("le rayon rend les filtres Marque et Profil et marque chaque carte", () => {
-  const html = renderRayon({ available: true, products }, "alimentation");
+test("la rubrique Croquettes rend les filtres Marque et Profil et marque chaque carte", () => {
+  const html = renderAlimentation({ available: true, products }, "croquettes");
   assert.match(html, /data-recipe-filters/);
   assert.match(html, /<option value="Opti Life">/);
   assert.match(html, /<option value="Primordial">/);
@@ -42,19 +42,19 @@ test("le rayon rend les filtres Marque et Profil et marque chaque carte", () => 
   assert.match(html, /data-brand="Primordial" data-profile="adult senior diet"/);
   assert.match(html, /\/assets\/recipe-filters\.js/);
   // La fiche non renseignée n'a aucune donnée de filtre mais reste présente.
-  assert.match(html, /<article class="product-tile"><a[^>]*>.*?Wellness non classée/s);
+  assert.match(html, /<article class="product-tile" data-order="[0-9]+" data-name="Wellness non classée"[^>]*><a[^>]*>.*?Wellness non classée/s);
 });
 
 test("aucun filtre n'apparaît sans profil renseigné, ni hors des croquettes", () => {
   const plain = [item({ reference: "wl", name: "Wellness", variantGroup: "wl", variantLabel: "12 kg" })];
-  const html = renderRayon({ available: true, products: plain }, "alimentation");
+  const html = renderAlimentation({ available: true, products: plain }, "croquettes");
   assert.doesNotMatch(html, /data-recipe-filters/);
   assert.doesNotMatch(html, /recipe-filters\.js/);
   assert.doesNotMatch(renderRayon({ available: true, products }, "jouets"), /data-recipe-filters/);
 });
 
 test("un nom de marque est échappé dans la page", () => {
-  const html = renderRayon({ available: true, products: [item({ reference: "z", name: "Z", variantGroup: "z", variantLabel: "1", brand: 'A"><script>1</script>', lifeStages: ["adult"] })] }, "alimentation");
+  const html = renderAlimentation({ available: true, products: [item({ reference: "z", name: "Z", variantGroup: "z", variantLabel: "1", brand: 'A"><script>1</script>', lifeStages: ["adult"] })] }, "croquettes");
   assert.doesNotMatch(html, /<script>1<\/script>/);
 });
 

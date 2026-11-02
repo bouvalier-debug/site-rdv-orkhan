@@ -124,6 +124,28 @@ function publicProduct(raw) {
   };
 }
 
+// Cartes « marque » du rayon Alimentation (Manager) : liste blanche, visuel servi par la route photo de la Boutique.
+function publicBrandCard(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const slug = typeof raw.slug === "string" && raw.slug.length <= 80 && SLUG.test(raw.slug) ? raw.slug : null;
+  const name = text(raw.name, 60);
+  const brand = text(raw.brand, 60);
+  if (!slug || !name || !brand) return null;
+  const match = typeof raw.photo?.url === "string" ? raw.photo.url.match(MANAGER_PHOTO_PATH) : null;
+  return {
+    slug, name, brand,
+    croquettes: raw.croquettes === true,
+    friandises: raw.friandises === true,
+    displayOrder: Number.isSafeInteger(raw.displayOrder) ? raw.displayOrder : 0,
+    photo: match ? {
+      url: `/api/catalogue-photo?id=${match[1].toLowerCase()}`,
+      width: Number.isSafeInteger(raw.photo.width) ? raw.photo.width : null,
+      height: Number.isSafeInteger(raw.photo.height) ? raw.photo.height : null,
+      altText: text(raw.photo.altText, 300) || name
+    } : null
+  };
+}
+
 // Nouveautés (CAT-08, CAT-10) : produits visibles, publiés depuis moins de 14 jours, hors « Sur demande ».
 function isNouveaute(product) {
   return product.listed && product.isNew && !product.onRequest;
@@ -140,10 +162,12 @@ async function listCatalogue(options = {}) {
     if (!response.ok) throw Object.assign(new Error("orkhan_catalog_error"), { status: response.status });
     const body = await response.json();
     const products = (Array.isArray(body?.products) ? body.products : []).map(publicProduct).filter(Boolean);
-    return { available: true, products };
+    // brandCards : null si le Manager ne les transmet pas (antérieur ou table absente) ; la Boutique déduit alors les cartes des marques.
+    const brandCards = Array.isArray(body?.brandCards) ? body.brandCards.map(publicBrandCard).filter(Boolean) : null;
+    return { available: true, products, brandCards };
   } catch (error) {
     logFailure("liste", error);
-    return { available: false, products: [] };
+    return { available: false, products: [], brandCards: null };
   }
 }
 
@@ -162,4 +186,4 @@ async function fetchCataloguePhoto(id, options = {}) {
   }
 }
 
-module.exports = { fetchCataloguePhoto, isNouveaute, listCatalogue, publicProduct };
+module.exports = { fetchCataloguePhoto, isNouveaute, listCatalogue, publicBrandCard, publicProduct };
