@@ -85,9 +85,11 @@ test("sac en cours : achat à anticiper dès aujourd'hui, sac couvrant 30 jours,
   assert.equal(budget.remainingPlan({ rationGrams: 150, remainingGrams: 1500, leadDays: 2.5, today }).status, "invalid-delay");
 });
 
-test("données de la page : croquettes uniquement, prix et poids du catalogue, rupture consultable", () => {
+test("données de la page : croquettes uniquement (Sur commande et rupture comprises), prix et poids du catalogue", () => {
   const recipes = budgetRecipes(catalogue);
-  assert.deepEqual(recipes.map((recipe) => recipe.slug), ["pr-12", "wc"]);
+  assert.deepEqual(recipes.map((recipe) => recipe.slug), ["pr-12", "sur-commande", "wc"]);
+  const surCommande = recipes.find((recipe) => recipe.slug === "sur-commande");
+  assert.deepEqual(surCommande.formats.map((format) => [format.reference, format.availability, format.publicPriceCents, format.orderable]), [["sur-commande", "Sur commande", 7000, true]]);
   const wellness = recipes.find((recipe) => recipe.slug === "wc");
   assert.deepEqual(wellness.formats.map((format) => [format.reference, format.label, format.weightGrams, format.publicPriceCents, format.familyPriceCents, format.orderable]), [
     ["wc-1-5", "1,5 kg", 1500, 1490, 1290, true],

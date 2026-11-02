@@ -11,20 +11,21 @@ function formatLabel(variant) {
   return "Format unique";
 }
 
-// Commande possible dans les mêmes conditions que sur la fiche produit ; un format en rupture reste consultable.
+// Commande possible dans les mêmes conditions que sur la fiche produit (en stock, stock faible ou « Sur commande » ouvert
+// à l'achat) ; un format en rupture ou fermé à l'achat reste consultable pour la simulation, jamais commandable ici.
 function orderable(variant) {
-  return variant.purchasable && (variant.state === "in_stock" || variant.state === "low_stock") && variant.maxOrderQuantity > 0;
+  return variant.purchasable && ["in_stock", "low_stock", "on_request"].includes(variant.state) && variant.maxOrderQuantity > 0;
 }
 
 function budgetRecipes(catalogue) {
   if (!catalogue.available) return [];
   return buildFiches(catalogue.products)
-    .filter((fiche) => fiche.subcategory === "croquettes" && !fiche.onRequest)
+    .filter((fiche) => fiche.subcategory === "croquettes")
     .map((fiche) => ({
       slug: fiche.slug,
       name: fiche.name,
       brand: fiche.recipe.brand,
-      formats: fiche.variants.filter((variant) => !variant.onRequest).map((variant) => ({
+      formats: fiche.variants.map((variant) => ({
         reference: variant.reference,
         label: formatLabel(variant),
         weightGrams: Number.isInteger(variant.weightGrams) ? variant.weightGrams : null,
