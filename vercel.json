@@ -158,6 +158,22 @@
       "destination": "/api/vitrine?vue=budget"
     },
     {
+      "source": "/rayons/alimentation/:rubrique",
+      "destination": "/api/vitrine?vue=alimentation&rubrique=:rubrique"
+    },
+    {
+      "source": "/rayons/alimentation/:rubrique/",
+      "destination": "/api/vitrine?vue=alimentation&rubrique=:rubrique"
+    },
+    {
+      "source": "/rayons/alimentation/:rubrique/:marque",
+      "destination": "/api/vitrine?vue=alimentation&rubrique=:rubrique&marque=:marque"
+    },
+    {
+      "source": "/rayons/alimentation/:rubrique/:marque/",
+      "destination": "/api/vitrine?vue=alimentation&rubrique=:rubrique&marque=:marque"
+    },
+    {
       "source": "/rayons/:rayon",
       "destination": "/api/vitrine?vue=rayon&rayon=:rayon"
     },

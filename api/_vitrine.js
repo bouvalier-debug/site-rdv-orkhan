@@ -5,6 +5,7 @@
 // ajoutée ici : le panier, le devis et la commande recontrôlent prix, stock et disponibilité côté serveur.
 const { CATALOG_CONFIG, RED_DINGO_PRICE_CENTS } = require("./_catalog");
 const { BACK_TO_TOP, FACEBOOK_FAB, RAYONS, SHOP_FOOTER, SHOP_HEADER } = require("../scripts/shop-layout");
+const { RUBRIQUES, cardsFor, fichesForCard, fichesOf, rubriqueByKey } = require("./_alimentation");
 
 const ORIGIN = "https://boutique.dynastiedorkhan.com";
 const FICHE_SLUG = /^[a-z0-9]+([-:][a-z0-9]+)*$/;
@@ -192,9 +193,9 @@ function recipeOf(variants) {
   return { brand: source.brand || null, lifeStages: source.lifeStages || [], traits: source.traits || [], dogSize: source.dogSize || null, energyKcalPerKg: source.energyKcalPerKg || null };
 }
 
-function recipeFilters(fiches) {
+function recipeFilters(fiches, { showBrand = true } = {}) {
   if (!fiches.length || !fiches.every((fiche) => fiche.subcategory === "croquettes")) return "";
-  const brands = [...new Set(fiches.map((fiche) => fiche.recipe.brand).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr"));
+  const brands = showBrand ? [...new Set(fiches.map((fiche) => fiche.recipe.brand).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr")) : [];
   const present = new Set(fiches.flatMap((fiche) => profileTokens(fiche.recipe)));
   const chips = PROFILE_CHIPS.filter(([token]) => present.has(token));
   if (!brands.length && !chips.length) return "";
@@ -285,12 +286,18 @@ function photoHtml(photo, className, loading = "lazy") {
 // C1 à C4 : carte compacte, sans description ni achat ; photo, nom, prix (ou « À partir de »), prix Famille,
 // disponibilité et seul bouton « Voir le produit ».
 function ficheCard(fiche) {
+  return ficheTile(fiche, null);
+}
+
+// Rayon Alimentation : la carte porte de quoi trier côté navigateur (prix public, prix Famille, publication, nom, rang par défaut).
+function ficheTile(fiche, order) {
   const href = `/produits/${encodeURIComponent(fiche.slug)}/`;
   const photo = fiche.photos[0];
   const recipe = fiche.recipe;
   const filterData = recipe && recipe.brand ? ` data-brand="${escapeHtml(recipe.brand)}"` : "";
   const profileData = recipe && profileTokens(recipe).length ? ` data-profile="${profileTokens(recipe).join(" ")}"` : "";
-  return `<article class="product-tile"${filterData}${profileData}><a class="product-tile-photo" href="${href}" tabindex="-1" aria-hidden="true">${photo ? photoHtml(photo, "") : `<span class="product-tile-placeholder">Photo à venir</span>`}</a>`
+  const sortData = order === null ? "" : ` data-order="${order}" data-name="${escapeHtml(fiche.name)}" data-price="${fiche.price}"${fiche.familyPrice !== null ? ` data-family-price="${fiche.familyPrice}"` : ""}${fiche.publishedAt ? ` data-published="${escapeHtml(fiche.publishedAt)}"` : ""}`;
+  return `<article class="product-tile"${filterData}${profileData}${sortData}><a class="product-tile-photo" href="${href}" tabindex="-1" aria-hidden="true">${photo ? photoHtml(photo, "") : `<span class="product-tile-placeholder">Photo à venir</span>`}</a>`
     + `<div class="product-tile-body"><h3><a href="${href}">${escapeHtml(fiche.name)}</a></h3>`
     + (fiche.showcase ? "" : `<p class="product-price">${priceText(fiche.price, fiche.priceFrom)}</p>`)
     + (fiche.familyPrice !== null && !fiche.showcase ? `<p class="family-price">Prix Famille Dynastie : ${priceText(fiche.familyPrice, fiche.familyPriceFrom)}</p>` : "")
@@ -406,13 +413,87 @@ function renderNouveautes(catalogue, requestedPage = 1) {
   });
 }
 
-function recipeEmpty(fiches) {
-  return recipeFilters(fiches) ? '<p class="rayon-empty" data-recipe-empty hidden>Aucune recette ne correspond à ces filtres. Réinitialisez-les pour revoir toutes les croquettes.</p>' : "";
+function recipeEmpty(fiches, options) {
+  return recipeFilters(fiches, options) ? '<p class="rayon-empty" data-recipe-empty hidden>Aucune recette ne correspond à ces filtres. Réinitialisez-les pour revoir toutes les croquettes.</p>' : "";
+}
+
+// Menu « Trier par » (assets/product-sort.js) : révélé par JavaScript, l'ordre par défaut est celui du Manager.
+const SORT_CHOICES = [["defaut", "Par défaut"], ["prix-asc", "Prix : du moins cher au plus cher"], ["prix-desc", "Prix : du plus cher au moins cher"], ["recents", "Plus récents"], ["nom-asc", "Nom : A à Z"], ["nom-desc", "Nom : Z à A"]];
+
+function sortBar(fiches) {
+  if (fiches.length < 2) return "";
+  return `<div class="sort-bar" data-sort-bar hidden><label><span>Trier par</span><select name="tri">${SORT_CHOICES.map(([value, label]) => `<option value="${value}">${label}</option>`).join("")}</select></label><p class="sort-note" data-sort-note role="status" aria-live="polite"></p></div>`;
+}
+
+const ALIMENTATION_PATH = "/rayons/alimentation/";
+
+function brandCardHtml(rubrique, card) {
+  const photo = card.photo ? photoHtml(card.photo, "") : `<span class="product-tile-placeholder">Photo à venir</span>`;
+  return `<a class="brand-card" href="${ALIMENTATION_PATH}${rubrique.key}/${card.slug}/"><span class="brand-card-photo">${photo}</span><span class="brand-card-name">${escapeHtml(card.name)}</span><span class="brand-card-count">${card.count} produit${card.count > 1 ? "s" : ""}</span></a>`;
+}
+
+// Page du rayon Alimentation : deux entrées, Croquettes et Friandises, chacune avec ses cartes par marque et un accès à
+// tous les produits de la rubrique. Les autres sous-catégories (pâtées, compléments…) restent listées en dessous.
+function renderAlimentationRayon(catalogue, rayon) {
+  const fiches = catalogue.available ? buildFiches(catalogue.products).filter((fiche) => fiche.shelf === rayon.key && !fiche.showcase) : [];
+  const blocks = Object.values(RUBRIQUES).map((rubrique) => {
+    const items = fichesOf(fiches, rubrique);
+    if (!items.length) return "";
+    const cards = cardsFor(rubrique, fiches, catalogue.brandCards);
+    return `<section class="rubrique-block" aria-labelledby="rubrique-${rubrique.key}"><div class="rubrique-heading"><h2 class="subcategory-title" id="rubrique-${rubrique.key}">${rubrique.label}</h2><a class="rubrique-all" href="${ALIMENTATION_PATH}${rubrique.key}/">${rubrique.all} (${items.length})</a></div>`
+      + (cards.length ? `<div class="brand-grid">${cards.map((card) => brandCardHtml(rubrique, card)).join("")}</div>` : "") + "</section>";
+  }).join("");
+  const others = fiches.filter((fiche) => !RUBRIQUES[fiche.subcategory]);
+  let listing = blocks + (others.length ? `<h2 class="subcategory-title">Autres articles</h2><div class="product-grid">${others.map(ficheCard).join("")}</div>` : "");
+  if (!catalogue.available) listing = '<p class="rayon-empty">Le catalogue est momentanément indisponible. Merci de réessayer dans quelques instants.</p>';
+  else if (!listing) listing = emptyRayon();
+  return page({
+    title: `${rayon.label} | Boutique Dynastie d'Orkhan`,
+    description: "Rayon Alimentation de la boutique de l'Élevage de la Dynastie d'Orkhan : croquettes et friandises, à parcourir par marque.",
+    canonical: ALIMENTATION_PATH,
+    hero: heroHtml(rayon.label, "Croquettes · Friandises", true),
+    body: `${rayonsNav(rayon.key)}<section class="rayon-listing" aria-label="Articles du rayon ${escapeHtml(rayon.label)}">${listing}</section>`
+  });
+}
+
+// /rayons/alimentation/<rubrique>/ (toute la rubrique) et /rayons/alimentation/<rubrique>/<marque>/ (une marque).
+function renderAlimentation(catalogue, rubriqueKey, brandSlug) {
+  const rubrique = rubriqueByKey(rubriqueKey);
+  const rayon = rayonBySlug("alimentation");
+  if (!rubrique || !rayon) return null;
+  const fiches = catalogue.available ? buildFiches(catalogue.products).filter((fiche) => fiche.shelf === rayon.key && !fiche.showcase) : [];
+  let items = fichesOf(fiches, rubrique);
+  let card = null;
+  if (brandSlug) {
+    card = cardsFor(rubrique, fiches, catalogue.brandCards).find((candidate) => candidate.slug === brandSlug);
+    if (!card) return null;
+    items = fichesForCard(rubrique, fiches, card);
+  }
+  const base = `${ALIMENTATION_PATH}${rubrique.key}/`;
+  const title = card ? `${rubrique.label} ${card.name}` : rubrique.all;
+  const crumbs = `<nav class="breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a> › <a href="${ALIMENTATION_PATH}">${rayon.label}</a> › ${card ? `<a href="${base}">${rubrique.label}</a> › <span>${escapeHtml(card.name)}</span>` : `<span>${rubrique.label}</span>`}</nav>`;
+  let listing;
+  if (!catalogue.available) listing = '<p class="rayon-empty">Le catalogue est momentanément indisponible. Merci de réessayer dans quelques instants.</p>';
+  else if (!items.length) listing = emptyRayon();
+  else {
+    const filters = rubrique.key === "croquettes" ? recipeFilters(items, { showBrand: !card }) : "";
+    listing = `${filters}${sortBar(items)}<div class="product-grid">${items.map((fiche, index) => ficheTile(fiche, index)).join("")}</div>${filters ? recipeEmpty(items, { showBrand: !card }) : ""}`;
+  }
+  const scripts = (listing.includes("data-recipe-filters") ? '<script src="/assets/recipe-filters.js" defer></script>' : "") + (listing.includes("data-sort-bar") ? '<script src="/assets/product-sort.js" defer></script>' : "");
+  return page({
+    title: `${title} | Boutique Dynastie d'Orkhan`,
+    description: card ? `${rubrique.label} ${card.name} : tous les produits de la marque à la boutique de l'Élevage de la Dynastie d'Orkhan.` : `${rubrique.all} de la boutique de l'Élevage de la Dynastie d'Orkhan, toutes marques.`,
+    canonical: card ? `${base}${card.slug}/` : base,
+    hero: heroHtml(title, card ? `Tous les produits ${card.name} en ${rubrique.label.toLocaleLowerCase("fr")}` : "Toutes les marques", true),
+    body: `${rayonsNav(rayon.key)}${crumbs}<section class="rayon-listing" aria-label="${escapeHtml(title)}">${listing}</section>`,
+    scripts
+  });
 }
 
 function renderRayon(catalogue, slug) {
   const rayon = rayonBySlug(slug);
   if (!rayon) return null;
+  if (rayon.key === "ALIMENTATION") return renderAlimentationRayon(catalogue, rayon);
   const fiches = catalogue.available ? buildFiches(catalogue.products).filter((fiche) => fiche.shelf === rayon.key && !fiche.showcase) : [];
   const parcours = PARCOURS[rayon.key] || [];
   let listing;
@@ -517,5 +598,5 @@ function renderNotFound() {
 
 module.exports = {
   ARTERO_PHOTOS, AVAILABILITY_LABELS, BUDGET_PATH, ON_REQUEST_NOTICE, PARCOURS, RATION_CALCULATOR_URL, SCENE, budgetHref, buildFiches, descriptionHtml, escapeHtml, findFiche, ficheCard, heroHtml, money,
-  page, rationCalculatorHref, rayonBySlug, renderAccueil, renderFiche, renderNotFound, renderNouveautes, renderRayon, renderSurDemande, sceneHtml, variantAvailability
+  page, rationCalculatorHref, rayonBySlug, renderAccueil, renderAlimentation, renderFiche, renderNotFound, renderNouveautes, renderRayon, renderSurDemande, sceneHtml, variantAvailability
 };

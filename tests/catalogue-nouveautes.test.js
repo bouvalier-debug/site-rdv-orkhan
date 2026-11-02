@@ -104,7 +104,7 @@ test("bascule sur un état indisponible sûr si le Manager est absent, lent, en 
       managerFetch(MANAGER_BODY, { status: 503 }).fetchImpl,
       managerFetch(MANAGER_BODY, { throws: Object.assign(new Error(`timeout ${SECRET}`), { name: "AbortError" }) }).fetchImpl
     ];
-    for (const fetchImpl of cases) assert.deepEqual(await listCatalogue({ ...MANAGER, fetch: fetchImpl }), { available: false, products: [] });
+    for (const fetchImpl of cases) assert.deepEqual(await listCatalogue({ ...MANAGER, fetch: fetchImpl }), { available: false, products: [], brandCards: null });
     await withEnv({ ORKHAN_MANAGER_URL: undefined, ORKHAN_SHOP_ORDERS_SECRET: undefined }, async () => {
       assert.equal((await listCatalogue()).available, false);
     });
