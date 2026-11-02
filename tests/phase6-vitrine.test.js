@@ -201,7 +201,7 @@ test("scène validée : image recompressée en deux tailles, six zones sans chev
   const html = vitrine.sceneHtml(scene);
   assert.ok(html.includes('srcset="/assets/accueil/scene-boutique-800.webp 800w, /assets/accueil/scene-boutique-1586.webp 1586w"'));
   assert.match(html, /width="1586" height="992"/);
-  assert.match(html, /aria-label="Rayon Identification : la médaille"/);
+  assert.match(html, /aria-label="Rayon Médailles : la médaille"/);
 });
 
 test("sitemap Boutique : pages fixes puis fiches produit du catalogue, pages fixes seules si le catalogue est indisponible", async () => {

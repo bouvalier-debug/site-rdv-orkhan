@@ -47,7 +47,7 @@ test("lots B1 B2 : menu Boutique « Accueil | Rayons | Panier » sans Contact, l
   assert.deepEqual([...labels.matchAll(/<(?:a [^>]*|summary)>([^<]+)/g)].map((match) => match[1].trim()).filter((label) => ["Accueil", "Rayons", "Panier", "Contact"].includes(label)), ["Accueil", "Rayons", "Panier"]);
   assert.ok(SHOP_HEADER.startsWith('<a class="shop-return-link" href="https://www.dynastiedorkhan.com/">← Retour au site de l’élevage</a><header class="shop-header">'));
   assert.match(css, /\.shop-return-link\{[^}]*min-height:44px/);
-  assert.deepEqual(RAYONS.map((rayon) => rayon.label), ["Alimentation", "Sellerie", "Identification", "Jouets", "Accessoires", "Hygiène et soins"]);
+  assert.deepEqual(RAYONS.map((rayon) => rayon.label), ["Alimentation", "Sellerie", "Médailles", "Jouets", "Accessoires", "Hygiène et soins"]);
   for (const rayon of RAYONS) assert.ok(SHOP_HEADER.includes(`<a href="/rayons/${rayon.slug}/">${rayon.label}</a>`), rayon.label);
   assert.doesNotMatch(SHOP_HEADER, /demande-de-rdv|Rendez-vous|nouveautes/);
   assert.match(SHOP_HEADER, /<details class="shop-rayons"><summary>Rayons<\/summary>/, "ouverture au clic, au clavier et au toucher");

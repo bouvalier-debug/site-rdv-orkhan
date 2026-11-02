@@ -17,7 +17,7 @@ const BACK_TO_TOP = '<button id="to-top" type="button" aria-label="Remonter en h
 const RAYONS = Object.freeze([
   { key: "ALIMENTATION", slug: "alimentation", label: "Alimentation", subcategories: { croquettes: "Croquettes", patees: "Pâtées", friandises: "Friandises", complements: "Compléments" } },
   { key: "SELLERIE", slug: "sellerie", label: "Sellerie", subcategories: { colliers: "Colliers", laisses: "Laisses", harnais: "Harnais" } },
-  { key: "IDENTIFICATION", slug: "identification", label: "Identification", subcategories: { "medailles-animoco": "Médailles Animoco connectées", "medailles-red-dingo": "Médailles Red Dingo gravées" } },
+  { key: "IDENTIFICATION", slug: "identification", label: "Médailles", subcategories: { "medailles-animoco": "Médailles Animoco connectées", "medailles-red-dingo": "Médailles Red Dingo gravées" } },
   { key: "JOUETS", slug: "jouets", label: "Jouets", subcategories: { peluches: "Peluches", "jouets-a-macher": "Jouets à mâcher", "jouets-d-occupation": "Jouets d’occupation" } },
   { key: "ACCESSOIRES", slug: "accessoires", label: "Accessoires", subcategories: { gamelles: "Gamelles", couchages: "Couchages", transport: "Transport" } },
   { key: "HYGIENE_SOINS", slug: "hygiene-et-soins", label: "Hygiène et soins", subcategories: { shampooings: "Shampooings", entretien: "Entretien", soins: "Soins", "outils-de-toilettage": "Outils de toilettage" } }
