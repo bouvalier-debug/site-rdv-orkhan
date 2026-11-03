@@ -133,3 +133,64 @@ test("fiche croquettes : lien budget prérempli avec le format affiché, mis à 
   const source = fs.readFileSync(path.join(__dirname, "../assets/vitrine.js"), "utf8");
   assert.match(source, /budgetLink\.href = variant\.budgetHref/);
 });
+
+// Espaces insécables des formats français ramenés à des espaces simples pour comparer.
+const flat = (text) => text.replace(/\s/g, " ");
+
+test("mode « autres croquettes » : sac de 12 kg à 60 €, 200 g/jour", () => {
+  const bag = budget.parseManualBag({ priceText: "60", weightText: "12" });
+  assert.deepEqual(bag, { status: "ok", publicPriceCents: 6000, bagGrams: 12000 });
+  const result = budget.bagBudget({ rationGrams: 200, bagGrams: bag.bagGrams, publicPriceCents: bag.publicPriceCents, familyPriceCents: null });
+  assert.equal(flat(budget.daysText(result.days)), "environ 60 jours");
+  assert.equal(flat(budget.euros(result.public.dailyCents)), "1,00 €");
+  assert.equal(flat(budget.euros(result.public.periodCents)), "30,00 €");
+  assert.equal(flat(budget.kilograms(result.periodGrams)), "6 kg");
+  assert.equal(result.bags, 1);
+  assert.equal(result.family, null, "aucun prix Famille en saisie libre");
+});
+
+test("mode manuel : décimales françaises, unités tolérées, valeurs nulles, négatives ou absurdes refusées", () => {
+  const parse = (priceText, weightText) => budget.parseManualBag({ priceText, weightText });
+  assert.deepEqual(parse("59,90 €", "7,5 kg"), { status: "ok", publicPriceCents: 5990, bagGrams: 7500 });
+  assert.deepEqual(parse("59.90", "2,5"), { status: "ok", publicPriceCents: 5990, bagGrams: 2500 });
+  for (const price of ["0", "-5", "abc", "12,345,6", "1001"]) assert.equal(parse(price, "12").status, "invalid-price", price);
+  for (const weight of ["0", "-1", "douze", "101", "0,0004"]) assert.equal(parse("60", weight).status, "invalid-weight", weight);
+  assert.equal(parse("", "12").status, "missing");
+  assert.equal(parse("60", "").status, "missing");
+  assert.equal(parse("", "").status, "missing");
+  // Ration : mêmes règles que le mode boutique (strictement positive).
+  for (const ration of [0, -10, NaN]) assert.equal(budget.bagBudget({ rationGrams: ration, bagGrams: 12000, publicPriceCents: 6000, familyPriceCents: null }).status, "invalid-ration");
+  assert.equal(budget.parseAmount("1,5"), 1.5);
+});
+
+test("anticipation du réapprovisionnement : même module dans les deux modes (1,5 kg restant, 200 g/jour)", () => {
+  const plan = budget.remainingPlan({ rationGrams: 200, remainingGrams: 1500, leadDays: 3, marginDays: 2, today: new Date(2026, 10, 3) });
+  assert.equal(plan.wholeDays, 7);
+  assert.deepEqual([plan.endDate.getMonth(), plan.endDate.getDate()], [10, 10]);
+  assert.deepEqual([plan.orderDate.getMonth(), plan.orderDate.getDate()], [10, 5]);
+  assert.equal(flat(budget.kilograms(plan.missingGrams)), "4,5 kg");
+});
+
+test("page : deux onglets (boutique par défaut), champs manuels séparés, rien de commercial dans le mode manuel", () => {
+  const html = renderBudget(catalogue);
+  assert.match(html, /data-budget-tab="boutique" aria-pressed="true">Croquettes de la boutique</);
+  assert.match(html, /data-budget-tab="manuel" aria-pressed="false">Autres croquettes</);
+  assert.match(html, /data-budget-initial="boutique"/);
+  const only = (mode) => [...html.matchAll(new RegExp("<(\\w+) data-budget-only=\"" + mode + "\"[^>]*>(.*?)</\\1>", "gs"))].map((match) => match[0]).join("");
+  const manual = only("manuel");
+  for (const text of ['name="nom"', 'name="prix"', 'name="poids"', "Nom des croquettes (facultatif)", "Prix du sac (€)", "Poids du sac (kg)", "Découvrir les croquettes de notre boutique", 'href="/rayons/alimentation/croquettes/"']) assert.ok(manual.includes(text), text);
+  assert.doesNotMatch(manual, /Famille|commander|name="recette"|name="format"|availability/);
+  const shop = only("boutique");
+  for (const text of ['name="recette"', 'name="format"', 'data-budget-out="availability"', 'data-budget-out="fiche"', "prix Famille"]) assert.ok(shop.includes(text), text);
+  // Une seule page, un seul module de calcul et de réapprovisionnement.
+  assert.equal((html.match(/Anticiper mon prochain achat/g) || []).length, 1);
+  assert.equal((html.match(/data-budget-out="days"/g) || []).length, 1);
+});
+
+test("sans catalogue, le mode manuel reste utilisable et s'ouvre directement", () => {
+  const html = renderBudget({ available: false, products: [] });
+  assert.match(html, /data-budget-initial="manuel"/);
+  assert.match(html, /name="prix"/);
+  assert.match(html, /catalogue est momentanément indisponible/);
+  assert.match(html, /<script src="\/assets\/budget-croquettes\.js" defer><\/script>/);
+});

@@ -186,6 +186,14 @@
 .budget-plan-result p{margin:0 0 6px}
 .budget-order{color:var(--wine);font-weight:800}
 .budget-notes{display:grid;gap:8px;margin-top:26px}
+/* Deux modes (boutique / autres croquettes) : mêmes couleurs que les pastilles de filtres */
+.budget-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 22px}
+.budget-tab{min-height:52px;padding:10px 14px;border:1px solid var(--wine);border-radius:14px;background:#fff;color:var(--wine);font:inherit;font-weight:800;line-height:1.25;text-align:center;cursor:pointer}
+.budget-tab[aria-pressed="true"]{background:var(--wine);color:#fff;box-shadow:0 8px 20px rgba(78,18,34,.18)}
+.budget-tab:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.budget-shop-link{justify-self:start;color:var(--wine);font-weight:700;font-size:.92rem}
+[data-budget-only][hidden]{display:none!important}
+.budget-results[hidden]{display:none}
 @media(max-width:520px){.budget-cards,.budget-row{grid-template-columns:1fr}.budget-card strong{font-size:1.3rem}.budget-form>.btn-voir{justify-self:stretch;text-align:center}}
 .fiche-family-note,.fiche-ref{margin:12px 0 0;color:var(--muted);font-size:.86rem}
 .fiche-description{max-width:820px;margin:48px 0 0}
