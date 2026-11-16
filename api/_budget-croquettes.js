@@ -107,7 +107,7 @@ function renderBudget(catalogue) {
     title: "Mon budget croquettes | Boutique Dynastie d'Orkhan",
     description: "Estimez la durée d'un sac de croquettes, le coût par jour et sur 30 jours, et le moment d'anticiper votre prochain achat.",
     canonical: BUDGET_PATH,
-    hero: heroHtml("Mon budget croquettes", "Durée du sac, coût par jour et sur 30 jours, et date indicative pour anticiper votre prochain achat.", true),
+    hero: heroHtml("Mon budget croquettes", "Durée du sac, coût par jour et sur 30 jours, et date indicative pour anticiper votre prochain achat.", false, null, { budget: true }),
     body,
     scripts: '<script src="/assets/budget-croquettes.js" defer></script>'
   });
