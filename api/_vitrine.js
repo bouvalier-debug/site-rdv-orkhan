@@ -383,15 +383,16 @@ const FAMILLE = '<section class="famille" aria-labelledby="famille-title" data-t
   + '<div class="famille-copy"><p class="kicker">Réservé aux familles de l’élevage</p><h2 id="famille-title">Un tarif réduit pour nos familles adoptantes</h2><p>Activez votre Tarif Famille Dynastie avec le numéro de puce de votre chien ou votre code Famille.</p><p class="famille-note">L’activation se fait dans le panier, avant le paiement.</p></div>'
   + '</section>';
 
-function stageHtml(title, subtitle) {
+function stageHtml(title, subtitle, options = {}) {
   const heading = escapeHtml(title).replace(/ (de l’élevage)$/, " <em>$1</em>");
-  return `<section class="stage">${WAVE}<div class="stage-copy"><p class="eyebrow">Élevage de la Dynastie d’Orkhan</p><h1>${heading}</h1>${subtitle ? `<p class="stage-lede">${escapeHtml(subtitle)}</p>` : ""}`
-    + '<p class="stage-actions"><a class="btn-gold" href="#rayons-title">Parcourir les rayons</a><a class="btn-ghost" href="#selection">Voir la sélection</a></p></div>'
+  const budget = options.budget === true;
+  return `<section class="stage${budget ? " stage-budget" : ""}">${WAVE}<div class="stage-copy"><p class="eyebrow">Élevage de la Dynastie d’Orkhan</p><h1>${heading}</h1>${subtitle ? `<p class="stage-lede">${escapeHtml(subtitle)}</p>` : ""}`
+    + (budget ? '</div>' : '<p class="stage-actions"><a class="btn-gold" href="#rayons-title">Parcourir les rayons</a><a class="btn-ghost" href="#selection">Voir la sélection</a></p></div>')
     + `<figure class="stage-tableau"><img src="${BANNER.src}" alt="${escapeHtml(BANNER.alt)}" width="${BANNER.width}" height="${BANNER.height}" fetchpriority="high" decoding="async"><figcaption>Nos Cavaliers King Charles &amp; nos Bullmastiffs</figcaption></figure></section>`;
 }
 
 function heroHtml(title, subtitle, compact, subtitleHtml, extra = {}) {
-  if (!compact) return stageHtml(title, subtitle);
+  if (!compact) return stageHtml(title, subtitle, extra);
   const shots = shotsHtml(extra.shots || [], "page-head-shots");
   return `<section class="page-head${shots ? " has-shots" : ""}">${WAVE}<div class="page-head-copy"><p class="eyebrow">${extra.eyebrow || "Élevage de la Dynastie d’Orkhan"}</p><h1>${escapeHtml(title)}</h1>${subtitle ? `<p class="page-head-sub">${subtitleHtml || escapeHtml(subtitle)}</p>` : ""}</div>${shots}</section>`;
 }
