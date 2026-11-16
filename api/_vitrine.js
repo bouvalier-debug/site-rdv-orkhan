@@ -257,6 +257,10 @@ function linkedText(text) {
 
 // B6 : la description du Manager (un seul champ texte) peut contenir des paragraphes, des intertitres (ligne courte se
 // terminant par « : ») et des listes (« - » ou « • »), pour présenter caractéristiques, composition et conseils.
+function isCapsHeading(line) {
+  return line.length >= 4 && line.length <= 60 && /\p{Lu}{3}/u.test(line) && !/\p{Ll}/u.test(line) && !/https:|[.!?]$/.test(line);
+}
+
 function descriptionHtml(text) {
   const blocks = String(text || "").replace(/\r/g, "").split(/\n{2,}/).map((block) => block.trim()).filter(Boolean);
   return blocks.map((block) => {
@@ -270,7 +274,9 @@ function descriptionHtml(text) {
       const item = line.match(/^[-•*]\s+(.*)$/);
       if (item) { flushParagraph(); list.push(item[1]); continue; }
       flush();
-      if (line.length <= 60 && line.endsWith(":")) { flushParagraph(); out.push(`<h3>${escapeHtml(line.slice(0, -1).trim())}</h3>`); } else paragraph.push(line);
+      if (line.length <= 60 && line.endsWith(":")) { flushParagraph(); out.push(`<h3>${escapeHtml(line.slice(0, -1).trim())}</h3>`); }
+      else if (isCapsHeading(line)) { flushParagraph(); out.push(`<h3>${escapeHtml(line)}</h3>`); }
+      else paragraph.push(line);
     }
     flush();
     flushParagraph();
@@ -297,8 +303,9 @@ function ficheTile(fiche, order) {
   const filterData = recipe && recipe.brand ? ` data-brand="${escapeHtml(recipe.brand)}"` : "";
   const profileData = recipe && profileTokens(recipe).length ? ` data-profile="${profileTokens(recipe).join(" ")}"` : "";
   const sortData = order === null ? "" : ` data-order="${order}" data-name="${escapeHtml(fiche.name)}" data-price="${fiche.price}"${fiche.familyPrice !== null ? ` data-family-price="${fiche.familyPrice}"` : ""}${fiche.publishedAt ? ` data-published="${escapeHtml(fiche.publishedAt)}"` : ""}`;
-  return `<article class="product-tile"${filterData}${profileData}${sortData}><a class="product-tile-photo" href="${href}" tabindex="-1" aria-hidden="true">${photo ? photoHtml(photo, "") : `<span class="product-tile-placeholder">Photo à venir</span>`}</a>`
-    + `<div class="product-tile-body"><h3><a href="${href}">${escapeHtml(fiche.name)}</a></h3>`
+  const brand = recipe && recipe.brand && !fiche.name.toLocaleLowerCase("fr").startsWith(recipe.brand.toLocaleLowerCase("fr")) ? `<p class="tile-brand">${escapeHtml(recipe.brand)}</p>` : "";
+  return `<article class="product-tile"${filterData}${profileData}${sortData}><a class="product-tile-photo" href="${href}" tabindex="-1" aria-hidden="true">${photo ? photoHtml(photo, "") : `<span class="product-tile-placeholder">Photo à venir</span>`}${fiche.isNew ? '<span class="tile-badge">Nouveauté</span>' : ""}</a>`
+    + `<div class="product-tile-body">${brand}<h3><a href="${href}">${escapeHtml(fiche.name)}</a></h3>`
     + (fiche.showcase ? "" : `<p class="product-price">${priceText(fiche.price, fiche.priceFrom)}</p>`)
     + (fiche.familyPrice !== null && !fiche.showcase ? `<p class="family-price">Prix Famille Dynastie : ${priceText(fiche.familyPrice, fiche.familyPriceFrom)}</p>` : "")
     + `<p class="availability availability-${fiche.state}">${AVAILABILITY_LABELS[fiche.state]}</p>`
@@ -323,7 +330,7 @@ function page({ title, description, canonical, body, robots, hero, scripts = "" 
   ${canonical ? `<link rel="canonical" href="${ORIGIN}${canonical}">` : ""}${robots ? `<meta name="robots" content="${robots}">` : ""}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&amp;family=Manrope:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&amp;family=Manrope:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/orkhan-design.css">
   <link rel="stylesheet" href="/assets/vitrine.css">
 </head>
@@ -342,8 +349,57 @@ ${scripts}
 `;
 }
 
-function heroHtml(title, subtitle, compact, subtitleHtml) {
-  return `<section class="hero${compact ? " hero-compact" : ""}"><div class="hero-copy"><p class="eyebrow">Élevage de la Dynastie d’Orkhan</p><h1>${escapeHtml(title)}</h1>${subtitle ? `<p>${subtitleHtml || escapeHtml(subtitle)}</p>` : ""}</div></section>`;
+const BANNER = { src: "/assets/banniere-dynastie-orkhan.webp", width: 2032, height: 774, alt: "Deux Bullmastiffs et quatre Cavaliers King Charles de l’élevage, posés sur une pelouse." };
+const WAVE = '<svg class="fil-or" viewBox="0 0 1200 400" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path pathLength="1" d="M-20 368C220 404 430 398 610 362S900 236 1010 132 1160 30 1230 14"/></svg>';
+
+// Jusqu'à trois photos réelles du catalogue, pour donner à chaque rayon son propre visuel sans image dédiée.
+function shotsOf(fiches, max = 3) {
+  const seen = new Set();
+  const shots = [];
+  for (const fiche of fiches) {
+    const photo = fiche.photos && fiche.photos[0];
+    if (!photo || seen.has(photo.url)) continue;
+    seen.add(photo.url);
+    shots.push(photo);
+    if (shots.length === max) break;
+  }
+  return shots;
+}
+
+function shotsHtml(shots, className) {
+  if (!shots.length) return "";
+  return `<i class="${className}" aria-hidden="true">${shots.map((photo) => `<span><img src="${escapeHtml(photo.url)}" alt="" loading="lazy" decoding="async"></span>`).join("")}</i>`;
+}
+
+function stageHtml(title, subtitle) {
+  const heading = escapeHtml(title).replace(/ (de l’élevage)$/, " <em>$1</em>");
+  return `<section class="stage">${WAVE}<div class="stage-copy"><p class="eyebrow">Élevage de la Dynastie d’Orkhan</p><h1>${heading}</h1>${subtitle ? `<p class="stage-lede">${escapeHtml(subtitle)}</p>` : ""}`
+    + '<p class="stage-actions"><a class="btn-gold" href="#rayons-title">Parcourir les rayons</a><a class="btn-ghost" href="#selection">Voir la sélection</a></p></div>'
+    + `<figure class="stage-tableau"><img src="${BANNER.src}" alt="${escapeHtml(BANNER.alt)}" width="${BANNER.width}" height="${BANNER.height}" fetchpriority="high" decoding="async"><figcaption>Nos Cavaliers King Charles &amp; nos Bullmastiffs</figcaption></figure></section>`;
+}
+
+function heroHtml(title, subtitle, compact, subtitleHtml, extra = {}) {
+  if (!compact) return stageHtml(title, subtitle);
+  const shots = shotsHtml(extra.shots || [], "page-head-shots");
+  return `<section class="page-head${shots ? " has-shots" : ""}">${WAVE}<div class="page-head-copy"><p class="eyebrow">${extra.eyebrow || "Élevage de la Dynastie d’Orkhan"}</p><h1>${escapeHtml(title)}</h1>${subtitle ? `<p class="page-head-sub">${subtitleHtml || escapeHtml(subtitle)}</p>` : ""}</div>${shots}</section>`;
+}
+
+// Outils existants (calculateur de ration du site public, Mon budget croquettes), rappelés là où ils sont utiles.
+function toolsHtml(compact) {
+  const cards = `<a class="tool-card" href="${RATION_CALCULATOR_URL}"><span class="tool-num" aria-hidden="true">01</span><strong>Calculateur de ration</strong><span>La ration quotidienne de votre chien, selon son poids et l’énergie de ses croquettes.</span><em>Calculer la ration <b aria-hidden="true">→</b></em></a>`
+    + `<a class="tool-card" href="${BUDGET_PATH}"><span class="tool-num" aria-hidden="true">02</span><strong>Mon budget croquettes</strong><span>Durée d’un sac, coût par jour et sur 30 jours, prochain achat à anticiper.</span><em>Estimer mon budget <b aria-hidden="true">→</b></em></a>`;
+  if (compact) return `<aside class="tool-strip" aria-label="Outils croquettes">${cards}</aside>`;
+  return `<section class="home-section home-tools" aria-labelledby="outils-title">${WAVE}<div class="home-tools-copy"><p class="kicker">Bien nourrir</p><h2 id="outils-title">Deux outils pour trouver <em>la juste ration</em></h2></div><div class="tool-grid">${cards}</div></section>`;
+}
+
+// Sélection de l'accueil : articles en stock avec photo, pris à tour de rôle dans chaque rayon, dans l'ordre du Manager.
+function selectionFiches(fiches, max = 8) {
+  const pools = RAYONS.map((rayon) => fiches.filter((fiche) => fiche.shelf === rayon.key && !fiche.onRequest && fiche.photos.length && (fiche.state === "in_stock" || fiche.state === "low_stock")));
+  const picked = [];
+  for (let rank = 0; picked.length < max && pools.some((pool) => pool[rank]); rank += 1) {
+    for (const pool of pools) if (pool[rank] && picked.length < max) picked.push(pool[rank]);
+  }
+  return picked;
 }
 
 function rayonsNav(current) {
@@ -376,14 +432,20 @@ function latestFiches(fiches) {
 function renderAccueil(catalogue) {
   const fiches = catalogue.available ? buildFiches(catalogue.products) : [];
   const nouveautes = latestFiches(fiches).slice(0, 12);
+  const selection = selectionFiches(fiches);
+  const parcoursShots = (key) => (PARCOURS[key] || []).map((item) => ({ url: item.photo }));
   const tiles = RAYONS.map((rayon) => {
+    const shots = [...parcoursShots(rayon.key), ...shotsOf(fiches.filter((fiche) => fiche.shelf === rayon.key && !fiche.showcase))].slice(0, 3);
     return `<a class="rayon-tile" href="/rayons/${rayon.slug}/"><strong>${rayon.label}</strong><span>${Object.values(rayon.subcategories).join(" · ")}</span>`
-      + '<em aria-hidden="true"><b>→</b></em></a>';
+      + `<em aria-hidden="true"><b>→</b></em>${shotsHtml(shots, "rayon-shots")}</a>`;
   }).join("");
-  const body = sceneHtml(SCENE)
-    + '<section class="home-section home-promises"><p><strong>Retrait gratuit à l’élevage</strong> pour les articles de la boutique</p><p class="home-promise-family"><span class="home-promise-badge" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><path d="M9 7h35l16 25-16 25H9a5 5 0 0 1-5-5V12a5 5 0 0 1 5-5Z"/><circle cx="13" cy="32" r="3"/><text x="34" y="42" text-anchor="middle">%</text></svg></span><span class="home-promise-copy"><strong>Un tarif réduit pour nos familles adoptantes</strong><span>Activez votre Tarif Famille Dynastie avec le numéro de puce de votre chien ou votre code Famille.</span></span></p><p><strong>Paiement sécurisé</strong> en ligne</p></section>'
-    + `<section class="home-section" aria-labelledby="rayons-title"><h2 id="rayons-title">Nos rayons</h2><div class="rayon-grid">${tiles}<a class="rayon-tile" href="/sur-demande/"><strong>Produits sur commande</strong><span>Découvrez les produits proposés sur commande.</span><em aria-hidden="true"><b>→</b></em></a></div></section>`
-    + (nouveautes.length ? `<section class="home-section" id="nouveautes" aria-labelledby="nouveautes-title"><div class="nouveautes-heading"><h2 id="nouveautes-title">Nos nouveautés</h2><div class="nouveautes-controls"><button type="button" class="nouveautes-arrow" data-carousel-prev aria-label="Nouveautés précédentes" aria-controls="nouveautes-list" disabled>←</button><button type="button" class="nouveautes-arrow" data-carousel-next aria-label="Nouveautés suivantes" aria-controls="nouveautes-list">→</button></div></div><div class="nouveautes-carousel" id="nouveautes-list" role="region" aria-label="Derniers produits publiés" tabindex="0">${nouveautes.map(ficheCard).join("")}</div><a class="nouveautes-all" href="/nouveautes/">Voir toutes les nouveautés</a></section>` : "");
+  const onRequestShots = shotsHtml(shotsOf(fiches.filter((fiche) => fiche.onRequest)), "rayon-shots");
+  const body = `<section class="home-section home-rayons" aria-labelledby="rayons-title"><div class="section-head"><p class="kicker">La boutique en six univers</p><h2 id="rayons-title">Nos rayons</h2></div><div class="rayon-grid">${tiles}<a class="rayon-tile" href="/sur-demande/"><strong>Produits sur commande</strong><span>Découvrez les produits proposés sur commande.</span><em aria-hidden="true"><b>→</b></em>${onRequestShots}</a></div></section>`
+    + (nouveautes.length ? `<section class="home-section" id="nouveautes" aria-labelledby="nouveautes-title"><div class="nouveautes-heading"><div class="section-head"><p class="kicker">Tout juste arrivés</p><h2 id="nouveautes-title">Nos nouveautés</h2></div><div class="nouveautes-controls"><button type="button" class="nouveautes-arrow" data-carousel-prev aria-label="Nouveautés précédentes" aria-controls="nouveautes-list" disabled>←</button><button type="button" class="nouveautes-arrow" data-carousel-next aria-label="Nouveautés suivantes" aria-controls="nouveautes-list">→</button></div></div><div class="nouveautes-carousel" id="nouveautes-list" role="region" aria-label="Derniers produits publiés" tabindex="0">${nouveautes.map(ficheCard).join("")}</div><a class="nouveautes-all" href="/nouveautes/">Voir toutes les nouveautés</a></section>` : "")
+    + (selection.length ? `<section class="home-section home-selection" id="selection" aria-labelledby="selection-title"><div class="section-head"><p class="kicker">En stock à l’élevage</p><h2 id="selection-title">La sélection de l’élevage</h2><p class="section-lede">Un aperçu de chaque rayon, parmi les produits que nous utilisons et recommandons.</p></div><div class="product-grid">${selection.map(ficheCard).join("")}</div></section>` : "")
+    + sceneHtml(SCENE)
+    + toolsHtml(false)
+    + '<section class="home-section home-promises"><p><strong>Retrait gratuit à l’élevage</strong> pour les articles de la boutique</p><p class="home-promise-family"><span class="home-promise-badge" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><path d="M9 7h35l16 25-16 25H9a5 5 0 0 1-5-5V12a5 5 0 0 1 5-5Z"/><circle cx="13" cy="32" r="3"/><text x="34" y="42" text-anchor="middle">%</text></svg></span><span class="home-promise-copy"><strong>Un tarif réduit pour nos familles adoptantes</strong><span>Activez votre Tarif Famille Dynastie avec le numéro de puce de votre chien ou votre code Famille.</span></span></p><p><strong>Paiement sécurisé</strong> en ligne</p></section>';
   return page({
     title: "Boutique de l'Élevage de la Dynastie d'Orkhan | Alimentation, sellerie, médailles et soins",
     description: "La boutique de l'Élevage de la Dynastie d'Orkhan : alimentation, sellerie, identification, jouets, accessoires, hygiène et soins pour votre chien. Retrait gratuit à l'élevage.",
@@ -451,7 +513,7 @@ function renderAlimentationRayon(catalogue, rayon) {
     title: `${rayon.label} | Boutique Dynastie d'Orkhan`,
     description: "Rayon Alimentation de la boutique de l'Élevage de la Dynastie d'Orkhan : croquettes et friandises, à parcourir par marque.",
     canonical: ALIMENTATION_PATH,
-    hero: heroHtml(rayon.label, "Croquettes · Friandises", true),
+    hero: heroHtml(rayon.label, "Croquettes · Friandises", true, '<a href="#rubrique-croquettes">Croquettes</a> · <a href="#rubrique-friandises">Friandises</a>', { eyebrow: "Rayon", shots: shotsOf(fiches) }),
     body: `${rayonsNav(rayon.key)}<section class="rayon-listing" aria-label="Articles du rayon ${escapeHtml(rayon.label)}">${listing}</section>`
   });
 }
@@ -484,8 +546,8 @@ function renderAlimentation(catalogue, rubriqueKey, brandSlug) {
     title: `${title} | Boutique Dynastie d'Orkhan`,
     description: card ? `${rubrique.label} ${card.name} : tous les produits de la marque à la boutique de l'Élevage de la Dynastie d'Orkhan.` : `${rubrique.all} de la boutique de l'Élevage de la Dynastie d'Orkhan, toutes marques.`,
     canonical: card ? `${base}${card.slug}/` : base,
-    hero: heroHtml(title, card ? `Tous les produits ${card.name} en ${rubrique.label.toLocaleLowerCase("fr")}` : "Toutes les marques", true),
-    body: `${rayonsNav(rayon.key)}${crumbs}<section class="rayon-listing" aria-label="${escapeHtml(title)}">${listing}</section>`,
+    hero: heroHtml(title, card ? `Tous les produits ${card.name} en ${rubrique.label.toLocaleLowerCase("fr")}` : "Toutes les marques", true, null, { eyebrow: `Rayon ${rayon.label}`, shots: shotsOf(items) }),
+    body: `${rayonsNav(rayon.key)}${crumbs}<section class="rayon-listing" aria-label="${escapeHtml(title)}">${listing}</section>${rubrique.key === "croquettes" && items.length ? toolsHtml(true) : ""}`,
     scripts
   });
 }
@@ -497,15 +559,17 @@ function renderRayon(catalogue, slug) {
   const fiches = catalogue.available ? buildFiches(catalogue.products).filter((fiche) => fiche.shelf === rayon.key && !fiche.showcase) : [];
   const parcours = PARCOURS[rayon.key] || [];
   let listing;
+  let anchors = null;
   if (!catalogue.available && !parcours.length) listing = '<p class="rayon-empty">Le catalogue est momentanément indisponible. Merci de réessayer dans quelques instants.</p>';
   else if (!fiches.length && !parcours.length) listing = emptyRayon();
   else {
     const sections = Object.entries(rayon.subcategories).map(([key, label]) => [label, fiches.filter((fiche) => fiche.subcategory === key)]).filter(([, items]) => items.length);
     const others = fiches.filter((fiche) => !rayon.subcategories[fiche.subcategory]);
     const grouped = sections.length > 1 || (sections.length === 1 && others.length);
+    if (grouped) anchors = sections.map(([label], index) => `<a href="#section-${index + 1}">${escapeHtml(label)}</a>`).join(" · ");
     listing = (parcours.length ? `<div class="product-grid">${parcours.map(parcoursCard).join("")}</div>` : "")
       + (grouped
-        ? sections.map(([label, items]) => `<h2 class="subcategory-title">${escapeHtml(label)}</h2>${recipeFilters(items)}<div class="product-grid">${items.map(ficheCard).join("")}</div>${recipeEmpty(items)}`).join("")
+        ? sections.map(([label, items], index) => `<span class="anchor" id="section-${index + 1}"></span><h2 class="subcategory-title">${escapeHtml(label)}</h2>${recipeFilters(items)}<div class="product-grid">${items.map(ficheCard).join("")}</div>${recipeEmpty(items)}`).join("")
           + (others.length ? `<h2 class="subcategory-title">Autres articles</h2><div class="product-grid">${others.map(ficheCard).join("")}</div>` : "")
         : fiches.length ? `${recipeFilters(fiches)}<div class="product-grid">${fiches.map(ficheCard).join("")}</div>${recipeEmpty(fiches)}` : "");
   }
@@ -513,7 +577,7 @@ function renderRayon(catalogue, slug) {
     title: `${rayon.label} | Boutique Dynastie d'Orkhan`,
     description: `Rayon ${rayon.label} de la boutique de l'Élevage de la Dynastie d'Orkhan : ${Object.values(rayon.subcategories).join(", ").toLocaleLowerCase("fr")}.`,
     canonical: `/rayons/${rayon.slug}/`,
-    hero: heroHtml(rayon.label, Object.values(rayon.subcategories).join(" · "), true),
+    hero: heroHtml(rayon.label, Object.values(rayon.subcategories).join(" · "), true, anchors, { eyebrow: "Rayon", shots: [...parcours.map((item) => ({ url: item.photo })), ...shotsOf(fiches)].slice(0, 3) }),
     body: `${rayonsNav(rayon.key)}<section class="rayon-listing" aria-label="Articles du rayon ${escapeHtml(rayon.label)}">${listing}</section>`,
     scripts: listing.includes("data-recipe-filters") ? '<script src="/assets/recipe-filters.js" defer></script>' : ""
   });
@@ -525,7 +589,7 @@ function renderSurDemande(catalogue) {
     title: "Produits sur commande | Boutique Dynastie d'Orkhan",
     description: "Produits sur commande de l'Élevage de la Dynastie d'Orkhan : commandés auprès de notre fournisseur après votre achat, retrait à l'élevage.",
     canonical: "/sur-demande/",
-    hero: heroHtml("Produits sur commande", "Découvrez les produits proposés sur commande. Pour connaître les disponibilités et les modalités, contactez l’élevage.", true, 'Découvrez les produits proposés sur commande. Pour connaître les disponibilités et les modalités, <a href="https://www.dynastiedorkhan.com/contact/">contactez l’élevage</a>.'),
+    hero: heroHtml("Produits sur commande", "Découvrez les produits proposés sur commande. Pour connaître les disponibilités et les modalités, contactez l’élevage.", true, 'Découvrez les produits proposés sur commande. Pour connaître les disponibilités et les modalités, <a href="https://www.dynastiedorkhan.com/contact/">contactez l’élevage</a>.', { shots: shotsOf(fiches) }),
     body: `${rayonsNav(null)}<section class="rayon-listing">${fiches.length ? `<div class="product-grid">${fiches.map(ficheCard).join("")}</div>` : '<p class="rayon-empty">Aucun produit sur commande pour le moment.</p>'}</section>`
   });
 }
@@ -554,7 +618,7 @@ function renderFiche(catalogue, slug) {
   const current = variants.find((variant) => variant.reference === selected.reference);
   const photos = current.photos;
   const gallery = photos.length
-    ? `<div class="fiche-gallery">${photoHtml(photos[0], "fiche-photo", "eager").replace("<img", '<img data-fiche-photo')}<div class="fiche-thumbs" data-fiche-thumbs${photos.length > 1 ? "" : " hidden"}>${photos.map((photo, index) => `<button type="button" data-photo-index="${index}"${index === 0 ? ' aria-current="true"' : ""}>${photoHtml(photo, "")}</button>`).join("")}</div></div>`
+    ? `<div class="fiche-gallery"><div class="fiche-plate">${photoHtml(photos[0], "fiche-photo", "eager").replace("<img", '<img data-fiche-photo')}</div><div class="fiche-thumbs" data-fiche-thumbs${photos.length > 1 ? "" : " hidden"}>${photos.map((photo, index) => `<button type="button" data-photo-index="${index}"${index === 0 ? ' aria-current="true"' : ""}>${photoHtml(photo, "")}</button>`).join("")}</div></div>`
     : `<div class="fiche-gallery"><span class="product-tile-placeholder fiche-photo">Photo à venir</span></div>`;
   const choice = variantChoices(variants, current);
   const purchase = fiche.showcase
@@ -568,8 +632,10 @@ function renderFiche(catalogue, slug) {
     ...(photos.length ? { image: photos.map((photo) => `${ORIGIN}${photo.url}`) } : {}),
     ...(fiche.showcase ? {} : { offers: { "@type": "AggregateOffer", priceCurrency: "EUR", lowPrice: (fiche.price / 100).toFixed(2), highPrice: (Math.max(...fiche.variants.map((variant) => variant.publicPriceCents)) / 100).toFixed(2), offerCount: fiche.variants.length } })
   };
+  const kickerParts = [rayon ? rayon.label : fiche.onRequest ? "Sur commande" : "", fiche.recipe.brand || ""].filter(Boolean);
+  const kicker = kickerParts.length ? `<p class="fiche-kicker">${kickerParts.map(escapeHtml).join(" · ")}</p>` : "";
   const body = `<nav class="breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a>${rayon ? ` › <a href="/rayons/${rayon.slug}/">${rayon.label}</a>` : fiche.onRequest ? ' › <a href="/sur-demande/">Produits sur commande</a>' : ""} › <span>${escapeHtml(fiche.name)}</span></nav>`
-    + `<article class="fiche" data-fiche><div class="fiche-media">${gallery}</div><div class="fiche-info"><h1>${escapeHtml(fiche.name)}</h1>${choice}`
+    + `<article class="fiche" data-fiche><div class="fiche-media">${gallery}</div><div class="fiche-info">${kicker}<h1>${escapeHtml(fiche.name)}</h1>${choice}`
     + (fiche.showcase ? "" : `<p class="product-price fiche-price" data-fiche-price>${current.price}</p><p class="family-price" data-fiche-family${current.familyPrice ? "" : " hidden"}>Prix Famille Dynastie : <span>${current.familyPrice || ""}</span></p>`)
     + `<p class="availability availability-${current.state}" data-fiche-availability>${current.availability}</p>${purchase}`
     + (croquettes ? rationLinkHtml(current) : "")

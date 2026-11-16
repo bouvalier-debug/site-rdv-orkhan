@@ -110,14 +110,16 @@ test("B7 : le guide des tailles est près du sélecteur de taille, discret, limi
 
 test("D3 : bannières de rayons = grande photo pleine largeur comme l'accueil, titre superposé, hauteur adaptée, accueil inchangé", () => {
   const css = read("assets/vitrine.css");
-  assert.match(css, /\.vitrine>\.hero\.hero-compact\{display:flex!important;align-items:flex-end!important;height:clamp\(300px,36vw,600px\)!important;[^}]*background-position:center 35%!important/);
-  // Mobile : accueil et rayons partagent la photo entière en haut, titre dessous.
-  assert.match(css, /@media\(max-width:700px\)\{\.vitrine>\.hero\{[^}]*background-size:100% auto!important/);
-  assert.doesNotMatch(css, /\.vitrine>\.hero:not\(\.hero-compact\) \.hero-copy\{background/);
+  // Boutique 2.0 : la grande photographie n'est plus répétée sur les rayons ; chaque bandeau est compact (pleine largeur,
+  // fond bordeaux) et illustré par les photos du rayon lui-même. Sur mobile, les niches photo sont masquées.
+  assert.match(css, /\.page-head\{[^}]*width:100vw;[^}]*background:var\(--stage\)/);
+  assert.match(css, /@media\(max-width:700px\)\{\.page-head\{grid-template-columns:minmax\(0,1fr\)\}\.page-head-shots\{display:none\}\}/);
+  assert.doesNotMatch(css, /\.page-head[^{]*\{[^}]*banniere-dynastie-orkhan/);
   assert.doesNotMatch(css, /hero-banner|background-image:none/);
   for (const html of [vitrine.renderRayon({ available: true, products: [] }, "identification"), vitrine.renderSurDemande({ available: true, products: [] })]) {
     assert.doesNotMatch(html, /hero-banner/);
-    assert.match(html, /<section class="hero hero-compact"><div class="hero-copy"><p class="eyebrow">/);
+    assert.match(html, /<section class="page-head[^"]*">[\s\S]*?<div class="page-head-copy"><p class="eyebrow">/);
+    assert.doesNotMatch(html, /banniere-dynastie-orkhan/);
   }
 });
 

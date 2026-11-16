@@ -306,3 +306,33 @@ body>footer .footer-links{margin-top:14px;font-size:.92rem}
 .site-footer .footer-nav a:hover,.site-footer .footer-legal a:hover{text-decoration:underline}
 @media(max-width:860px){.site-footer .footer-inner{grid-template-columns:1fr 1fr}.site-footer .footer-id{grid-column:1/-1}}
 @media(max-width:520px){.site-footer .footer-inner{grid-template-columns:1fr;gap:22px}}
+
+/* Boutique 2.0 : en-tête commun affiné (bandeau de retour bordeaux, barre collante, filet d'or). */
+main:has(>.shop-header){padding-top:0}
+.shop-return-link{position:relative;isolation:isolate;display:flex;min-height:36px;padding:4px 0;color:#e3c58a;font-size:.76rem;letter-spacing:.06em}
+.shop-return-link::before{content:"";position:absolute;inset:0 calc(50% - 50vw);z-index:-1;background:#4e1222}
+.shop-return-link:hover{color:#fff;text-decoration:none}
+.shop-header{position:sticky;top:0;min-height:76px}
+.shop-header::before{content:"";position:absolute;inset:0 calc(50% - 50vw);z-index:-1;background:rgba(255,253,249,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.shop-header::after{content:"";position:absolute;inset:auto calc(50% - 50vw) -1px;height:1px;background:linear-gradient(90deg,transparent 0,var(--gold) 30%,var(--gold) 70%,transparent);opacity:.7}
+.shop-brand img{width:54px;height:54px}
+.shop-menu>a,.shop-rayons>summary{font-size:.9rem;letter-spacing:.02em}
+.shop-menu .cart-nav-link{border-color:var(--wine);background:var(--wine);color:#fff;padding-inline:18px}
+.shop-menu .cart-nav-link:hover{background:var(--wine-dark)}
+.shop-menu .cart-badge{background:var(--gold);color:#2b0c14}
+.shop-rayons ul{padding:10px;border-radius:14px;border-color:var(--line);box-shadow:0 30px 70px rgba(78,18,34,.18)}
+.shop-rayons li a{font-family:"Lora",Georgia,serif;font-size:1.08rem;font-weight:600}
+.shop-rayons .shop-rayons-extra a{font-family:"Manrope",Arial,sans-serif;font-size:.92rem}
+@media(max-width:700px){
+  .shop-return-link{min-height:44px}
+  .shop-header{flex-direction:row;align-items:center;gap:8px;min-height:62px;padding-bottom:0}
+  .shop-brand{gap:9px;min-width:0}
+  .shop-brand img{width:42px;height:42px}
+  .shop-brand strong{font-size:.95rem;white-space:nowrap}
+  .shop-brand small{font-size:.62rem}
+  .shop-menu{flex:0 0 auto;gap:4px}
+  .shop-menu>a[href="/"]{display:none}
+  .shop-menu>a,.shop-rayons>summary{padding:8px 10px;font-size:.86rem}
+  .shop-menu .cart-nav-link{padding-inline:13px}
+  .shop-rayons ul{top:calc(100% + 1px);border-radius:0 0 14px 14px}
+}
