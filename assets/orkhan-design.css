@@ -336,3 +336,19 @@ main:has(>.shop-header){padding-top:0}
   .shop-menu .cart-nav-link{padding-inline:13px}
   .shop-rayons ul{top:calc(100% + 1px);border-radius:0 0 14px 14px}
 }
+/* À largeur de téléphone, la marque doit céder de la place aux boutons
+   Rayons et Panier : éviter le chevauchement sans cacher la navigation. */
+@media(max-width:520px){
+  .shop-header .shop-brand{flex:1 1 auto;min-width:0;gap:7px}
+  .shop-header .shop-brand img{width:38px;height:38px}
+  .shop-header .shop-brand span{min-width:0}
+  .shop-header .shop-brand strong{font-size:.82rem;line-height:1.12;white-space:normal;overflow-wrap:anywhere}
+  .shop-header .shop-brand small{font-size:.55rem;letter-spacing:.08em}
+  .shop-header .shop-menu{flex:0 0 auto;gap:2px}
+  .shop-header .shop-rayons>summary{padding-inline:7px;font-size:.8rem}
+  .shop-header .shop-menu .cart-nav-link{padding-inline:10px;font-size:.8rem}
+}
+@media(max-width:340px){
+  .shop-header{flex-direction:column;align-items:stretch;gap:2px;padding-block:6px}
+  .shop-header .shop-menu{justify-content:flex-end}
+}
