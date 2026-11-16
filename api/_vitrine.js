@@ -378,10 +378,10 @@ function rayonShotsHtml(shots, label) {
   return `<i class="rayon-shots${shots.length ? "" : " is-empty"}" data-initial="${initial}" aria-hidden="true">${shots.map((photo) => `<span><img src="${escapeHtml(photo.url)}" alt="" loading="lazy" decoding="async"></span>`).join("")}<small class="rayon-cap"><b>${escapeHtml(label)}</b>Découvrir le rayon</small></i>`;
 }
 
-// Tarif Famille Dynastie : le bloc existant, remonté sous la scène d'ouverture. L'activation reste celle du panier.
+// Tarif Famille Dynastie : le bloc existant, remonté sous la scène d'ouverture, sans bouton : l'activation reste celle du panier.
 const FAMILLE = '<section class="famille" aria-labelledby="famille-title" data-tilt><span class="home-promise-badge" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><path d="M9 7h35l16 25-16 25H9a5 5 0 0 1-5-5V12a5 5 0 0 1 5-5Z"/><circle cx="13" cy="32" r="3"/><text x="34" y="42" text-anchor="middle">%</text></svg></span>'
   + '<div class="famille-copy"><p class="kicker">Réservé aux familles de l’élevage</p><h2 id="famille-title">Un tarif réduit pour nos familles adoptantes</h2><p>Activez votre Tarif Famille Dynastie avec le numéro de puce de votre chien ou votre code Famille.</p></div>'
-  + '<p class="famille-action"><a class="btn-gold" href="/panier/#family-title">Activer mon Tarif Famille <b aria-hidden="true">→</b></a><small>L’activation se fait au panier, avant le paiement.</small></p></section>';
+  + '</section>';
 
 function stageHtml(title, subtitle) {
   const heading = escapeHtml(title).replace(/ (de l’élevage)$/, " <em>$1</em>");
