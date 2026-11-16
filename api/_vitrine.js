@@ -343,6 +343,7 @@ function page({ title, description, canonical, body, robots, hero, scripts = "" 
 </main>
 ${FACEBOOK_FAB}${BACK_TO_TOP}
 <script src="/assets/cart.js"></script>
+<script src="/assets/boutique-motion.js" defer></script>
 ${scripts}
 </body>
 </html>
@@ -371,6 +372,17 @@ function shotsHtml(shots, className) {
   return `<i class="${className}" aria-hidden="true">${shots.map((photo) => `<span><img src="${escapeHtml(photo.url)}" alt="" loading="lazy" decoding="async"></span>`).join("")}</i>`;
 }
 
+// Vitrine d'un rayon dans l'armoire de l'accueil : ses photos, sa légende, et un état soigné s'il n'a pas encore de photo.
+function rayonShotsHtml(shots, label) {
+  const initial = escapeHtml(label.trim().charAt(0).toLocaleUpperCase("fr"));
+  return `<i class="rayon-shots${shots.length ? "" : " is-empty"}" data-initial="${initial}" aria-hidden="true">${shots.map((photo) => `<span><img src="${escapeHtml(photo.url)}" alt="" loading="lazy" decoding="async"></span>`).join("")}<small class="rayon-cap"><b>${escapeHtml(label)}</b>Découvrir le rayon</small></i>`;
+}
+
+// Tarif Famille Dynastie : le bloc existant, remonté sous la scène d'ouverture. L'activation reste celle du panier.
+const FAMILLE = '<section class="famille" aria-labelledby="famille-title" data-tilt><span class="home-promise-badge" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><path d="M9 7h35l16 25-16 25H9a5 5 0 0 1-5-5V12a5 5 0 0 1 5-5Z"/><circle cx="13" cy="32" r="3"/><text x="34" y="42" text-anchor="middle">%</text></svg></span>'
+  + '<div class="famille-copy"><p class="kicker">Réservé aux familles de l’élevage</p><h2 id="famille-title">Un tarif réduit pour nos familles adoptantes</h2><p>Activez votre Tarif Famille Dynastie avec le numéro de puce de votre chien ou votre code Famille.</p></div>'
+  + '<p class="famille-action"><a class="btn-gold" href="/panier/#family-title">Activer mon Tarif Famille <b aria-hidden="true">→</b></a><small>L’activation se fait au panier, avant le paiement.</small></p></section>';
+
 function stageHtml(title, subtitle) {
   const heading = escapeHtml(title).replace(/ (de l’élevage)$/, " <em>$1</em>");
   return `<section class="stage">${WAVE}<div class="stage-copy"><p class="eyebrow">Élevage de la Dynastie d’Orkhan</p><h1>${heading}</h1>${subtitle ? `<p class="stage-lede">${escapeHtml(subtitle)}</p>` : ""}`
@@ -389,7 +401,7 @@ function toolsHtml(compact) {
   const cards = `<a class="tool-card" href="${RATION_CALCULATOR_URL}"><span class="tool-num" aria-hidden="true">01</span><strong>Calculateur de ration</strong><span>La ration quotidienne de votre chien, selon son poids et l’énergie de ses croquettes.</span><em>Calculer la ration <b aria-hidden="true">→</b></em></a>`
     + `<a class="tool-card" href="${BUDGET_PATH}"><span class="tool-num" aria-hidden="true">02</span><strong>Mon budget croquettes</strong><span>Durée d’un sac, coût par jour et sur 30 jours, prochain achat à anticiper.</span><em>Estimer mon budget <b aria-hidden="true">→</b></em></a>`;
   if (compact) return `<aside class="tool-strip" aria-label="Outils croquettes">${cards}</aside>`;
-  return `<section class="home-section home-tools" aria-labelledby="outils-title">${WAVE}<div class="home-tools-copy"><p class="kicker">Bien nourrir</p><h2 id="outils-title">Deux outils pour trouver <em>la juste ration</em></h2></div><div class="tool-grid">${cards}</div></section>`;
+  return `<section class="home-section home-tools" aria-labelledby="outils-title">${WAVE}<div class="home-tools-copy"><p class="kicker">Bien nourrir</p><h2 id="outils-title">Deux outils pour bien gérer <em>son alimentation</em></h2><p class="home-tools-lede">Calculez la ration quotidienne de votre chien et estimez votre budget croquettes en quelques instants.</p></div><div class="tool-grid">${cards}</div></section>`;
 }
 
 // Sélection de l'accueil : articles en stock avec photo, pris à tour de rôle dans chaque rayon, dans l'ordre du Manager.
@@ -420,8 +432,8 @@ function sceneHtml(scene) {
     return `<a class="scene-zone scene-label-${zone.labelAt || "bottom"}${zone.width < 10 ? " scene-zone-small" : ""}" href="/rayons/${rayon.slug}/" aria-label="${escapeHtml(label)}" style="left:${zone.left}%;top:${zone.top}%;width:${zone.width}%;height:${zone.height}%"><span aria-hidden="true">${rayon.label}</span></a>`;
   }).join("");
   const srcset = (scene.sources || []).map(([url, width]) => `${url} ${width}w`).join(", ");
-  return `<section class="home-section home-scene" aria-labelledby="scene-title"><h2 id="scene-title">Explorez la boutique</h2><p class="scene-hint">Choisissez un produit pour découvrir son rayon.</p>`
-    + `<div class="scene-frame"><img src="${scene.image}"${srcset ? ` srcset="${srcset}" sizes="(max-width: 1220px) calc(100vw - 28px), 1180px"` : ""} alt="${escapeHtml(scene.alt)}" width="${scene.width}" height="${scene.height}" decoding="async">${zones}</div></section>`;
+  return `<section class="home-section home-scene" aria-labelledby="scene-title"><h2 id="scene-title">Explorez la boutique</h2><p class="scene-hint">Chaque produit de cette image ouvre son rayon : cliquez ou touchez un repère numéroté.</p>`
+    + `<div class="scene-frame"><img src="${scene.image}"${srcset ? ` srcset="${srcset}" sizes="(max-width: 1220px) calc(100vw - 28px), 1180px"` : ""} alt="${escapeHtml(scene.alt)}" width="${scene.width}" height="${scene.height}" decoding="async">${zones}</div><ol class="scene-legend">${RAYONS.filter((rayon) => scene.zones?.[rayon.key]).map((rayon) => `<li><a href="/rayons/${rayon.slug}/">${rayon.label}</a></li>`).join("")}</ol></section>`;
 }
 
 function latestFiches(fiches) {
@@ -437,15 +449,15 @@ function renderAccueil(catalogue) {
   const tiles = RAYONS.map((rayon) => {
     const shots = [...parcoursShots(rayon.key), ...shotsOf(fiches.filter((fiche) => fiche.shelf === rayon.key && !fiche.showcase))].slice(0, 3);
     return `<a class="rayon-tile" href="/rayons/${rayon.slug}/"><strong>${rayon.label}</strong><span>${Object.values(rayon.subcategories).join(" · ")}</span>`
-      + `<em aria-hidden="true"><b>→</b></em>${shotsHtml(shots, "rayon-shots")}</a>`;
+      + `<em aria-hidden="true"><b>→</b></em>${rayonShotsHtml(shots, rayon.label)}</a>`;
   }).join("");
-  const onRequestShots = shotsHtml(shotsOf(fiches.filter((fiche) => fiche.onRequest)), "rayon-shots");
-  const body = `<section class="home-section home-rayons" aria-labelledby="rayons-title"><div class="section-head"><p class="kicker">La boutique en six univers</p><h2 id="rayons-title">Nos rayons</h2></div><div class="rayon-grid">${tiles}<a class="rayon-tile" href="/sur-demande/"><strong>Produits sur commande</strong><span>Découvrez les produits proposés sur commande.</span><em aria-hidden="true"><b>→</b></em>${onRequestShots}</a></div></section>`
+  const onRequestShots = rayonShotsHtml(shotsOf(fiches.filter((fiche) => fiche.onRequest)), "Sur commande");
+  const body = `${FAMILLE}<section class="home-section home-rayons" aria-labelledby="rayons-title"><div class="section-head"><p class="kicker">La boutique en six univers</p><h2 id="rayons-title">Nos rayons</h2></div><div class="rayon-grid">${tiles}<a class="rayon-tile" href="/sur-demande/"><strong>Produits sur commande</strong><span>Découvrez les produits proposés sur commande.</span><em aria-hidden="true"><b>→</b></em>${onRequestShots}</a></div></section>`
     + (nouveautes.length ? `<section class="home-section" id="nouveautes" aria-labelledby="nouveautes-title"><div class="nouveautes-heading"><div class="section-head"><p class="kicker">Tout juste arrivés</p><h2 id="nouveautes-title">Nos nouveautés</h2></div><div class="nouveautes-controls"><button type="button" class="nouveautes-arrow" data-carousel-prev aria-label="Nouveautés précédentes" aria-controls="nouveautes-list" disabled>←</button><button type="button" class="nouveautes-arrow" data-carousel-next aria-label="Nouveautés suivantes" aria-controls="nouveautes-list">→</button></div></div><div class="nouveautes-carousel" id="nouveautes-list" role="region" aria-label="Derniers produits publiés" tabindex="0">${nouveautes.map(ficheCard).join("")}</div><a class="nouveautes-all" href="/nouveautes/">Voir toutes les nouveautés</a></section>` : "")
     + (selection.length ? `<section class="home-section home-selection" id="selection" aria-labelledby="selection-title"><div class="section-head"><p class="kicker">En stock à l’élevage</p><h2 id="selection-title">La sélection de l’élevage</h2><p class="section-lede">Un aperçu de chaque rayon, parmi les produits que nous utilisons et recommandons.</p></div><div class="product-grid">${selection.map(ficheCard).join("")}</div></section>` : "")
     + sceneHtml(SCENE)
     + toolsHtml(false)
-    + '<section class="home-section home-promises"><p><strong>Retrait gratuit à l’élevage</strong> pour les articles de la boutique</p><p class="home-promise-family"><span class="home-promise-badge" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><path d="M9 7h35l16 25-16 25H9a5 5 0 0 1-5-5V12a5 5 0 0 1 5-5Z"/><circle cx="13" cy="32" r="3"/><text x="34" y="42" text-anchor="middle">%</text></svg></span><span class="home-promise-copy"><strong>Un tarif réduit pour nos familles adoptantes</strong><span>Activez votre Tarif Famille Dynastie avec le numéro de puce de votre chien ou votre code Famille.</span></span></p><p><strong>Paiement sécurisé</strong> en ligne</p></section>';
+    + '<section class="home-section home-promises"><p><strong>Retrait gratuit à l’élevage</strong> pour les articles de la boutique</p><p><strong>Paiement sécurisé</strong> en ligne</p></section>';
   return page({
     title: "Boutique de l'Élevage de la Dynastie d'Orkhan | Alimentation, sellerie, médailles et soins",
     description: "La boutique de l'Élevage de la Dynastie d'Orkhan : alimentation, sellerie, identification, jouets, accessoires, hygiène et soins pour votre chien. Retrait gratuit à l'élevage.",

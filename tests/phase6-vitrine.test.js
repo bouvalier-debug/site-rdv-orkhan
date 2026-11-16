@@ -99,7 +99,10 @@ test("accueil : engagements, sept rayons et au plus douze nouveautés triées, p
   assert.ok(home.indexOf('id="rayons-title"') < home.indexOf("home-promises"));
   assert.ok(home.indexOf('id="rayons-title"') < home.indexOf('id="nouveautes-title"'));
   assert.equal((home.match(/class="rayon-tile"/g) || []).length, 7);
-  const rayonGrid = home.match(/<div class="rayon-grid">([\s\S]*?)<\/div>/)[1].replace(/<i class="rayon-shots"[\s\S]*?<\/i>/g, "");
+  const rayonGrid = home.match(/<div class="rayon-grid">([\s\S]*?)<\/div>/)[1].replace(/<i class="rayon-shots[\s\S]*?<\/i>/g, "");
+  assert.ok(home.indexOf('class="famille"') > home.indexOf('class="stage"') && home.indexOf('class="famille"') < home.indexOf('id="rayons-title"'), "le Tarif Famille suit la scène d'ouverture, avant les rayons");
+  assert.equal((home.match(/Un tarif réduit pour nos familles adoptantes/g) || []).length, 1, "un seul bloc Tarif Famille");
+  assert.match(home, /<a class="btn-gold" href="\/panier\/#family-title">/, "l'activation reste celle du panier");
   assert.doesNotMatch(rayonGrid, /\d+ articles?|Prochainement|Découvrir/i);
   assert.equal((rayonGrid.match(/<em aria-hidden="true"><b>→<\/b><\/em>/g) || []).length, 7);
   assert.equal((home.match(/class="product-tile"/g) || []).length, 12);
