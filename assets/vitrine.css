@@ -269,7 +269,8 @@
 .home-promise-badge text{font:800 29px Arial,sans-serif}
 .famille .kicker{margin-bottom:4px;color:var(--gold-soft)}
 .famille h2{margin:0;color:var(--paper);font-size:clamp(1.3rem,2.1vw,1.7rem);font-weight:600;line-height:1.15;letter-spacing:-.02em;text-wrap:balance}
-.famille-copy>p:last-child{max-width:none;margin:4px 0 0;color:#f3e6dc;font-size:.93rem;line-height:1.45}
+.famille-copy>p:not(.kicker){max-width:none;margin:4px 0 0;color:#f3e6dc;font-size:.93rem;line-height:1.45}
+.famille-copy>.famille-note{margin-top:8px;color:#ecd9b4;font-size:.84rem;font-style:italic}
 .famille-action{display:flex;flex-direction:column;align-items:center;gap:8px;margin:0}
 .famille-action .btn-gold{white-space:nowrap}
 .famille-action .btn-gold b{display:inline-block;margin-left:8px;transition:transform .3s var(--ease)}
@@ -282,7 +283,7 @@
   .famille .kicker{font-size:.66rem;letter-spacing:.14em}
   .famille .kicker::before{display:none}
   .famille h2{font-size:1.3rem}
-  .famille-copy>p:last-child{font-size:.9rem}
+  .famille-copy>p:not(.kicker){font-size:.9rem}
 }
 @media(prefers-reduced-motion:no-preference){.famille::before{animation:reflet 6.5s cubic-bezier(.5,0,.3,1) 1.2s infinite}}
 @keyframes reflet{0%{background-position:160% 0}38%,100%{background-position:-60% 0}}
