@@ -147,7 +147,7 @@
 .product-tile-photo{display:block;aspect-ratio:1;width:100%;overflow:hidden;position:relative;border-radius:8px;background:var(--plate)}
 .product-tile-photo::after{content:"";position:absolute;inset:0;border-radius:8px;box-shadow:inset 0 0 0 1px var(--gold);opacity:0;transition:opacity .3s}
 .product-tile-photo,.product-tile-photo:hover{text-decoration:none}
-.product-tile-photo img{display:block;width:100%;height:100%;aspect-ratio:1;object-fit:contain;padding:10%;mix-blend-mode:multiply;transition:transform .6s var(--ease)}
+.product-tile-photo img{display:block;width:100%;height:100%;aspect-ratio:1;object-fit:contain;padding:10px;mix-blend-mode:multiply;transition:transform .6s var(--ease)}
 .product-tile:hover .product-tile-photo img{transform:scale(1.06)}
 .product-tile:hover .product-tile-photo::after,.product-tile:focus-within .product-tile-photo::after{opacity:1}
 .product-tile-placeholder{display:grid;width:100%;height:100%;min-height:0;place-items:center;padding:10px;color:var(--muted);font-family:"Lora",Georgia,serif;font-size:.95rem;font-style:italic;text-align:center}
@@ -384,9 +384,9 @@
 .vitrine>.breadcrumb{margin:26px 0 22px}
 .fiche{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);gap:clamp(28px,4.5vw,64px);align-items:start}
 .fiche-gallery{position:sticky;top:96px}
-.fiche-plate{position:relative;aspect-ratio:1;max-height:min(640px,calc(100vh - 220px));width:100%;border-radius:12px;background:var(--plate);overflow:hidden}
+.fiche-plate{position:relative;aspect-ratio:1;max-height:min(680px,calc(100vh - 160px));width:100%;border-radius:12px;background:var(--plate);overflow:hidden}
 .fiche-plate::after{content:"";position:absolute;inset:12px;border:1px solid rgba(189,148,82,.4);border-radius:6px;pointer-events:none}
-.fiche-photo{display:block;width:100%;height:100%;object-fit:contain;padding:8%;mix-blend-mode:multiply}
+.fiche-photo{display:block;width:100%;height:100%;object-fit:contain;padding:18px;mix-blend-mode:multiply}
 .fiche-gallery .product-tile-placeholder.fiche-photo{height:140px;border-radius:12px;background:var(--plate)}
 .fiche-thumbs{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
 .fiche-thumbs[hidden]{display:none}
@@ -502,7 +502,7 @@
 @media(max-width:700px){
   .section-head{margin-bottom:22px}
   .product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 14px}
-  .product-tile-photo img{padding:8%}
+  .product-tile-photo img{padding:10px}
   .product-tile h3{font-size:.96rem}
   .product-price{font-size:1rem}
   .family-price{font-size:.8rem}
