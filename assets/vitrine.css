@@ -384,7 +384,7 @@
 .vitrine>.breadcrumb{margin:26px 0 22px}
 .fiche{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);gap:clamp(28px,4.5vw,64px);align-items:start}
 .fiche-gallery{position:sticky;top:96px}
-.fiche-plate{position:relative;aspect-ratio:1;max-height:min(680px,calc(100vh - 160px));width:100%;border-radius:12px;background:var(--plate);overflow:hidden}
+.fiche-plate{position:relative;aspect-ratio:1;width:100%;border-radius:12px;background:var(--plate);overflow:hidden}
 .fiche-plate::after{content:"";position:absolute;inset:12px;border:1px solid rgba(189,148,82,.4);border-radius:6px;pointer-events:none}
 .fiche-photo{display:block;width:100%;height:100%;object-fit:contain;padding:18px;mix-blend-mode:multiply}
 .fiche-gallery .product-tile-placeholder.fiche-photo{height:140px;border-radius:12px;background:var(--plate)}
