@@ -35,7 +35,7 @@ async function run(items, { createCheckout, attach, release, flag, paymentOption
   const input = {
     checkoutAttemptId: "123e4567-e89b-42d3-a456-426614174000", items, shipping: { mode: "pickup", pickupTiming: "appointment" },
     customer: { firstName: "Test", lastName: "Echec", email: "echec@dynastiedorkhan.com", phone: "0600000000", country: "FR" },
-    legalAcceptance: { version: "cgv-2026-10-21-3", accepted: true }
+    legalAcceptance: { version: "cgv-2026-11-26", accepted: true }
   };
   let result; let error;
   try { result = await executeCheckout(input, options); } catch (caught) { error = caught; }

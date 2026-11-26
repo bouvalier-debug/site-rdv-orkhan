@@ -150,7 +150,7 @@ test("Stripe : une ligne « Articles » au montant net, la livraison à part, sa
     checkoutAttemptId: "123e4567-e89b-42d3-a456-426614174000", items: [line("sp-b0", 3), line("sp-t2", 3), line("animoco")], shipping: PICKUP,
     familyChipNumber: "250269812345678",
     customer: { firstName: "Test", lastName: "Offres", email: "offres@example.test", phone: "0600000000", country: "FR" },
-    legalAcceptance: { version: "cgv-2026-10-21-3", accepted: true }
+    legalAcceptance: { version: "cgv-2026-11-26", accepted: true }
   }, {
     env: { ORKHAN_SHOP_ORDERS_SECRET: "secret-test" }, origin: "https://boutique.test", now: () => new Date(NOW),
     listCatalogue: async () => catalogue(), verifyFamilyChip: async () => ({ status: "ok", recognized: true }),
@@ -180,7 +180,7 @@ test("Stripe avec livraison : Articles (net) + Livraison (non remisée) = total 
     checkoutAttemptId: "123e4567-e89b-42d3-a456-426614174001", items: [{ productId: "animoco", quantity: 2 }], shipping: { mode: "animoco-light-fr" },
     familyChipNumber: "250269812345678",
     customer: { firstName: "T", lastName: "L", email: "l@example.test", phone: "0600000000", address: "1 rue", addressExtra: "", postalCode: "59000", city: "Lille", country: "FR" },
-    legalAcceptance: { version: "cgv-2026-10-21-3", accepted: true }
+    legalAcceptance: { version: "cgv-2026-11-26", accepted: true }
   }, {
     origin: "https://boutique.test", verifyFamilyChip: async () => ({ status: "ok", recognized: true }),
     manager: { ...fakePricingManager(), async createOrder(payload) { created.push(payload); return { reference: "BOUT-TEST" }; }, async attachPaymentReference() { return {}; } },

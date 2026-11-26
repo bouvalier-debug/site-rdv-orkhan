@@ -2,10 +2,11 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
-// Corrections finales : CGV en vigueur (cgv-2026-10-21-3, article 7.5 sans délai de disponibilité ; 4.3 code Famille depuis cgv-2026-10-21-2) ; les versions précédentes sont
-// publiées comme archives, à l'identique de leur source.
-const document = require("../legal/cgv-2026-10-21-3.json");
-const ARCHIVES = ["cgv-2026-10-05", "cgv-2026-10-07", "cgv-2026-10-21", "cgv-2026-10-21-2"];
+// Étape 2 : CGV en vigueur cgv-2026-11-26 (prix public unique, Avantage Famille global, offres « X achetés + Y offerts »,
+// remboursements des commandes remisées). Les versions précédentes, dont cgv-2026-10-21-3, sont publiées comme archives,
+// à l'identique de leur source.
+const document = require("../legal/cgv-2026-11-26.json");
+const ARCHIVES = ["cgv-2026-10-05", "cgv-2026-10-07", "cgv-2026-10-21", "cgv-2026-10-21-2", "cgv-2026-10-21-3"];
 
 function inline(value) {
   const escaped = String(value).replace(/[&<>]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[character]);

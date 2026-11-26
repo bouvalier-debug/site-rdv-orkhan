@@ -91,7 +91,8 @@ test("CGV : seule l'article 4.3 change, les versions précédentes restent archi
   const previous = require("../legal/cgv-2026-10-21.json");
   // Corrections finales : la version en vigueur est cgv-2026-10-21-3 ; elle ne diffère de -2 que par l'article 7.5 (sans délai de 24 h).
   const latest = require("../legal/cgv-2026-10-21-3.json");
-  assert.equal(SHOP_LEGAL_CURRENT_VERSION, latest.version);
+  // Étape 2 : cgv-2026-10-21-3 est archivée, la version en vigueur est cgv-2026-11-26 (tests/cgv-2026-11-26.test.js).
+  assert.equal(SHOP_LEGAL_CURRENT_VERSION, "cgv-2026-11-26");
   const latestChanged = latest.blocks.map((block, index) => JSON.stringify(block) !== JSON.stringify(current.blocks[index]) ? index : null).filter((index) => index !== null);
   assert.equal(latestChanged.length, 2, "titre de version et article 7.5");
   assert.match(latest.blocks[latestChanged[1]].text, /^7\.5\. \*\*Retrait à l'élevage\*\*.*lors du départ du chiot, soit à une autre date convenue/);

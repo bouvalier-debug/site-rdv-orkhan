@@ -35,7 +35,7 @@ test("côté serveur : la commande est refusée avant toute création de command
     items: [{ productId: "cosmetics:block", quantity: 1 }],
     shipping: pickup,
     customer: { firstName: "T", lastName: "T", email: "t@example.test", phone: "0600000000", country: "FR", address: "", addressExtra: "", postalCode: "", city: "" },
-    legalAcceptance: { version: "cgv-2026-10-21-3", accepted: true }
+    legalAcceptance: { version: "cgv-2026-11-26", accepted: true }
   }, deps);
   assert.equal(result.error, "product_not_purchasable");
   assert.equal(result.status, 409);
