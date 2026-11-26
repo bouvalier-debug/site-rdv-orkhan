@@ -38,7 +38,7 @@ test("une fiche par groupe de variantes, avec « À partir de », prix public un
   assert.equal(vitrine.findFiche(fiches, "croquettes-test-10kg"), croquettes, "l'URL d'une variante ouvre la fiche du groupe");
 });
 
-test("carte compacte : photo, nom, prix public unique, disponibilité et seul bouton « Voir le produit »", () => {
+test("carte compacte : photo, nom, prix public unique, disponibilité, « Voir le produit » et ajout rapide sans choix préalable", () => {
   const [croquettes, laisse, panier] = vitrine.buildFiches(CATALOGUE.products);
   const card = vitrine.ficheCard(croquettes);
   assert.match(card, /À partir de 14,90/);
@@ -46,7 +46,11 @@ test("carte compacte : photo, nom, prix public unique, disponibilité et seul bo
   assert.match(card, /En stock/);
   assert.equal((card.match(/class="btn-voir"/g) || []).length, 1);
   assert.match(card, /href="\/produits\/croquettes-test\/">Voir le produit<\/a>/);
-  assert.doesNotMatch(card, /Ajouter au panier|<button|<form|Sans céréales|Retrait gratuit/, "ni achat, ni description, ni badge de retrait (C1–C3)");
+  // Un seul format commandable (l'autre est en rupture) : ajout rapide de ce format, sans formulaire ni description.
+  assert.match(card, /<button type="button" class="btn-add" data-quick-add="croquettes-test-2kg" data-quick-max="[0-9]+"/);
+  assert.equal((card.match(/<button/g) || []).length, 1);
+  assert.doesNotMatch(card, /<form|Sans céréales|Retrait gratuit/, "ni formulaire, ni description, ni badge de retrait (C1–C3)");
+  assert.doesNotMatch(vitrine.ficheCard(panier), /data-quick-add/, "vitrine sur demande non achetable : pas d'ajout rapide");
   assert.match(vitrine.ficheCard(laisse), /Laisse &lt;cuir&gt;/);
   assert.match(vitrine.ficheCard(laisse), /Stock faible/);
   assert.doesNotMatch(vitrine.ficheCard(panier), /product-price/, "pas de prix affiché pour un article sur demande");

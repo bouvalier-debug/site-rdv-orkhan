@@ -576,3 +576,16 @@
   .offer-banner-link{justify-self:start}
   .tile-offer{top:7px;right:7px;font-size:.64rem;padding:3px 8px}
 }
+
+/* ───────── Ajout rapide au panier depuis les cartes (produits sans choix préalable) ───────── */
+.product-tile .tile-actions{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:auto;padding-top:12px}
+.product-tile .tile-actions .btn-voir{margin-top:0}
+.btn-add{position:relative;z-index:2;display:inline-flex;align-items:center;justify-content:center;align-self:stretch;min-height:42px;padding:9px 16px;border:0;border-radius:999px;background:var(--wine);color:#fff;font:inherit;font-size:.9rem;font-weight:800;cursor:pointer;box-shadow:0 8px 18px rgba(115,29,50,.18);transition:background .15s,transform .15s}
+.btn-add:hover{background:var(--wine-dark,#5a1527)}
+.btn-add:focus-visible{outline:3px solid var(--gold-soft);outline-offset:3px}
+.btn-add:active{transform:scale(.98)}
+.btn-add.is-added{background:#2f7d4f}
+.product-tile .tile-actions .btn-voir{z-index:2}
+.tile-added{height:1.3em;line-height:1.3;margin:6px 0 0;color:#2f7d4f;font-size:.8rem;font-weight:800}
+.tile-added[data-kind="warn"]{color:#a13a4b}
+.product-tile .cart-conflict{position:relative;z-index:2;margin-top:8px;font-size:.82rem}

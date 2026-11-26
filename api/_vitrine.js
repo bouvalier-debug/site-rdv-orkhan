@@ -300,6 +300,24 @@ function ficheCard(fiche) {
 }
 
 // Rayon Alimentation : la carte porte de quoi trier côté navigateur (prix public, publication, nom, rang par défaut).
+// Ajout rapide depuis la carte : seulement si un seul format est commandable (aucun choix de taille, couleur ou
+// conditionnement), en stock ou sur commande ouvert à l'achat. Le panier, le devis et la commande recontrôlent tout.
+const QUICK_ADD_STATES = new Set(["in_stock", "low_stock", "on_request"]);
+function quickAddVariant(fiche) {
+  if (fiche.showcase) return null;
+  const orderable = fiche.variants.filter((variant) => variant.purchasable && QUICK_ADD_STATES.has(variant.state) && variant.maxOrderQuantity > 0);
+  if (orderable.length !== 1) return null;
+  if (fiche.variants.length > 1 && fiche.variants.some((variant) => variant !== orderable[0] && QUICK_ADD_STATES.has(variant.state))) return null;
+  return orderable[0];
+}
+
+function quickAddHtml(fiche) {
+  const variant = quickAddVariant(fiche);
+  if (!variant) return "";
+  const label = fiche.variants.length > 1 && variant.variantLabel ? `${fiche.name} – ${variant.variantLabel}` : fiche.name;
+  return `<button type="button" class="btn-add" data-quick-add="${escapeHtml(variant.reference)}" data-quick-max="${variant.maxOrderQuantity}" data-quick-name="${escapeHtml(label)}" aria-label="Ajouter au panier : ${escapeHtml(label)}">Ajouter au panier</button>`;
+}
+
 function ficheTile(fiche, order) {
   const href = `/produits/${encodeURIComponent(fiche.slug)}/`;
   const photo = fiche.photos[0];
@@ -313,7 +331,7 @@ function ficheTile(fiche, order) {
     + (fiche.showcase ? "" : `<p class="product-price">${priceText(fiche.price, fiche.priceFrom)}</p>`)
     + tileNoteHtml(fiche.offer)
     + `<p class="availability availability-${fiche.state}">${AVAILABILITY_LABELS[fiche.state]}</p>`
-    + `<a class="btn-voir" href="${href}">Voir le produit</a></div></article>`;
+    + `<div class="tile-actions">${quickAddHtml(fiche)}<a class="btn-voir" href="${href}">Voir le produit</a></div><p class="tile-added" data-quick-status role="status" aria-live="polite"></p></div></article>`;
 }
 
 function parcoursCard(item) {
@@ -347,7 +365,7 @@ function page({ title, description, canonical, body, robots, hero, scripts = "" 
 ${FACEBOOK_FAB}${BACK_TO_TOP}
 <script src="/assets/cart.js"></script>
 <script src="/assets/boutique-motion.js" defer></script>
-${scripts}
+${scripts}${body.includes("data-quick-add") ? `${scripts.includes("/assets/product-cart.js") ? "" : '<script src="/assets/product-cart.js"></script>\n'}<script src="/assets/quick-add.js" defer></script>` : ""}
 </body>
 </html>
 `;
