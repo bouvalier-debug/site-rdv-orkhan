@@ -44,7 +44,7 @@ test("la fiche regroupe le modèle, sépare les axes et grise les combinaisons a
   assert.match(html, /name="variant-axis-1" value="S" disabled/);
   assert.match(html, /name="variant-axis-1" value="M" checked/);
   assert.match(html, /data-fiche-price>26,90/);
-  assert.match(html, /data-fiche-family hidden/);
+  assert.doesNotMatch(html, /data-fiche-family|Prix Famille|21,90/, "étape 2 : aucun prix Famille individuel");
   assert.match(html, /data-fiche-ref>collier-bleu-m/);
   assert.match(html, new RegExp(`data-fiche-photo[^>]*${photoId(3)}`));
   const variants = variantData(html);

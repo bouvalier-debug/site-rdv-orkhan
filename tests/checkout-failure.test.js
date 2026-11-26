@@ -22,6 +22,7 @@ async function run(items, { createCheckout, attach, release, flag, paymentOption
     env: ENV, origin: "https://boutique.test", now: () => new Date("2026-10-17T10:00:00.000Z"),
     listCatalogue: async () => ({ available: true, products: CATALOGUE }),
     manager: {
+      ...require("./helpers/manager-pricing").fakePricingManager(),
       async createOrder() { calls.push(["create"]); return { reference: REFERENCE }; },
       async attachPaymentReference(reference, payload) { calls.push(["attach", payload.providerRef]); if (attach) return attach(); return {}; },
       async releaseFailedCheckout(reference, payload) { calls.push(["release", reference, payload]); if (release) return release(); return { operation: "released", released: 1 }; },

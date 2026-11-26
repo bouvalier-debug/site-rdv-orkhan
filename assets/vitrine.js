@@ -1,5 +1,5 @@
 // Fiche produit de la Boutique : variantes du Manager, galerie et ajout au panier partagé.
-// Seules la référence et la quantité sont stockées ; prix, stock et tarif Famille sont recontrôlés côté serveur.
+// Seules la référence et la quantité sont stockées ; prix, stock, offres et avantage Famille sont recontrôlés côté serveur.
 (function vitrine() {
   "use strict";
   const fiche = document.querySelector("[data-fiche]");
@@ -9,7 +9,7 @@
   const byReference = new Map(variants.map((variant) => [variant.reference, variant]));
   const axisFields = [...fiche.querySelectorAll("[data-variant-axis]")];
   const priceNode = fiche.querySelector("[data-fiche-price]");
-  const familyNode = fiche.querySelector("[data-fiche-family]");
+  const offerNodes = [...fiche.querySelectorAll("[data-fiche-offer]")];
   const availabilityNode = fiche.querySelector("[data-fiche-availability]");
   const referenceNode = fiche.querySelector("[data-fiche-ref]");
   const quantityInput = fiche.querySelector("[data-fiche-quantity]");
@@ -66,7 +66,8 @@
   function select(variant) {
     current = variant;
     if (priceNode) priceNode.textContent = variant.price;
-    if (familyNode) { familyNode.hidden = !variant.familyPrice; familyNode.querySelector("span").textContent = variant.familyPrice || ""; }
+    // Encart de l'offre du format choisi (aucun si ce format n'en relève pas).
+    offerNodes.forEach((node) => { node.hidden = node.dataset.ficheOffer !== variant.offerId; });
     if (availabilityNode) { availabilityNode.textContent = variant.availability; availabilityNode.className = `availability availability-${variant.state}`; }
     if (referenceNode) referenceNode.textContent = variant.reference;
     if (quantityInput) {

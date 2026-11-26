@@ -77,17 +77,11 @@ function validateCart(input, options = {}) {
       if (combinedQuantity > product.maxOrderQuantity) return { error: "out_of_stock", productId: product.id };
     }
 
+    // Étape 2 : prix public unique pour tous les clients. L'avantage Famille est une remise globale sur le panier,
+    // calculée par le Manager (api/_cart-pricing.js) ; les prix Famille individuels ne sont plus appliqués.
     let unitPriceCents = product.priceCents;
     let validatedOptions;
-    if (product.family === "animoco") {
-      unitPriceCents = input.benefits && input.benefits.dynastieFamily
-        ? product.familyPriceCents : product.publicPriceCents;
-    }
-    // Même règle que le Manager (expectedCatalogUnitPrice) : prix famille s'il existe et si le panier y a droit.
-    if (product.catalogue) {
-      unitPriceCents = input.benefits && input.benefits.dynastieFamily && Number.isInteger(product.familyPriceCents)
-        ? product.familyPriceCents : product.publicPriceCents;
-    }
+    if (product.family === "animoco" || product.catalogue) unitPriceCents = product.publicPriceCents;
     if (product.family === "red-dingo") {
       validatedOptions = validateRedDingo(product, item.options, options.engravingConfig);
       if (validatedOptions.error) return validatedOptions;

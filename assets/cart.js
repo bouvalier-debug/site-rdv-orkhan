@@ -91,7 +91,45 @@
   // lignes de commande).
   const FAMILY_CHIP_STORAGE_KEY = "orkhan-shop-family-chip-v1";
   const FAMILY_CHIP_MAX_AGE_DAYS = 30;
-  const FAMILY_IDLE_MESSAGE = "Indiquez le numéro de puce d’un chien issu de l’élevage, ou le code Famille remis lors de votre réservation : les tarifs Famille s’appliquent aux articles qui en proposent un.";
+  const FAMILY_IDLE_MESSAGE = "Indiquez le numéro de puce d’un chien issu de l’élevage, ou le code Famille remis lors de votre réservation : l’Avantage Famille s’applique à tout le panier, offres en cours comprises.";
+
+  // Étape 2 : taux de l'avantage Famille (points de base, transmis par le devis du serveur) : « 5 % ».
+  function familyRateText(basisPoints) {
+    if (!Number.isInteger(basisPoints) || basisPoints <= 0) return "";
+    return `${(basisPoints / 100).toLocaleString("fr-FR", { maximumFractionDigits: 2 })}\u00a0%`;
+  }
+
+  function plural(count, word) {
+    return `${count} ${word}${count > 1 ? "s" : ""}`;
+  }
+
+  // Remises du devis, dans l'ordre du calcul du Manager : une ligne par offre appliquée, puis une seule ligne Avantage
+  // Famille. La répartition par article reste invisible.
+  function discountRows(quote) {
+    const pricing = quote && quote.pricing;
+    if (!pricing) return [];
+    const rows = (pricing.offers || []).filter((offer) => offer.discountCents > 0).map((offer) => ({
+      kind: "offer",
+      label: `${offer.name} (${offer.buyQuantity} + ${offer.freeQuantity} offert${offer.freeQuantity > 1 ? "s" : ""})`,
+      amountCents: offer.discountCents
+    }));
+    if (pricing.family && pricing.family.discountCents > 0) {
+      rows.push({ kind: "family", label: `Avantage Famille : −${familyRateText(pricing.family.basisPoints)}`, amountCents: pricing.family.discountCents });
+    }
+    return rows;
+  }
+
+  // Progression de chaque offre présente au panier : produits offerts et produits manquants pour le prochain.
+  function offerProgressMessages(quote) {
+    const offers = (quote && quote.pricing && quote.pricing.offers) || [];
+    return offers.map((offer) => {
+      const offered = offer.freeItems > 0 ? `${plural(offer.freeItems, "produit")} offert${offer.freeItems > 1 ? "s" : ""}` : "";
+      const next = offer.freeItems > 0 ? "en obtenir un de plus" : `en obtenir ${offer.freeQuantity} offert${offer.freeQuantity > 1 ? "s" : ""}`;
+      const missing = offer.missingForNextFree > 0 ? `ajoutez encore ${plural(offer.missingForNextFree, "produit")} de l’offre pour ${next}` : "";
+      const text = [offered, missing].filter(Boolean).join(" ; ");
+      return { name: offer.name, text: `${text.charAt(0).toUpperCase()}${text.slice(1)}.`, complete: offer.freeItems > 0 && !missing };
+    });
+  }
 
   function cleanFamilyChip(value) {
     return typeof value === "string" ? value.trim().slice(0, 32) : "";
@@ -303,7 +341,7 @@
       return "Pour cette commande, seul le retrait à l’élevage est proposé.";
     }
     if (code === "family_verification_unavailable") {
-      return "Le service de vérification du tarif Famille est momentanément indisponible. Réessayez dans quelques instants, ou retirez le numéro de puce ou le code Famille pour commander au tarif public.";
+      return "Le service de vérification de l’Avantage Famille est momentanément indisponible. Réessayez dans quelques instants, ou retirez le numéro de puce ou le code Famille pour commander sans l’Avantage Famille.";
     }
     if (code === "invalid_chip") return "Le numéro de puce Famille Dynastie saisi est invalide. Corrigez-le ou retirez-le pour continuer.";
     if (code === "invalid_family_code") return "Le code Famille Dynastie saisi est invalide. Corrigez-le ou retirez-le pour continuer.";
@@ -319,7 +357,8 @@
     if (code === "out_of_stock") return "Un produit de votre panier n’est plus disponible dans la quantité demandée. Réduisez la quantité ou retirez-le du panier.";
     if (code === "product_not_purchasable") return "Un produit de votre panier n’est plus en vente. Retirez-le du panier pour continuer.";
     if (code === "catalogue_unavailable") return "Les nouveaux produits sont momentanément indisponibles. Réessayez dans quelques instants ou retirez-les du panier.";
-    if (code === "price_changed") return "Le prix d’un produit a changé. Vérifiez votre panier avant de continuer.";
+    if (code === "price_changed") return "Le prix d’un produit ou une offre a changé. Vérifiez votre panier avant de continuer.";
+    if (code === "pricing_unavailable") return "Le calcul des offres et des remises est momentanément indisponible. Réessayez dans quelques instants.";
     // Phase 4 : commande Red Dingo séparée (CGV 5.6) et moment du retrait (CGV 7.5).
     if (code === "red_dingo_separate_order") return "Les médailles Red Dingo se commandent séparément des autres articles. Retirez-les du panier pour commander les autres articles, puis passez une seconde commande pour les médailles.";
     if (code === "pickup_timing_required" || code === "invalid_pickup_timing") return "Indiquez quand vous souhaitez retirer vos achats.";
@@ -426,6 +465,9 @@
     const subtotalNode = container.querySelector("[data-cart-subtotal]");
     const shippingNode = container.querySelector("[data-cart-shipping]");
     const totalNode = container.querySelector("[data-cart-total]");
+    const discountsNode = container.querySelector("[data-cart-discounts]");
+    const savingsNode = container.querySelector("[data-cart-savings]");
+    const offersNode = container.querySelector("[data-cart-offers]");
     const customerForm = container.querySelector("[data-customer-form]");
     const checkoutButton = container.querySelector("[data-checkout-button]");
     const checkoutStatus = container.querySelector("[data-checkout-status]");
@@ -601,6 +643,7 @@
       renderLines(items, quote, "failed");
       const autoSelected = renderModes(result);
       subtotalNode.textContent = money(quote?.subtotalCents);
+      renderPricing(quote);
       shippingNode.textContent = quote?.shipping ? money(quote.shipping.priceCents) : "À choisir";
       totalNode.textContent = money(quote?.totalCents);
       if (checkoutButton) checkoutButton.disabled = !quote;
@@ -638,6 +681,7 @@
         container.querySelectorAll("[data-red-dingo-only]").forEach((node) => { node.hidden = true; });
         if (onRequestNotice) onRequestNotice.hidden = true;
         subtotalNode.textContent = money(0);
+        renderPricing(null);
         shippingNode.textContent = "—";
         totalNode.textContent = money(0);
         return;
@@ -655,18 +699,47 @@
       }
     }
 
+    // Étape 2 : remises du devis (une ligne par offre, une ligne Avantage Famille), montant total économisé et
+    // progression des offres. Les prix des lignes restent les prix publics.
+    function renderPricing(quote) {
+      const rows = discountRows(quote);
+      if (discountsNode) {
+        discountsNode.replaceChildren(...rows.map((row) => {
+          const node = element(document, "div", `total-row total-row--discount total-row--${row.kind}`);
+          node.append(element(document, "span", "", row.label), element(document, "strong", "", `−${money(row.amountCents)}`));
+          return node;
+        }));
+      }
+      if (savingsNode) {
+        const saved = Number.isInteger(quote?.discountCents) ? quote.discountCents : 0;
+        savingsNode.hidden = saved <= 0;
+        const amount = savingsNode.querySelector("strong");
+        if (amount) amount.textContent = money(saved);
+      }
+      if (offersNode) {
+        const messages = offerProgressMessages(quote);
+        offersNode.replaceChildren(...messages.map((message) => {
+          const node = element(document, "p", `cart-offer${message.complete ? " cart-offer--complete" : ""}`);
+          node.append(element(document, "strong", "", message.name), element(document, "span", "", message.text));
+          return node;
+        }));
+        offersNode.hidden = !messages.length;
+      }
+    }
+
     function renderFamilyStatus(result) {
       if (!familyStatus) return;
       const chip = familyStore.get();
       if (familyRemove) familyRemove.hidden = !chip;
-      let text = FAMILY_IDLE_MESSAGE;
+      const rate = familyRateText(result?.quote?.familyDiscountBasisPoints);
+      let text = rate ? FAMILY_IDLE_MESSAGE.replace("l’Avantage Famille s’applique", `l’Avantage Famille de ${rate} s’applique`) : FAMILY_IDLE_MESSAGE;
       let kind = "idle";
       if (chip && result?.error === "invalid_chip") { text = "Numéro de puce invalide : saisissez les 15 chiffres, ou retirez-le."; kind = "error"; }
       else if (chip && result?.error === "invalid_family_code") { text = "Code Famille invalide : vérifiez sa saisie (DYN-XXXX-XXXX), ou retirez-le."; kind = "error"; }
       else if (chip && result?.error === "family_proof_conflict") { text = "Utilisez soit le code Famille, soit le numéro de puce, pas les deux."; kind = "error"; }
-      else if (chip && result?.error === "family_verification_unavailable") { text = "Vérification momentanément indisponible. Réessayez, ou retirez le numéro pour commander au tarif public."; kind = "error"; }
-      else if (chip && result?.quote?.benefits?.dynastieFamily === true) { text = "Famille Dynastie reconnue : tarifs Famille appliqués aux articles concernés."; kind = "ok"; }
-      else if (chip && result?.quote) { text = familyProofPayload(chip).familyCode ? "Code Famille non reconnu ou expiré : les tarifs publics s’appliquent." : "Puce non reconnue : les tarifs publics s’appliquent."; kind = "warn"; }
+      else if (chip && result?.error === "family_verification_unavailable") { text = "Vérification momentanément indisponible. Réessayez, ou retirez le numéro pour commander sans l’Avantage Famille."; kind = "error"; }
+      else if (chip && result?.quote?.benefits?.dynastieFamily === true) { text = `Famille Dynastie reconnue : Avantage Famille${rate ? ` de ${rate}` : ""} appliqué à tout le panier.`; kind = "ok"; }
+      else if (chip && result?.quote) { text = familyProofPayload(chip).familyCode ? "Code Famille non reconnu ou expiré : aucune remise Famille n’est appliquée." : "Puce non reconnue : aucune remise Famille n’est appliquée."; kind = "warn"; }
       familyStatus.textContent = text;
       familyStatus.dataset.kind = kind;
       if (familyHelp) familyHelp.hidden = kind !== "error" && kind !== "warn";
@@ -884,7 +957,10 @@
     FAMILY_CHIP_STORAGE_KEY,
     createCustomerStore,
     deliveryDelayLines,
+    discountRows,
     displayOptionRows,
+    familyRateText,
+    offerProgressMessages,
     checkoutCancelMessage,
     handleCheckoutCancel,
     hasSignedCheckoutCancel,

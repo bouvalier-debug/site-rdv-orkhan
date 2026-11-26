@@ -15,6 +15,7 @@
     .cart-contact-option{margin:14px 0 0;padding:14px 16px;border:1px solid var(--line);border-radius:8px;background:var(--cream);font-size:.9rem;line-height:1.5}.cart-contact-option p{margin:0 0 8px}.cart-contact-option a,.family-help a{color:var(--wine);font-weight:800;text-decoration:underline;text-underline-offset:3px}.cart-contact-option a:focus-visible,.family-help a:focus-visible{outline:2px solid var(--wine);outline-offset:3px}.family-help{margin:8px 0 0;color:var(--muted);font-size:.875rem}
     @media(max-width:480px){.cart-line{padding:17px}.cart-line__controls{align-items:stretch;flex-direction:column}.cart-quantity input{width:100%}.cart-remove{align-self:flex-start}.summary-card,.customer-card{padding:18px}.customer-fields{grid-template-columns:1fr}.customer-fields .full{grid-column:auto}}
     .family-card .family-intro{margin-top:-6px;color:var(--muted);font-size:.9rem}.family-field{display:grid;gap:5px;font-size:.875rem;font-weight:800}.family-field small{font-size:inherit;font-weight:600}.family-field input{width:100%;min-height:46px;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:#fff;font:inherit}.family-actions{display:flex;gap:10px;align-items:center;margin-top:10px}.family-button{min-height:44px;padding:9px 15px;border:0;border-radius:999px;color:#fff;background:var(--wine);font:inherit;font-weight:800;cursor:pointer}.family-link{min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:6px;color:var(--wine);background:#fff;font:inherit;font-weight:800;cursor:pointer}.family-status{margin:12px 0 0;padding:12px;border-left:4px solid var(--gold);background:var(--cream);font-size:.875rem}.family-status[data-kind="ok"]{border-left-color:#2f7d4f;background:#eef7f1}.family-status[data-kind="error"]{border-left-color:#a13a4b;background:#fbeef0}
+    .cart-discounts{display:grid;gap:8px}.cart-discounts:empty{display:none}.total-row--discount{color:var(--wine)}.total-row--discount span{font-size:.93rem}.total-row--discount strong{white-space:nowrap}.cart-savings{margin:12px 0 0;padding:10px 12px;border:1px solid var(--gold);border-radius:6px;background:var(--cream);color:var(--wine);font-size:.93rem;font-weight:700}.cart-savings[hidden],.cart-offers[hidden]{display:none}.cart-offers{display:grid;gap:8px;margin:0 0 16px}.cart-offer{display:grid;gap:2px;margin:0;padding:10px 12px;border-left:4px solid var(--gold);background:var(--cream);font-size:.88rem}.cart-offer strong{color:var(--wine)}.cart-offer--complete{border-left-color:var(--wine)}
   </style>
   <script src="/assets/cart.js" defer></script>
 </head>
@@ -59,10 +60,10 @@
       <aside class="cart-summary">
         <section class="summary-card family-card" aria-labelledby="family-title">
           <h2 id="family-title">Vous êtes une Famille Dynastie ?</h2>
-          <p class="family-intro">Une seule vérification pour tout le panier, à partir du numéro de puce d’un chien issu de l’élevage ou du code Famille remis lors de votre réservation.</p>
+          <p class="family-intro">Avantage Famille : une remise sur tout le panier, cumulable avec les offres en cours. Une seule vérification, à partir du numéro de puce d’un chien issu de l’élevage ou du code Famille remis lors de votre réservation.</p>
           <label class="family-field"><span>Numéro de puce ou code Famille <small>(facultatif)</small></span><input data-family-chip autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="32" placeholder="15 chiffres ou DYN-XXXX-XXXX"></label>
           <div class="family-actions"><button class="family-button" type="button" data-family-chip-verify>Vérifier</button><button class="family-link" type="button" data-family-chip-remove hidden>Retirer</button></div>
-          <p class="family-status" data-family-status role="status" aria-live="polite" data-kind="idle">Indiquez le numéro de puce d’un chien issu de l’élevage, ou le code Famille remis lors de votre réservation : les tarifs Famille s’appliquent aux articles qui en proposent un.</p>
+          <p class="family-status" data-family-status role="status" aria-live="polite" data-kind="idle">Indiquez le numéro de puce d’un chien issu de l’élevage, ou le code Famille remis lors de votre réservation : l’Avantage Famille s’applique à tout le panier, offres en cours comprises.</p>
           <p class="family-help" data-family-help hidden>Besoin d’aide ? <a href="https://www.dynastiedorkhan.com/contact/">Me contacter</a></p>
         </section>
         <section class="summary-card" aria-labelledby="shipping-title">
@@ -72,11 +73,14 @@
         </section>
         <section class="summary-card" aria-labelledby="summary-title">
           <h2 id="summary-title">Récapitulatif</h2>
+          <div class="cart-offers" data-cart-offers role="status" aria-live="polite" hidden></div>
           <div class="totals">
             <div class="total-row"><span>Sous-total</span><strong data-cart-subtotal>—</strong></div>
+            <div class="cart-discounts" data-cart-discounts></div>
             <div class="total-row"><span>Livraison</span><strong data-cart-shipping>—</strong></div>
             <div class="total-row total-row--grand"><span>Total</span><strong data-cart-total>—</strong></div>
           </div>
+          <p class="cart-savings" data-cart-savings hidden>Vous économisez <strong>—</strong> sur cette commande.</p>
           <p class="summary-delays" hidden><strong>Délais :</strong> <span data-delivery-delays></span></p>
           <div class="on-request-notice" data-on-request-notice hidden><p><strong>Produit sur commande</strong></p><p>Cet article est disponible sur commande, sous réserve de disponibilité auprès de notre fournisseur.</p><p>La date de disponibilité pour le retrait à l'élevage vous sera communiquée par SMS ou par e-mail.</p></div>
           <div class="checkout-confirm">

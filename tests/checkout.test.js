@@ -5,6 +5,7 @@ const { executeCheckout } = require("../api/_checkout");
 const { checkoutParameters, createStripeAdapter } = require("../api/_payment/stripe");
 const { createManagerClient } = require("../api/_orkhan-shop-orders");
 const { quoteCartRequest } = require("../api/cart-quote");
+const { fakePricingManager } = require("./helpers/manager-pricing");
 
 const ATTEMPT = "123e4567-e89b-42d3-a456-426614174000";
 const CUSTOMER = {
@@ -27,6 +28,7 @@ function checkoutInput(overrides = {}) {
 function dependencies(overrides = {}) {
   const calls = [];
   const manager = {
+    ...fakePricingManager(),
     async createOrder(payload, key) {
       calls.push(["create", payload, key]);
       return { reference: "BOUT-TEST" };
@@ -76,17 +78,31 @@ test("recalcule l’éligibilité Famille et ne transmet jamais la puce", async 
   });
   await executeCheckout(input, deps);
   assert.equal(deps.calls[0][1].dynastieFamilyEligible, true);
-  assert.equal(deps.calls[0][1].totalCents, 2149);
+  // Étape 2 : prix public 19,99 €, avantage Famille global de 5 % (1,00 €), livraison 3,50 € non remisée.
+  assert.equal(deps.calls[0][1].pricingVersion, 2);
+  assert.equal(deps.calls[0][1].lines[0].unitPriceCents, 1999);
+  assert.equal(deps.calls[0][1].subtotalCents, 1999);
+  assert.equal(deps.calls[0][1].discountCents, 100);
+  assert.equal(deps.calls[0][1].totalCents, 2249);
+  // Stripe : une ligne « Articles » au montant net et la livraison, sans coupon ; total identique à la commande.
+  const stripe = deps.calls.find((call) => call[0] === "stripe")[1];
+  assert.deepEqual(stripe.lines.map((line) => [line.name, line.quantity, line.unitPriceCents]), [["Articles", 1, 1899]]);
+  assert.equal(stripe.shippingCents, 350);
+  const params = checkoutParameters({ ...stripe, orderReference: "BOUT-TEST", customerEmail: "a@b.test", successUrl: "https://s", cancelUrl: "https://c" });
+  assert.equal(params.get("line_items[0][price_data][unit_amount]"), "1899");
+  assert.equal(params.get("line_items[1][price_data][unit_amount]"), "350");
+  assert.equal([...params.keys()].some((key) => /discount|coupon/.test(key)), false);
   assert.doesNotMatch(JSON.stringify(deps.calls), /250 123 456 789 012|chipNumber/);
 });
 
 test("cart-quote et checkout partagent exactement la résolution Famille", async () => {
   const verifyFamilyChip = async () => ({ status: "ok", recognized: true });
   const items = [{ productId: "animoco", quantity: 1, options: { chipNumber: "250123456789012" } }];
-  const quote = await quoteCartRequest({ items, shipping: { mode: "animoco-light-fr" } }, { verifyFamilyChip });
+  const quote = await quoteCartRequest({ items, shipping: { mode: "animoco-light-fr" } }, { verifyFamilyChip, manager: fakePricingManager() });
   const deps = dependencies({ verifyFamilyChip });
   await executeCheckout(checkoutInput({ items }), deps);
   assert.equal(quote.quote.totalCents, deps.calls[0][1].totalCents);
+  assert.equal(quote.quote.totalCents, 2249);
 });
 
 test("refuse une livraison indisponible avant toute création externe", async () => {

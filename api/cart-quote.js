@@ -1,5 +1,6 @@
 const { quoteCart } = require("./_cart");
 const { cartCatalog } = require("./_cart-catalogue");
+const { applyCommercialPricing } = require("./_cart-pricing");
 const { chipNumbers, familyCodeInput, resolveFamilyEligibility } = require("./_family-benefit");
 const { clientIp, consumeRequest } = require("./_family-eligibility");
 
@@ -31,8 +32,12 @@ async function quoteCartRequest(input, options = {}) {
     shipping: input?.shipping,
     benefits: { dynastieFamily: eligibility.familyEligible }
   }, { ...options.quoteOptions, ...(catalogue.catalog ? { catalog: catalogue.catalog } : {}) });
-  if (!result.quote || !catalogue.catalog) return result;
-  return { ...result, quote: { ...result.quote, lines: result.quote.lines.map((line) => {
+  if (!result.quote) return result;
+  // Étape 2 : offres en cours et avantage Famille global, calculés par le Manager.
+  const priced = await (options.applyCommercialPricing || applyCommercialPricing)(result.quote, eligibility.familyEligible, options);
+  if (priced.error) return priced;
+  if (!catalogue.catalog) return { ...result, quote: priced.quote };
+  return { ...result, quote: { ...priced.quote, lines: priced.quote.lines.map((line) => {
     const product = catalogue.catalog.get(line.productId);
     if (!product?.variantGroup) return line;
     const displayName = displayVariantName(product);

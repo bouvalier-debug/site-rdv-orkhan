@@ -1,5 +1,6 @@
 const { quoteCart } = require("./_cart");
 const { cartCatalog } = require("./_cart-catalogue");
+const { applyCommercialPricing } = require("./_cart-pricing");
 const { chipNumbers, resolveFamilyEligibility } = require("./_family-benefit");
 const { createManagerClient } = require("./_orkhan-shop-orders");
 const { createPaymentProvider } = require("./_payment");
@@ -97,6 +98,15 @@ function orderLines(lines) {
   }));
 }
 
+// Lignes transmises à Stripe. Panier remisé (offre ou avantage Famille) : une seule ligne « Articles » au montant net,
+// sans coupon Stripe, pour que le montant payé soit exactement le total validé par le Manager ; la ligne « Livraison »
+// est ajoutée par l'adaptateur Stripe. Sans remise : lignes détaillées, comme avant.
+function stripeLines(lines, quote) {
+  if (!quote.discountCents) return lines;
+  const net = quote.pricing.netSubtotalCents;
+  return [{ productId: "articles", name: "Articles", quantity: 1, unitPriceCents: net, subtotalCents: net }];
+}
+
 function shippingSnapshot(selection, quoteShipping) {
   return {
     mode: quoteShipping.mode,
@@ -148,14 +158,22 @@ async function executeCheckout(input, options = {}) {
       : quoteResult.error === "out_of_stock" || quoteResult.error === "product_not_purchasable" ? 409 : 400;
     return { error: quoteResult.error, status };
   }
-  const quote = quoteResult.quote;
-  if (!quote.shipping || !Number.isInteger(quote.totalCents)) return { error: "shipping_required", status: 400 };
+  if (!quoteResult.quote.shipping || !Number.isInteger(quoteResult.quote.totalCents)) return { error: "shipping_required", status: 400 };
+  // Étape 2 : offres en cours et avantage Famille global, calculés par le Manager ; le Manager refait ce calcul à la
+  // création de la commande et refuse tout écart (PRICE_MISMATCH, traduit en price_changed).
+  const priced = await (options.applyCommercialPricing || applyCommercialPricing)(quoteResult.quote, familyEligible, { manager: options.manager, managerOptions: options.managerOptions });
+  if (priced.error) return priced;
+  const quote = priced.quote;
+  if (!Number.isInteger(quote.totalCents)) return { error: "shipping_required", status: 400 };
   if (quote.lines.some((line) => line.family === "red-dingo" || /^red-dingo:/i.test(line.productId)) && input.engravingConfirmed !== true) {
     return { error: "engraving_confirmation_required", status: 400 };
   }
 
   const lines = orderLines(quote.lines);
   const orderPayload = {
+    // Format de commande de l'étape 2 : lignes au prix public, remises totales (offres + avantage Famille) à part.
+    pricingVersion: quote.pricingVersion,
+    discountCents: quote.discountCents,
     currency: quote.currency,
     subtotalCents: quote.subtotalCents,
     shippingCents: quote.shipping.priceCents,
@@ -190,7 +208,7 @@ async function executeCheckout(input, options = {}) {
     idempotencyKey: attemptId,
     orderReference,
     currency: quote.currency,
-    lines,
+    lines: stripeLines(lines, quote),
     shippingCents: quote.shipping.priceCents,
     customerEmail: customerResult.customer.email,
     ...(hasCatalogueLines
@@ -227,6 +245,7 @@ module.exports = {
   requestOrigin,
   shippingSnapshot,
   shippingCountryMatches,
+  stripeLines,
   validateCustomer,
   SHOP_LEGAL_CURRENT_VERSION
 };

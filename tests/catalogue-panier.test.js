@@ -6,6 +6,7 @@ const { quoteCartRequest } = require("../api/cart-quote");
 const { CATALOGUE_CHECKOUT_EXPIRY_SECONDS, executeCheckout } = require("../api/_checkout");
 const { checkoutParameters, createStripeAdapter } = require("../api/_payment/stripe");
 const { catalogueLine } = require("../assets/product-cart");
+const { fakePricingManager } = require("./helpers/manager-pricing");
 
 // Lot 2, étape 4 : produits du catalogue Manager dans le panier, le devis, la commande et Stripe (mode test).
 const SHAMPOING = { reference: "shampoing-test", name: "Shampoing doux", family: "COLIS", publicPriceCents: 1500, familyPriceCents: 1200, weightGrams: 300, purchasable: true, maxOrderQuantity: 3 };
@@ -22,7 +23,8 @@ function quote(items, extra = {}) {
   const source = extra.source || catalogueSource();
   return quoteCartRequest({ items, shipping: extra.shipping }, {
     listCatalogue: source.listCatalogue,
-    verifyFamilyChip: async () => ({ status: "ok", recognized: extra.family === true })
+    verifyFamilyChip: async () => ({ status: "ok", recognized: extra.family === true }),
+    manager: fakePricingManager()
   });
 }
 
@@ -44,10 +46,13 @@ test("un produit achetable du catalogue est chiffré au prix du Manager, en retr
   assert.equal(result.quote.totalCents, 3000);
 });
 
-test("le prix famille Dynastie du Manager s'applique quand le panier y a droit", async () => {
+test("étape 2 : prix public unique, l'avantage Famille global du Manager s'applique quand le panier y a droit", async () => {
   const items = [{ productId: "animoco", quantity: 1, options: { chipNumber: CHIP } }, { productId: "shampoing-test", quantity: 1 }];
   const family = await quote(items, { family: true });
-  assert.deepEqual(family.quote.lines.map((line) => line.unitPriceCents), [1799, 1200]);
+  assert.deepEqual(family.quote.lines.map((line) => line.unitPriceCents), [1999, 1500]);
+  // 5 % de 34,99 € = 1,75 € (médaille Animoco comprise).
+  assert.deepEqual(family.quote.pricing.family, { basisPoints: 500, discountCents: 175 });
+  assert.equal(family.quote.pricing.netSubtotalCents, 3324);
   const publicPrice = await quote(items, { family: false });
   assert.deepEqual(publicPrice.quote.lines.map((line) => line.unitPriceCents), [1999, 1500]);
 });
@@ -66,7 +71,7 @@ test("le panier distingue les deux formats Wellness sans doubler le format déj�
   const input = { items: variants.map((product) => ({ productId: product.reference, quantity: 1 })),
     shipping: { mode: "pickup", pickupTiming: "appointment" } };
   const listCatalogue = async () => ({ available: true, products: variants });
-  const publicResult = await quoteCartRequest(input, { listCatalogue });
+  const publicResult = await quoteCartRequest(input, { listCatalogue, manager: fakePricingManager() });
   assert.deepEqual(publicResult.quote.lines.map((line) => line.displayName || line.name), [
     "Wellness CORE Puppy Original – Dinde et Poulet – 1,5 kg",
     "Wellness CORE Puppy Original – Dinde et Poulet – 10 kg"
@@ -75,9 +80,10 @@ test("le panier distingue les deux formats Wellness sans doubler le format déj�
   assert.equal(publicResult.quote.lines[1].name, variants[1].name, "le nom commercial du devis reste inchangé");
   assert.equal(publicResult.quote.totalCents, 7980);
   const familyResult = await quoteCartRequest({ ...input, familyCode: "DYN-TEST-TEST" }, {
-    listCatalogue, verifyFamilyCode: async () => ({ status: "ok", recognized: true })
+    listCatalogue, verifyFamilyCode: async () => ({ status: "ok", recognized: true }), manager: fakePricingManager()
   });
-  assert.equal(familyResult.quote.totalCents, 7480);
+  // Étape 2 : 5 % de 79,80 € = 3,99 €.
+  assert.equal(familyResult.quote.totalCents, 7581);
 });
 
 test("les autres axes de variante complètent le nom sans répéter une valeur déjà écrite", async () => {
@@ -133,6 +139,7 @@ function checkoutDeps(managerError) {
     origin: "https://boutique.test",
     env: { ORKHAN_SHOP_ORDERS_SECRET: "secret-boutique-test" },
     manager: {
+      ...fakePricingManager(),
       async createOrder(payload) { calls.push(["create", payload]); if (managerError) throw Object.assign(new Error(managerError), { status: 409, response: { error: managerError } }); return { reference: "BOUT-TEST" }; },
       async attachPaymentReference(reference, payload) { calls.push(["attach", reference, payload]); return {}; }
     },

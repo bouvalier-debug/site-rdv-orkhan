@@ -7,6 +7,7 @@ const { quoteCart } = require("../api/_cart");
 const { SHIPPING_CONFIG, SHIPPING_MODES } = require("../api/_shipping");
 const cartQuoteHandler = require("../api/cart-quote");
 const { quoteCartRequest } = cartQuoteHandler;
+const { fakePricingManager } = require("./helpers/manager-pricing");
 
 const TEST_SHIPPING_CONFIG = {
   ...SHIPPING_CONFIG,
@@ -85,13 +86,14 @@ test("phase 4 : Animoco plus Red Dingo exige deux commandes séparées, avec ou 
   }
 });
 
-test("les prix public et Famille sont recalculés depuis le catalogue", () => {
+test("étape 2 : le prix public unique est recalculé depuis le catalogue, même avec un bénéfice Famille transmis", () => {
   const publicQuote = quote([{ productId: "animoco", quantity: 1 }], { mode: "pickup" });
   const familyQuote = quote([{ productId: "animoco", quantity: 1, priceCents: 1 }], { mode: "pickup" }, {
     benefits: { dynastieFamily: true }, priceCents: 1, shippingCents: 1, totalCents: 1
   });
   assert.equal(publicQuote.quote.totalCents, 1999);
-  assert.equal(familyQuote.quote.totalCents, 1799);
+  assert.equal(familyQuote.quote.totalCents, 1999);
+  assert.equal(familyQuote.quote.lines[0].unitPriceCents, 1999);
 });
 
 test("un produit colis prend la bonne tranche relais/Locker", () => {
@@ -249,21 +251,30 @@ test("cart-quote répond 503 quand Mondial Relay réel est indisponible", async 
   assert.deepEqual(response.body.availableModes, ["pickup"]);
 });
 
-test("cart-quote applique le tarif Famille uniquement après vérification serveur", async () => {
+test("cart-quote applique l'avantage Famille global uniquement après vérification serveur", async () => {
   const input = {
     items: [{ productId: "animoco", quantity: 1, options: { chipNumber: "250123456789012" } }],
     shipping: { mode: "animoco-light-fr" }
   };
+  const calls = [];
   const recognized = await quoteCartRequest(input, {
+    manager: fakePricingManager({ calls }),
     verifyFamilyChip: async () => ({ status: "ok", recognized: true }),
     quoteOptions: { catalog: TEST_CATALOG, shippingConfig: TEST_SHIPPING_CONFIG }
   });
   const unknown = await quoteCartRequest(input, {
+    manager: fakePricingManager({ calls }),
     verifyFamilyChip: async () => ({ status: "ok", recognized: false }),
     quoteOptions: { catalog: TEST_CATALOG, shippingConfig: TEST_SHIPPING_CONFIG }
   });
-  assert.equal(recognized.quote.lines[0].unitPriceCents, 1799);
-  assert.equal(recognized.quote.totalCents, 2149);
+  // Prix public unique ; 5 % de 19,99 € = 1,00 € (arrondi au centime le plus proche, une seule fois) ; livraison non remisée.
+  assert.equal(recognized.quote.lines[0].unitPriceCents, 1999);
+  assert.deepEqual(recognized.quote.pricing.family, { basisPoints: 500, discountCents: 100 });
+  assert.equal(recognized.quote.discountCents, 100);
+  assert.equal(recognized.quote.totalCents, 2249);
+  // Panier historique sans Famille reconnue : aucune remise possible, aucun appel au Manager.
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0][1].dynastieFamilyEligible, true);
   assert.equal(unknown.quote.lines[0].unitPriceCents, 1999);
   assert.equal(unknown.quote.totalCents, 2349);
 });

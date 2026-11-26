@@ -1,9 +1,16 @@
 "use strict";
 
-// Mon budget croquettes : page rendue côté serveur à partir du catalogue Manager (recettes, formats, poids, prix public
-// et prix Famille tels qu'enregistrés). Les calculs sont faits dans le navigateur par assets/budget-croquettes.js ;
-// l'adresse ne transmet qu'une référence de format et une ration, jamais un prix.
+// Mon budget croquettes : page rendue côté serveur à partir du catalogue Manager (recettes, formats, poids et prix public
+// unique). Étape 2 : l'ancien prix Famille par format est remplacé par une estimation « avec l'Avantage Famille », au taux
+// global enregistré dans le Manager (le panier reste seul juge du montant réel). Les calculs sont faits dans le navigateur
+// par assets/budget-croquettes.js ; l'adresse ne transmet qu'une référence de format et une ration, jamais un prix.
 const { AVAILABILITY_LABELS, BUDGET_PATH, buildFiches, escapeHtml, heroHtml, money, page, rationCalculatorHref } = require("./_vitrine");
+const { familyRateText } = require("./_offers");
+
+function familyBasisPoints(catalogue) {
+  const value = catalogue && catalogue.commercial ? catalogue.commercial.familyDiscountBasisPoints : null;
+  return Number.isSafeInteger(value) && value > 0 ? value : null;
+}
 
 function formatLabel(variant) {
   if (variant.variantLabel) return variant.variantLabel;
@@ -30,7 +37,6 @@ function budgetRecipes(catalogue) {
         label: formatLabel(variant),
         weightGrams: Number.isInteger(variant.weightGrams) ? variant.weightGrams : null,
         publicPriceCents: variant.publicPriceCents,
-        familyPriceCents: Number.isInteger(variant.familyPriceCents) ? variant.familyPriceCents : null,
         state: variant.state,
         availability: AVAILABILITY_LABELS[variant.state],
         orderable: orderable(variant),
@@ -52,8 +58,8 @@ function recipeOptions(recipes) {
   return [...groups].map(([brand, items]) => `<optgroup label="${escapeHtml(brand)}">${items.map((recipe) => `<option value="${escapeHtml(recipe.slug)}">${escapeHtml(recipe.name)}</option>`).join("")}</optgroup>`).join("");
 }
 
-const card = (title, name, family) => `<div class="budget-card"><span>${title}</span><strong data-budget-out="${name}"></strong>`
-  + (family ? `<small data-budget-out="${name}-family" hidden>Prix Famille : <span></span></small>` : "") + "</div>";
+const card = (title, name, familyRate) => `<div class="budget-card"><span>${title}</span><strong data-budget-out="${name}"></strong>`
+  + (familyRate ? only("boutique", `<small data-budget-out="${name}-family" hidden>Avec l’Avantage Famille (−${familyRate}) : <span></span></small>`) : "") + "</div>";
 
 // Deux modes sur une seule page : « boutique » (catalogue) et « manuel » (saisie libre). Les éléments propres à un mode portent
 // data-budget-only ; assets/budget-croquettes.js les affiche ou les masque selon l'onglet choisi.
@@ -61,6 +67,8 @@ const only = (mode, html) => html.replace(/^<(\w+)/, `<$1 data-budget-only="${mo
 
 function renderBudget(catalogue) {
   const recipes = budgetRecipes(catalogue);
+  const basisPoints = familyBasisPoints(catalogue);
+  const familyRate = familyRateText(basisPoints);
   const first = recipes[0];
   const unavailable = catalogue.available ? "Aucune recette de croquettes n’est proposée pour le moment." : "Le catalogue est momentanément indisponible. Merci de réessayer dans quelques instants.";
   // Sans catalogue, le mode manuel (qui n'en a pas besoin) s'ouvre directement.
@@ -74,7 +82,7 @@ function renderBudget(catalogue) {
   const body = `<section class="budget" aria-labelledby="budget-title">`
       + `<div class="budget-tabs" role="group" aria-label="Type de croquettes">${tab("boutique", "Croquettes de la boutique")}${tab("manuel", "Autres croquettes")}</div>`
       + `<h2 id="budget-title">Votre sac et votre chien</h2>`
-      + `<form class="budget-form" data-budget-form data-budget-initial="${initial}" novalidate>`
+      + `<form class="budget-form" data-budget-form data-budget-initial="${initial}"${basisPoints ? ` data-family-basis-points="${basisPoints}"` : ""} novalidate>`
       + shopFields
       + only("manuel", `<label>Nom des croquettes (facultatif)<input name="nom" maxlength="60" autocomplete="off" placeholder="Mes croquettes"></label>`)
       + only("manuel", `<label>Prix du sac (€)<input name="prix" inputmode="decimal" autocomplete="off" placeholder="59,90"></label>`)
@@ -85,7 +93,7 @@ function renderBudget(catalogue) {
       + only("boutique", `<p class="availability" data-budget-out="availability"></p>`)
       + `<p class="budget-message" data-budget-message role="status" aria-live="polite">Indiquez la ration quotidienne de votre chien pour obtenir son budget.</p>`
       + `<div class="budget-results" data-budget-results hidden aria-live="polite">`
-      + `<div class="budget-cards">${card("Mon sac dure", "days")}${card("Coût par jour", "daily", true)}${card("Budget sur 30 jours", "period", true)}${card("Quantité nécessaire sur 30 jours", "quantity")}</div>`
+      + `<div class="budget-cards">${card("Mon sac dure", "days")}${card("Coût par jour", "daily", familyRate)}${card("Budget sur 30 jours", "period", familyRate)}${card("Quantité nécessaire sur 30 jours", "quantity")}</div>`
       + `<p class="budget-purchase">Pour couvrir 30 jours sans stock à la maison, achat de <strong data-budget-out="purchase"></strong>.</p>`
       + `<p class="budget-note">Le budget sur 30 jours est un coût de consommation calculé au prorata ; l’achat correspond à des sacs entiers.</p></div>`
       + (first ? only("boutique", `<a class="btn-voir" data-budget-out="fiche" href="${escapeHtml(first.formats[0].href)}">Voir ce format dans la boutique</a>`) : "")
@@ -100,7 +108,7 @@ function renderBudget(catalogue) {
       + `<p data-budget-out="missing"></p><p class="budget-order" data-budget-out="order"></p></div>`
       + `<p class="budget-note">Le délai et la marge sont choisis par vous : ce n’est pas un délai de livraison garanti par la boutique.</p></fieldset></form>`
       + `<div class="budget-notes"><p>Estimations pratiques, établies pour une ration quotidienne constante : elles ne remplacent pas un conseil alimentaire. Chez le chiot, la ration évolue avec la croissance : actualisez-la régulièrement.</p>`
-      + only("boutique", `<p>Prix enregistrés dans la boutique, hors éventuels frais de livraison. Le prix Famille s’applique au panier après vérification de votre numéro de puce ou de votre code Famille.</p>`)
+      + only("boutique", `<p>Prix publics enregistrés dans la boutique, hors éventuels frais de livraison et hors offres promotionnelles. Familles Dynastie : l’Avantage Famille${familyRate ? ` (${familyRate})` : ""} s’applique à tout le panier après vérification de votre numéro de puce ou de votre Code Famille ; le montant exact est calculé dans le panier.</p>`)
       + `</div></section>`
       + `<script type="application/json" id="budget-data">${JSON.stringify(recipes).replace(/</g, "\\u003c")}</script>`;
   return page({

@@ -147,7 +147,7 @@ test("seul un panier avec des produits du catalogue reçoit le lien d'annulation
       customer: { firstName: "Test", lastName: "Panier", email: "panier@example.test", phone: "0600000000", country: "FR" }, legalAcceptance: { version: "cgv-2026-10-21-3", accepted: true } }, {
       env: ENV, origin: "https://boutique.test", now: () => NOW,
       listCatalogue: async () => ({ available: true, products: [{ reference: "shampoing-test", name: "Shampoing", family: "COLIS", publicPriceCents: 1500, familyPriceCents: null, weightGrams: 300, purchasable: true, maxOrderQuantity: 3 }] }),
-      manager: { async createOrder() { return { reference: REFERENCE }; }, async attachPaymentReference() { return {}; } },
+      manager: { ...require("./helpers/manager-pricing").fakePricingManager(), async createOrder() { return { reference: REFERENCE }; }, async attachPaymentReference() { return {}; } },
       payment: { provider: "STRIPE", async createCheckout(payload) { calls.push(payload); return { providerRef: SESSION, checkoutUrl: "https://checkout.stripe.test" }; } }
     });
     return calls[0].cancelUrl;

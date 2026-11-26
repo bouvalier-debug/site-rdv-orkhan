@@ -33,12 +33,14 @@ test("exemple de référence : sac de 10 kg à 59,90 €, 150 g/jour", () => {
   assert.equal(result.family, null);
 });
 
-test("prix Famille : le prix enregistré est utilisé tel quel, sans remise supplémentaire", () => {
-  const result = budget.bagBudget({ rationGrams: 150, bagGrams: 10000, publicPriceCents: 5990, familyPriceCents: 5690 });
-  assert.equal(result.family.periodCents, 5690 * 4500 / 10000);
+test("étape 2 : estimation avec l'Avantage Famille au taux global du Manager, à partir du prix public unique", () => {
+  const result = budget.bagBudget({ rationGrams: 150, bagGrams: 10000, publicPriceCents: 5990, familyBasisPoints: 500 });
+  assert.equal(result.family.periodCents, result.public.periodCents * 0.95);
   assert.equal(budget.euros(result.family.periodCents), "25,61 €");
+  // Remise arrondie une seule fois sur l'achat, comme au panier : 5 % de 59,90 € = 3,00 € (2,995 arrondi au centime supérieur).
   assert.equal(result.family.purchaseCents, 5690);
-  assert.notEqual(result.family.periodCents, result.public.periodCents * 0.95);
+  assert.equal(budget.bagBudget({ rationGrams: 150, bagGrams: 10000, publicPriceCents: 5990 }).family, null, "sans taux publié : pas d'estimation");
+  assert.equal(budget.bagBudget({ rationGrams: 150, bagGrams: 10000, publicPriceCents: 5990, familyPriceCents: 1 }).family, null, "un ancien prix Famille est ignoré");
 });
 
 test("sacs entiers sur 30 jours : arrondi supérieur, sans exiger un sac de trop sur un multiple exact", () => {
@@ -91,9 +93,9 @@ test("données de la page : croquettes uniquement (Sur commande et rupture compr
   const surCommande = recipes.find((recipe) => recipe.slug === "sur-commande");
   assert.deepEqual(surCommande.formats.map((format) => [format.reference, format.availability, format.publicPriceCents, format.orderable]), [["sur-commande", "Sur commande", 7000, true]]);
   const wellness = recipes.find((recipe) => recipe.slug === "wc");
-  assert.deepEqual(wellness.formats.map((format) => [format.reference, format.label, format.weightGrams, format.publicPriceCents, format.familyPriceCents, format.orderable]), [
-    ["wc-1-5", "1,5 kg", 1500, 1490, 1290, true],
-    ["wc-10", "10 kg", 10000, 5990, 5690, false]
+  assert.deepEqual(wellness.formats.map((format) => [format.reference, format.label, format.weightGrams, format.publicPriceCents, "familyPriceCents" in format, format.orderable]), [
+    ["wc-1-5", "1,5 kg", 1500, 1490, false, true],
+    ["wc-10", "10 kg", 10000, 5990, false, false]
   ]);
   assert.equal(wellness.formats[1].availability, "Rupture de stock");
   assert.equal(wellness.formats[1].href, "/produits/wc-10/");
@@ -181,7 +183,11 @@ test("page : deux onglets (boutique par défaut), champs manuels séparés, rien
   for (const text of ['name="nom"', 'name="prix"', 'name="poids"', "Nom des croquettes (facultatif)", "Prix du sac (€)", "Poids du sac (kg)", "Découvrir les croquettes de notre boutique", 'href="/rayons/alimentation/croquettes/"']) assert.ok(manual.includes(text), text);
   assert.doesNotMatch(manual, /Famille|commander|name="recette"|name="format"|availability/);
   const shop = only("boutique");
-  for (const text of ['name="recette"', 'name="format"', 'data-budget-out="availability"', 'data-budget-out="fiche"', "prix Famille"]) assert.ok(shop.includes(text), text);
+  for (const text of ['name="recette"', 'name="format"', 'data-budget-out="availability"', 'data-budget-out="fiche"', "l’Avantage Famille"]) assert.ok(shop.includes(text), text);
+  assert.doesNotMatch(html, /Prix Famille|prix Famille/);
+  const withRate = renderBudget({ ...catalogue, commercial: { familyDiscountBasisPoints: 500, offers: [] } });
+  assert.match(withRate, /data-family-basis-points="500"/);
+  assert.match(withRate, /Avec l’Avantage Famille \(−5\u00a0%\) : <span><\/span>/);
   // Une seule page, un seul module de calcul et de réapprovisionnement.
   assert.equal((html.match(/Anticiper mon prochain achat/g) || []).length, 1);
   assert.equal((html.match(/data-budget-out="days"/g) || []).length, 1);

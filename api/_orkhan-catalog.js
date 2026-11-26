@@ -146,6 +146,37 @@ function publicBrandCard(raw) {
   };
 }
 
+// Étape 2 : taux de l'avantage Famille et offres « X achetés + Y offerts » en cours, publiés par le Manager avec le
+// catalogue. Le Manager ne publie que les offres activées et dans leurs dates ; une offre dont la fin est passée est
+// tout de même écartée ici (page restée en cache). null si le Manager ne publie pas ces données : la Boutique affiche
+// alors l'avantage Famille sans pourcentage et aucune offre.
+const MAX_FAMILY_BASIS_POINTS = 2000;
+function publicOffer(raw, now) {
+  if (!raw || typeof raw !== "object") return null;
+  const id = text(raw.id, 80);
+  const name = text(raw.name, 120);
+  const buyQuantity = Number.isSafeInteger(raw.buyQuantity) && raw.buyQuantity >= 1 && raw.buyQuantity <= 20 ? raw.buyQuantity : null;
+  const freeQuantity = Number.isSafeInteger(raw.freeQuantity) && raw.freeQuantity >= 1 && raw.freeQuantity <= 20 ? raw.freeQuantity : null;
+  const productReferences = Array.isArray(raw.productReferences)
+    ? [...new Set(raw.productReferences.map((reference) => text(reference, 80)).filter(Boolean))] : [];
+  if (!id || !name || !buyQuantity || !freeQuantity || !productReferences.length) return null;
+  const endsAt = catalogueDate(raw.endsAt);
+  if (endsAt && Date.parse(endsAt) <= now) return null;
+  return {
+    id, name, buyQuantity, freeQuantity, lotQuantity: buyQuantity + freeQuantity,
+    lotPriceCents: cents(raw.lotPriceCents), endsAt, productReferences
+  };
+}
+
+function publicCommercial(raw, now = Date.now()) {
+  if (!raw || typeof raw !== "object") return null;
+  const basisPoints = raw.familyDiscountBasisPoints;
+  return {
+    familyDiscountBasisPoints: Number.isSafeInteger(basisPoints) && basisPoints >= 0 && basisPoints <= MAX_FAMILY_BASIS_POINTS ? basisPoints : null,
+    offers: (Array.isArray(raw.offers) ? raw.offers : []).map((offer) => publicOffer(offer, now)).filter(Boolean)
+  };
+}
+
 // Nouveautés (CAT-08, CAT-10) : produits visibles, publiés depuis moins de 14 jours, hors « Sur demande ».
 function isNouveaute(product) {
   return product.listed && product.isNew && !product.onRequest;
@@ -164,10 +195,10 @@ async function listCatalogue(options = {}) {
     const products = (Array.isArray(body?.products) ? body.products : []).map(publicProduct).filter(Boolean);
     // brandCards : null si le Manager ne les transmet pas (antérieur ou table absente) ; la Boutique déduit alors les cartes des marques.
     const brandCards = Array.isArray(body?.brandCards) ? body.brandCards.map(publicBrandCard).filter(Boolean) : null;
-    return { available: true, products, brandCards };
+    return { available: true, products, brandCards, commercial: publicCommercial(body?.commercial, options.now ? options.now() : Date.now()) };
   } catch (error) {
     logFailure("liste", error);
-    return { available: false, products: [], brandCards: null };
+    return { available: false, products: [], brandCards: null, commercial: null };
   }
 }
 
@@ -186,4 +217,4 @@ async function fetchCataloguePhoto(id, options = {}) {
   }
 }
 
-module.exports = { fetchCataloguePhoto, isNouveaute, listCatalogue, publicBrandCard, publicProduct };
+module.exports = { fetchCataloguePhoto, isNouveaute, listCatalogue, publicBrandCard, publicCommercial, publicProduct };

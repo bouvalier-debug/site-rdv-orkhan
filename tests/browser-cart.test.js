@@ -181,7 +181,7 @@ test("le rendu Animoco masque les options techniques et le numéro de puce", () 
 
 test("une indisponibilité Famille bloque le total et le paiement avec le message prévu", () => {
   const result = { error: "family_verification_unavailable", status: 503 };
-  assert.equal(quoteStatusMessage(result), "Le service de vérification du tarif Famille est momentanément indisponible. Réessayez dans quelques instants, ou retirez le numéro de puce ou le code Famille pour commander au tarif public.");
+  assert.equal(quoteStatusMessage(result), "Le service de vérification de l’Avantage Famille est momentanément indisponible. Réessayez dans quelques instants, ou retirez le numéro de puce ou le code Famille pour commander sans l’Avantage Famille.");
   const source = fs.readFileSync(path.join(__dirname, "..", "assets", "cart.js"), "utf8");
   assert.match(source, /checkoutButton\.disabled = !quote/, "sans devis valide (dont Famille indisponible ou panier vide), le paiement est bloqué");
 });

@@ -74,24 +74,24 @@ test("page d'une marque : uniquement les produits de la marque dans la rubrique,
 test("le menu Trier par propose les six options et chaque carte porte ses prix", () => {
   const html = renderAlimentation({ available: true, products, brandCards: cards }, "croquettes");
   for (const value of ["defaut", "prix-asc", "prix-desc", "recents", "nom-asc", "nom-desc"]) assert.match(html, new RegExp(`<option value="${value}">`));
-  assert.match(html, /data-order="0" data-name="Acana Adult" data-price="4000" data-family-price="3500"/);
+  assert.match(html, /data-order="0" data-name="Acana Adult" data-price="4000"/);
+  assert.doesNotMatch(html, /data-family-price/, "étape 2 : prix public unique");
 });
 
-test("tri : prix applicable (public ou Famille), récents, noms ; ordre par défaut = ordre du Manager", () => {
+test("tri : prix public unique, récents, noms ; ordre par défaut = ordre du Manager", () => {
   const items = [
     { name: "Bravo", price: "5000", familyPrice: "3000", published: "2026-10-01T00:00:00.000Z", order: "0" },
     { name: "alpha", price: "4000", familyPrice: "", published: "2026-10-20T00:00:00.000Z", order: "1" },
     { name: "Zèbre", price: "4500", published: "", order: "2" }
   ];
-  const names = (mode, family) => sortItems(items, mode, family).map((entry) => entry.name);
-  assert.deepEqual(names("defaut", false), ["Bravo", "alpha", "Zèbre"]);
-  assert.deepEqual(names("prix-asc", false), ["alpha", "Zèbre", "Bravo"]);
-  assert.deepEqual(names("prix-desc", false), ["Bravo", "Zèbre", "alpha"]);
-  assert.deepEqual(names("prix-asc", true), ["Bravo", "alpha", "Zèbre"], "prix Famille 30 € pour Bravo, public pour les autres");
-  assert.deepEqual(names("recents", false), ["alpha", "Bravo", "Zèbre"]);
-  assert.deepEqual(names("nom-asc", false), ["alpha", "Bravo", "Zèbre"]);
-  assert.deepEqual(names("nom-desc", false), ["Zèbre", "Bravo", "alpha"]);
-  assert.equal(applicablePrice(items[1], true), 4000, "sans prix Famille, le prix public s'applique");
+  const names = (mode) => sortItems(items, mode).map((entry) => entry.name);
+  assert.deepEqual(names("defaut"), ["Bravo", "alpha", "Zèbre"]);
+  assert.deepEqual(names("prix-asc"), ["alpha", "Zèbre", "Bravo"], "un ancien prix Famille n'intervient plus");
+  assert.deepEqual(names("prix-desc"), ["Bravo", "Zèbre", "alpha"]);
+  assert.deepEqual(names("recents"), ["alpha", "Bravo", "Zèbre"]);
+  assert.deepEqual(names("nom-asc"), ["alpha", "Bravo", "Zèbre"]);
+  assert.deepEqual(names("nom-desc"), ["Zèbre", "Bravo", "alpha"]);
+  assert.equal(applicablePrice(items[0]), 5000, "prix public unique");
   assert.equal(items.length, 3, "le tri ne retire aucune carte");
 });
 
@@ -115,7 +115,7 @@ test("routes : les pages rubrique et marque passent par l'unique fonction vitrin
   assert.equal((await run({ rubrique: "croquettes" })).code, 200);
 });
 
-test("tri Famille : le point d'entrée accepte une puce ou un code Famille, jamais les deux, et la Boutique envoie la preuve mémorisée au panier", async () => {
+test("vérification Famille : le point d'entrée accepte une puce ou un code Famille ; le tri n'en dépend plus (prix public unique)", async () => {
   const eligibility = require("../api/family-eligibility");
   const responder = () => ({ headers: {}, setHeader(n, v) { this.headers[n] = v; }, status(c) { this.statusCode = c; return this; }, json(b) { this.body = b; return this; }, end() { return this; } });
   const calls = [];
@@ -133,5 +133,5 @@ test("tri Famille : le point d'entrée accepte une puce ou un code Famille, jama
     assert.ok(calls.some((url) => url.endsWith("/verify-code")) && calls.some((url) => url.endsWith("/verify-chip")), calls.join(","));
   } finally { global.fetch = original; }
   const script = fs.readFileSync(path.join(__dirname, "..", "assets", "product-sort.js"), "utf8");
-  assert.match(script, /\/\[a-z\]\/i\.test\(proof\) \? \{ familyCode: proof \} : \{ chipNumber: proof \}/);
+  assert.doesNotMatch(script, /family-eligibility|familyPrice|chipNumber/);
 });

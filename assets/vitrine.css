@@ -547,3 +547,32 @@
 @keyframes tracer{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
 @keyframes entree{from{opacity:0;translate:0 34px}}
 .home-tools-lede{max-width:44ch;margin:14px 0 0;color:#f3e6dc;line-height:1.6}
+
+/* ───────── Étape 2 : offres « X achetés + Y offerts » (bordeaux vineux, doré, crème), sans changer le prix public ───────── */
+.tile-offer{position:absolute;top:10px;right:10px;z-index:1;padding:4px 10px;border:1px solid var(--gold);border-radius:999px;background:var(--cream);color:var(--wine);font-size:.7rem;font-weight:900;letter-spacing:.02em;line-height:1.4;white-space:nowrap;box-shadow:0 4px 10px rgba(115,29,50,.12)}
+.tile-offer-note{margin:2px 0 0;color:#8a6628;font-size:.8rem;font-weight:700}
+.fiche-info>.fiche-offer{order:4;align-self:stretch}
+.fiche-offer{margin:14px 0 0;padding:14px 18px;border:1px solid var(--hair);border-left:3px solid var(--wine);border-radius:0 12px 12px 0;background:var(--cream);color:var(--ink);font-size:.9rem}
+.fiche-offer[hidden]{display:none}
+.fiche-offer-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0 0 8px;color:var(--wine)}
+.fiche-offer-badge{padding:3px 10px;border-radius:999px;background:var(--wine);color:#fff;font-size:.76rem;font-weight:900;white-space:nowrap}
+.fiche-offer ul{display:grid;gap:4px;margin:0;padding:0 0 0 18px}
+.fiche-offer li::marker{color:var(--gold)}
+.offer-banner{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px clamp(18px,3vw,36px);margin:clamp(40px,5vw,64px) 0 0;padding:clamp(16px,2.2vw,24px) clamp(18px,2.8vw,32px);border:1px solid var(--hair);border-left:4px solid var(--wine);border-radius:0 16px 16px 0;background:linear-gradient(110deg,var(--cream) 0%,#fff8ea 100%)}
+.rayon-listing+.offer-banner,.breadcrumb+.offer-banner,.rayon-chips+.offer-banner{margin:0 0 30px}
+.offer-banner-kicker{margin:0 0 4px;color:#8a6628;font-size:.74rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.offer-banner h2{margin:0;color:var(--wine);font-size:clamp(1.3rem,2.1vw,1.7rem);font-weight:600;line-height:1.15;letter-spacing:-.02em}
+.offer-banner-list{display:grid;gap:4px;margin:10px 0 0;padding:0;list-style:none}
+.offer-banner-list li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-size:.93rem}
+.offer-banner-name{font-weight:800;color:var(--ink)}
+.offer-banner-price{color:var(--muted)}
+.offer-banner-price strong{color:var(--wine)}
+.offer-banner-badge{padding:1px 8px;border-radius:999px;background:var(--wine);color:#fff;font-size:.74rem;font-weight:900}
+.offer-banner-list small{flex-basis:100%;color:var(--muted)}
+.offer-banner-note{margin:8px 0 0;color:var(--muted);font-size:.84rem}
+.offer-banner-link{margin-top:0;white-space:nowrap}
+@media(max-width:700px){
+  .offer-banner{grid-template-columns:minmax(0,1fr)}
+  .offer-banner-link{justify-self:start}
+  .tile-offer{top:7px;right:7px;font-size:.64rem;padding:3px 8px}
+}

@@ -15,7 +15,7 @@ const CODE = "DYN-7K2Q-M9XA";
 const CHIP = "250269812345678";
 const CROQUETTES = { reference: "croquettes-test", name: "Croquettes", family: "CROQUETTES", publicPriceCents: 1490, familyPriceCents: 1290, weightGrams: 1500, purchasable: true, maxOrderQuantity: 12 };
 const codeVerifier = (recognized, calls = []) => async (code) => { calls.push(code); return { status: "ok", recognized }; };
-const quote = (input, options) => quoteCartRequest(input, { listCatalogue: async () => ({ available: true, products: [CROQUETTES] }), ...options });
+const quote = (input, options) => quoteCartRequest(input, { listCatalogue: async () => ({ available: true, products: [CROQUETTES] }), manager: require("./helpers/manager-pricing").fakePricingManager(), ...options });
 
 test("le code est normalisé comme dans le Manager et vérifié par la route verify-code, sans la puce", async () => {
   assert.equal(normalizeFamilyCode("dyn 7k2q m9xa"), "7K2QM9XA");
@@ -43,13 +43,15 @@ test("une seule preuve par panier : code OU puce, jamais les deux ; la puce rest
   assert.deepEqual(chipCalls, [CHIP]);
 });
 
-test("devis : un code reconnu donne le tarif Famille, un code non reconnu ou expiré le tarif public", async () => {
+test("devis : un code reconnu donne l'avantage Famille global, un code non reconnu ou expiré aucune remise", async () => {
   const items = [{ productId: "croquettes-test", quantity: 1 }];
   const ok = await quote({ items, familyCode: CODE }, { verifyFamilyCode: codeVerifier(true) });
-  assert.equal(ok.quote.lines[0].unitPriceCents, 1290);
+  assert.equal(ok.quote.lines[0].unitPriceCents, 1490);
+  assert.equal(ok.quote.pricing.family.discountCents, 75);
   assert.equal(ok.quote.benefits.dynastieFamily, true);
   const refused = await quote({ items, familyCode: CODE }, { verifyFamilyCode: codeVerifier(false) });
   assert.equal(refused.quote.lines[0].unitPriceCents, 1490);
+  assert.equal(refused.quote.pricing.family, null);
 });
 
 test("paiement : le code est revérifié côté serveur ; ni le Manager ni Stripe ne reçoivent le code", async () => {
@@ -64,13 +66,14 @@ test("paiement : le code est revérifié côté serveur ; ni le Manager ni Strip
   }, {
     env: { ORKHAN_SHOP_ORDERS_SECRET: "secret-test" }, origin: "https://boutique.test",
     listCatalogue: async () => ({ available: true, products: [CROQUETTES] }), verifyFamilyCode: codeVerifier(true, calls),
-    manager: { async createOrder(payload) { created.push(payload); return { reference: "BOUT-2026-ABCDEF1234" }; }, async attachPaymentReference() { return {}; } },
+    manager: { ...require("./helpers/manager-pricing").fakePricingManager(), async createOrder(payload) { created.push(payload); return { reference: "BOUT-2026-ABCDEF1234" }; }, async attachPaymentReference() { return {}; } },
     payment: { provider: "STRIPE", async createCheckout(input) { stripe.push(input); return { providerRef: "cs_test_1", checkoutUrl: "https://checkout.stripe.test" }; } }
   });
   assert.equal(result.ok, true);
   assert.deepEqual(calls, [CODE]);
   assert.equal(created[0].dynastieFamilyEligible, true);
-  assert.equal(created[0].lines[0].unitPriceCents, 1290);
+  assert.equal(created[0].lines[0].unitPriceCents, 1490);
+  assert.equal(created[0].discountCents, 75);
   assert.doesNotMatch(JSON.stringify(created[0]) + JSON.stringify(stripe), /7K2Q|M9XA/i);
 });
 

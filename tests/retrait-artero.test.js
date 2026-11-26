@@ -47,7 +47,7 @@ test("les autres produits restent achetables : Animoco et produit du catalogue",
   assert.equal(animoco.error, undefined);
   assert.equal(animoco.quote.lines[0].unitPriceCents, 1999);
   const product = { reference: "shampoing-test", name: "Shampoing", family: "COLIS", publicPriceCents: 1500, familyPriceCents: null, weightGrams: 400, purchasable: true, maxOrderQuantity: 5, photos: [], shelf: "HYGIENE_SOINS", subcategory: "shampooings", variantGroup: null, variantLabel: null, onRequest: false, isNew: false, availability: "in_stock", listed: true };
-  const catalogue = await quoteCartRequest({ items: [{ productId: "shampoing-test", quantity: 2 }], shipping: pickup }, { listCatalogue: async () => ({ available: true, products: [product] }) });
+  const catalogue = await quoteCartRequest({ items: [{ productId: "shampoing-test", quantity: 2 }], shipping: pickup }, { listCatalogue: async () => ({ available: true, products: [product] }), manager: require("./helpers/manager-pricing").fakePricingManager() });
   assert.equal(catalogue.quote.totalCents, 3000);
 });
 

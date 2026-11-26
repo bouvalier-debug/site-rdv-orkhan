@@ -44,6 +44,10 @@ function createManagerClient(options = {}) {
   }
 
   return {
+    // Étape 2 : devis commercial du panier (prix publics, offres en cours, avantage Famille global), lecture seule.
+    quotePricing(payload) {
+      return request("/api/shop-catalog/pricing", { method: "POST", body: JSON.stringify(payload) });
+    },
     createOrder(payload, idempotencyKey) {
       return request("/api/shop-orders", {
         method: "POST",

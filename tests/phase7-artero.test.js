@@ -58,7 +58,7 @@ test("les photos de repli Artero existent et la photo du pack est optimisée", (
 test("devis : une ancienne ligne cosmetics:* bascule vers le catalogue (prix, stock, retrait seul) quand le produit est ouvert à l'achat", async () => {
   const input = { items: [{ productId: "cosmetics:block", quantity: 2 }], shipping: { mode: "pickup", pickupTiming: "appointment" } };
   const catalogue = list([artero("artero-block", "Artero Block", 2200, { maxOrderQuantity: 5 })]);
-  const result = await quoteCartRequest(input, { listCatalogue: catalogue });
+  const result = await quoteCartRequest(input, { listCatalogue: catalogue, manager: require("./helpers/manager-pricing").fakePricingManager() });
   assert.deepEqual(result.quote.lines.map((line) => [line.productId, line.unitPriceCents, line.subtotalCents]), [["artero-block", 2200, 4400]]);
   assert.deepEqual(result.quote.availableShippingModes, ["pickup"]);
   assert.equal((await quoteCartRequest({ ...input, items: [{ productId: "cosmetics:block", quantity: 6 }] }, { listCatalogue: catalogue })).error, "out_of_stock");

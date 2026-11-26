@@ -47,7 +47,7 @@
     }
   }
 
-  // 3. Relief du cartouche Tarif Famille : légère inclinaison et lumière sous le pointeur (souris uniquement).
+  // 3. Relief du cartouche Avantage Famille : légère inclinaison et lumière sous le pointeur (souris uniquement).
   var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var hover = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   if (!calm && hover) {

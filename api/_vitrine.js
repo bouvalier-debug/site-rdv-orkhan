@@ -5,7 +5,8 @@
 // ajoutée ici : le panier, le devis et la commande recontrôlent prix, stock et disponibilité côté serveur.
 const { CATALOG_CONFIG, RED_DINGO_PRICE_CENTS } = require("./_catalog");
 const { BACK_TO_TOP, FACEBOOK_FAB, RAYONS, SHOP_FOOTER, SHOP_HEADER } = require("../scripts/shop-layout");
-const { RUBRIQUES, cardsFor, fichesForCard, fichesOf, rubriqueByKey } = require("./_alimentation");
+const { RUBRIQUES, brandKey, cardsFor, fichesForCard, fichesOf, rubriqueByKey } = require("./_alimentation");
+const { familyRateOf, ficheOfferHtml, offerBannerHtml, offerForReference, offersAmong, runningOffers, tileBadgeHtml, tileNoteHtml, tileOffer } = require("./_offers");
 
 const ORIGIN = "https://boutique.dynastiedorkhan.com";
 const FICHE_SLUG = /^[a-z0-9]+([-:][a-z0-9]+)*$/;
@@ -65,7 +66,7 @@ const SCENE = {
 // Parcours spéciaux conservés (Identification). Les cosmétiques Artero ne sont plus proposés (aucun stock à l'élevage).
 const PARCOURS = {
   IDENTIFICATION: [
-    { href: "/medailles-connectees/", name: "Médaille connectée Animoco", photo: "/medailles-connectees/assets/medaille-animoco-recto-verso.webp", price: CATALOG_CONFIG.animoco.publicPriceCents, familyPrice: CATALOG_CONFIG.animoco.familyPriceCents, note: "Livraison en France ou retrait à l’élevage" },
+    { href: "/medailles-connectees/", name: "Médaille connectée Animoco", photo: "/medailles-connectees/assets/medaille-animoco-recto-verso.webp", price: CATALOG_CONFIG.animoco.publicPriceCents, note: "Livraison en France ou retrait à l’élevage" },
     { href: "/medailles-gravees/", name: "Médaille gravée Red Dingo", photo: "/medailles-gravees/assets/medaille-chien-plage-red-dingo.jpg", price: RED_DINGO_PRICE_CENTS, note: "Gravure et livraison comprises" }
   ]
 };
@@ -131,7 +132,8 @@ function variantAvailability(product) {
 
 // CAT-02 / C5 : une fiche par groupe de variantes (chaque format garde sa référence, son prix et son stock), sinon une
 // fiche par produit. Seuls les produits visibles sont présentés.
-function buildFiches(products) {
+// Étape 2 : prix public unique ; offers (catalogue.commercial) sert seulement à la pastille « X + Y offert » des cartes.
+function buildFiches(products, offers = []) {
   const groups = new Map();
   for (const product of products) {
     if (!product || !product.listed) continue;
@@ -154,8 +156,7 @@ function buildFiches(products) {
       .map((product) => ({ ...product, state: variantAvailability(product) }));
     const first = variants[0];
     const prices = variants.map((variant) => variant.publicPriceCents);
-    const familyPrices = variants.map((variant) => variant.familyPriceCents).filter(Number.isInteger);
-    return {
+    const fiche = {
       slug: first.variantGroup || first.reference,
       name: first.name,
       shelf: first.shelf,
@@ -171,11 +172,14 @@ function buildFiches(products) {
       recipe: recipeOf(variants),
       price: Math.min(...prices),
       priceFrom: new Set(prices).size > 1,
-      familyPrice: familyPrices.length ? Math.min(...familyPrices) : null,
-      familyPriceFrom: new Set(familyPrices).size > 1,
       state: AVAILABILITY_RANK.find((state) => variants.some((variant) => variant.state === state))
     };
+    return { ...fiche, offer: tileOffer(fiche, offers) };
   });
+}
+
+function catalogueFiches(catalogue) {
+  return catalogue.available ? buildFiches(catalogue.products, runningOffers(catalogue)) : [];
 }
 
 // Filtres Marque et Profil des croquettes. Un produit non renseigné n'a ni marque ni profil : il reste visible sous « Tous ».
@@ -289,25 +293,25 @@ function photoHtml(photo, className, loading = "lazy") {
   return `<img class="${className}" src="${escapeHtml(photo.url)}" alt="${escapeHtml(photo.altText)}" loading="${loading}"${size}>`;
 }
 
-// C1 à C4 : carte compacte, sans description ni achat ; photo, nom, prix (ou « À partir de »), prix Famille,
-// disponibilité et seul bouton « Voir le produit ».
+// C1 à C4 : carte compacte, sans description ni achat ; photo, nom, prix public unique (ou « À partir de »), pastille
+// d'offre éventuelle, disponibilité et seul bouton « Voir le produit ».
 function ficheCard(fiche) {
   return ficheTile(fiche, null);
 }
 
-// Rayon Alimentation : la carte porte de quoi trier côté navigateur (prix public, prix Famille, publication, nom, rang par défaut).
+// Rayon Alimentation : la carte porte de quoi trier côté navigateur (prix public, publication, nom, rang par défaut).
 function ficheTile(fiche, order) {
   const href = `/produits/${encodeURIComponent(fiche.slug)}/`;
   const photo = fiche.photos[0];
   const recipe = fiche.recipe;
   const filterData = recipe && recipe.brand ? ` data-brand="${escapeHtml(recipe.brand)}"` : "";
   const profileData = recipe && profileTokens(recipe).length ? ` data-profile="${profileTokens(recipe).join(" ")}"` : "";
-  const sortData = order === null ? "" : ` data-order="${order}" data-name="${escapeHtml(fiche.name)}" data-price="${fiche.price}"${fiche.familyPrice !== null ? ` data-family-price="${fiche.familyPrice}"` : ""}${fiche.publishedAt ? ` data-published="${escapeHtml(fiche.publishedAt)}"` : ""}`;
+  const sortData = order === null ? "" : ` data-order="${order}" data-name="${escapeHtml(fiche.name)}" data-price="${fiche.price}"${fiche.publishedAt ? ` data-published="${escapeHtml(fiche.publishedAt)}"` : ""}`;
   const brand = recipe && recipe.brand && !fiche.name.toLocaleLowerCase("fr").startsWith(recipe.brand.toLocaleLowerCase("fr")) ? `<p class="tile-brand">${escapeHtml(recipe.brand)}</p>` : "";
-  return `<article class="product-tile"${filterData}${profileData}${sortData}><a class="product-tile-photo" href="${href}" tabindex="-1" aria-hidden="true">${photo ? photoHtml(photo, "") : `<span class="product-tile-placeholder">Photo à venir</span>`}${fiche.isNew ? '<span class="tile-badge">Nouveauté</span>' : ""}</a>`
+  return `<article class="product-tile"${filterData}${profileData}${sortData}><a class="product-tile-photo" href="${href}" tabindex="-1" aria-hidden="true">${photo ? photoHtml(photo, "") : `<span class="product-tile-placeholder">Photo à venir</span>`}${fiche.isNew ? '<span class="tile-badge">Nouveauté</span>' : ""}${tileBadgeHtml(fiche.offer)}</a>`
     + `<div class="product-tile-body">${brand}<h3><a href="${href}">${escapeHtml(fiche.name)}</a></h3>`
     + (fiche.showcase ? "" : `<p class="product-price">${priceText(fiche.price, fiche.priceFrom)}</p>`)
-    + (fiche.familyPrice !== null && !fiche.showcase ? `<p class="family-price">Prix Famille Dynastie : ${priceText(fiche.familyPrice, fiche.familyPriceFrom)}</p>` : "")
+    + tileNoteHtml(fiche.offer)
     + `<p class="availability availability-${fiche.state}">${AVAILABILITY_LABELS[fiche.state]}</p>`
     + `<a class="btn-voir" href="${href}">Voir le produit</a></div></article>`;
 }
@@ -315,7 +319,6 @@ function ficheTile(fiche, order) {
 function parcoursCard(item) {
   return `<article class="product-tile"><a class="product-tile-photo" href="${item.href}" tabindex="-1" aria-hidden="true"><img src="${item.photo}" alt="" loading="lazy"></a>`
     + `<div class="product-tile-body"><h3><a href="${item.href}">${escapeHtml(item.name)}</a></h3><p class="product-price">${priceText(item.price, item.fromPrice)}</p>`
-    + (Number.isInteger(item.familyPrice) ? `<p class="family-price">Prix Famille Dynastie : ${money(item.familyPrice)}</p>` : "")
     + `<p class="availability availability-parcours">${escapeHtml(item.note)}</p><a class="btn-voir" href="${item.href}">Voir le produit</a></div></article>`;
 }
 
@@ -378,10 +381,36 @@ function rayonShotsHtml(shots, label) {
   return `<i class="rayon-shots${shots.length ? "" : " is-empty"}" data-initial="${initial}" aria-hidden="true">${shots.map((photo) => `<span><img src="${escapeHtml(photo.url)}" alt="" loading="lazy" decoding="async"></span>`).join("")}<small class="rayon-cap"><b>${escapeHtml(label)}</b>Découvrir le rayon</small></i>`;
 }
 
-// Tarif Famille Dynastie : le bloc existant, remonté sous la scène d'ouverture, sans bouton : l'activation reste celle du panier.
-const FAMILLE = '<section class="famille" aria-labelledby="famille-title" data-tilt><span class="home-promise-badge" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><path d="M9 7h35l16 25-16 25H9a5 5 0 0 1-5-5V12a5 5 0 0 1 5-5Z"/><circle cx="13" cy="32" r="3"/><text x="34" y="42" text-anchor="middle">%</text></svg></span>'
-  + '<div class="famille-copy"><p class="kicker">Réservé aux familles de l’élevage</p><h2 id="famille-title">Un tarif réduit pour nos familles adoptantes</h2><p>Activez votre Tarif Famille Dynastie avec le numéro de puce de votre chien ou votre code Famille.</p><p class="famille-note">L’activation se fait dans le panier, avant le paiement.</p></div>'
-  + '</section>';
+// Avantage Famille (étape 2) : le cartouche existant (présentation, dimensions, couleurs et pictogramme inchangés), sans
+// bouton : l'activation reste celle du panier. Le taux est celui enregistré dans Orkhan Manager ; sans taux publié, le
+// texte reste exact sans pourcentage.
+function familleHtml(rate) {
+  const title = rate ? `${rate} de remise toute l’année pour nos familles adoptantes` : "Une remise toute l’année pour nos familles adoptantes";
+  const text = `Bénéficiez ${rate ? `de ${rate} de remise` : "d’une remise"} sur vos achats, cumulable avec les offres promotionnelles en cours.`;
+  return FAMILLE_BADGE + `<div class="famille-copy"><p class="kicker">Réservé aux familles de l’élevage</p><h2 id="famille-title">${title}</h2><p>${text}</p><p class="famille-note">Activez votre avantage dans le panier avec le numéro de puce de votre chien ou votre Code Famille, avant le paiement.</p></div></section>`;
+}
+const FAMILLE_BADGE = '<section class="famille" aria-labelledby="famille-title" data-tilt><span class="home-promise-badge" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><path d="M9 7h35l16 25-16 25H9a5 5 0 0 1-5-5V12a5 5 0 0 1 5-5Z"/><circle cx="13" cy="32" r="3"/><text x="34" y="42" text-anchor="middle">%</text></svg></span>';
+
+// Bandeau des offres en cours parmi des fiches ; lien vers la page de marque quand toutes les offres concernent une seule
+// marque qui a sa page (sauf sur cette page même).
+function offerBanner(catalogue, fiches, { linkToBrand = true } = {}) {
+  const offers = offersAmong(runningOffers(catalogue), fiches);
+  if (!offers.length) return "";
+  const references = new Set(offers.flatMap((offer) => offer.productReferences));
+  const brands = new Map();
+  for (const fiche of fiches) {
+    if (fiche.recipe && fiche.recipe.brand && fiche.variants.some((variant) => references.has(variant.reference))) brands.set(brandKey(fiche.recipe.brand), fiche.recipe.brand);
+  }
+  const brand = brands.size === 1 ? [...brands.values()][0] : null;
+  let href = null;
+  if (brand && linkToBrand) {
+    for (const rubrique of Object.values(RUBRIQUES)) {
+      const card = cardsFor(rubrique, fiches, catalogue.brandCards).find((candidate) => brandKey(candidate.brand) === brandKey(brand));
+      if (card) { href = `${ALIMENTATION_PATH}${rubrique.key}/${card.slug}/`; break; }
+    }
+  }
+  return offerBannerHtml(offers, { brand, href });
+}
 
 function stageHtml(title, subtitle, options = {}) {
   const heading = escapeHtml(title).replace(/ (de l’élevage)$/, " <em>$1</em>");
@@ -443,7 +472,7 @@ function latestFiches(fiches) {
 }
 
 function renderAccueil(catalogue) {
-  const fiches = catalogue.available ? buildFiches(catalogue.products) : [];
+  const fiches = catalogueFiches(catalogue);
   const nouveautes = latestFiches(fiches).slice(0, 12);
   const selection = selectionFiches(fiches);
   const parcoursShots = (key) => (PARCOURS[key] || []).map((item) => ({ url: item.photo }));
@@ -453,7 +482,8 @@ function renderAccueil(catalogue) {
       + `<em aria-hidden="true"><b>→</b></em>${rayonShotsHtml(shots, rayon.label)}</a>`;
   }).join("");
   const onRequestShots = rayonShotsHtml(shotsOf(fiches.filter((fiche) => fiche.onRequest)), "Sur commande");
-  const body = `${FAMILLE}<section class="home-section home-rayons" aria-labelledby="rayons-title"><div class="section-head"><p class="kicker">La boutique en six univers</p><h2 id="rayons-title">Nos rayons</h2></div><div class="rayon-grid">${tiles}<a class="rayon-tile" href="/sur-demande/"><strong>Produits sur commande</strong><span>Découvrez les produits proposés sur commande.</span><em aria-hidden="true"><b>→</b></em>${onRequestShots}</a></div></section>`
+  const body = `${familleHtml(familyRateOf(catalogue))}<section class="home-section home-rayons" aria-labelledby="rayons-title"><div class="section-head"><p class="kicker">La boutique en six univers</p><h2 id="rayons-title">Nos rayons</h2></div><div class="rayon-grid">${tiles}<a class="rayon-tile" href="/sur-demande/"><strong>Produits sur commande</strong><span>Découvrez les produits proposés sur commande.</span><em aria-hidden="true"><b>→</b></em>${onRequestShots}</a></div></section>`
+    + offerBanner(catalogue, fiches)
     + (nouveautes.length ? `<section class="home-section" id="nouveautes" aria-labelledby="nouveautes-title"><div class="nouveautes-heading"><div class="section-head"><p class="kicker">Tout juste arrivés</p><h2 id="nouveautes-title">Nos nouveautés</h2></div><div class="nouveautes-controls"><button type="button" class="nouveautes-arrow" data-carousel-prev aria-label="Nouveautés précédentes" aria-controls="nouveautes-list" disabled>←</button><button type="button" class="nouveautes-arrow" data-carousel-next aria-label="Nouveautés suivantes" aria-controls="nouveautes-list">→</button></div></div><div class="nouveautes-carousel" id="nouveautes-list" role="region" aria-label="Derniers produits publiés" tabindex="0">${nouveautes.map(ficheCard).join("")}</div><a class="nouveautes-all" href="/nouveautes/">Voir toutes les nouveautés</a></section>` : "")
     + (selection.length ? `<section class="home-section home-selection" id="selection" aria-labelledby="selection-title"><div class="section-head"><p class="kicker">En stock à l’élevage</p><h2 id="selection-title">La sélection de l’élevage</h2><p class="section-lede">Un aperçu de chaque rayon, parmi les produits que nous utilisons et recommandons.</p></div><div class="product-grid">${selection.map(ficheCard).join("")}</div></section>` : "")
     + sceneHtml(SCENE)
@@ -470,7 +500,7 @@ function renderAccueil(catalogue) {
 }
 
 function renderNouveautes(catalogue, requestedPage = 1) {
-  const items = catalogue.available ? latestFiches(buildFiches(catalogue.products)) : [];
+  const items = latestFiches(catalogueFiches(catalogue));
   const pageNumber = Number(requestedPage);
   if (!Number.isSafeInteger(pageNumber) || pageNumber < 1) return null;
   const pageSize = 24;
@@ -510,7 +540,7 @@ function brandCardHtml(rubrique, card) {
 // Page du rayon Alimentation : deux entrées, Croquettes et Friandises, chacune avec ses cartes par marque et un accès à
 // tous les produits de la rubrique. Les autres sous-catégories (pâtées, compléments…) restent listées en dessous.
 function renderAlimentationRayon(catalogue, rayon) {
-  const fiches = catalogue.available ? buildFiches(catalogue.products).filter((fiche) => fiche.shelf === rayon.key && !fiche.showcase) : [];
+  const fiches = catalogueFiches(catalogue).filter((fiche) => fiche.shelf === rayon.key && !fiche.showcase);
   const blocks = Object.values(RUBRIQUES).map((rubrique) => {
     const items = fichesOf(fiches, rubrique);
     if (!items.length) return "";
@@ -527,7 +557,7 @@ function renderAlimentationRayon(catalogue, rayon) {
     description: "Rayon Alimentation de la boutique de l'Élevage de la Dynastie d'Orkhan : croquettes et friandises, à parcourir par marque.",
     canonical: ALIMENTATION_PATH,
     hero: heroHtml(rayon.label, "Croquettes · Friandises", true, '<a href="#rubrique-croquettes">Croquettes</a> · <a href="#rubrique-friandises">Friandises</a>', { eyebrow: "Rayon", shots: shotsOf(fiches) }),
-    body: `${rayonsNav(rayon.key)}<section class="rayon-listing" aria-label="Articles du rayon ${escapeHtml(rayon.label)}">${listing}</section>`
+    body: `${rayonsNav(rayon.key)}${catalogue.available ? offerBanner(catalogue, fiches) : ""}<section class="rayon-listing" aria-label="Articles du rayon ${escapeHtml(rayon.label)}">${listing}</section>`
   });
 }
 
@@ -536,7 +566,7 @@ function renderAlimentation(catalogue, rubriqueKey, brandSlug) {
   const rubrique = rubriqueByKey(rubriqueKey);
   const rayon = rayonBySlug("alimentation");
   if (!rubrique || !rayon) return null;
-  const fiches = catalogue.available ? buildFiches(catalogue.products).filter((fiche) => fiche.shelf === rayon.key && !fiche.showcase) : [];
+  const fiches = catalogueFiches(catalogue).filter((fiche) => fiche.shelf === rayon.key && !fiche.showcase);
   let items = fichesOf(fiches, rubrique);
   let card = null;
   if (brandSlug) {
@@ -560,7 +590,7 @@ function renderAlimentation(catalogue, rubriqueKey, brandSlug) {
     description: card ? `${rubrique.label} ${card.name} : tous les produits de la marque à la boutique de l'Élevage de la Dynastie d'Orkhan.` : `${rubrique.all} de la boutique de l'Élevage de la Dynastie d'Orkhan, toutes marques.`,
     canonical: card ? `${base}${card.slug}/` : base,
     hero: heroHtml(title, card ? `Tous les produits ${card.name} en ${rubrique.label.toLocaleLowerCase("fr")}` : "Toutes les marques", true, null, { eyebrow: `Rayon ${rayon.label}`, shots: shotsOf(items) }),
-    body: `${rayonsNav(rayon.key)}${crumbs}<section class="rayon-listing" aria-label="${escapeHtml(title)}">${listing}</section>${rubrique.key === "croquettes" && items.length ? toolsHtml(true) : ""}`,
+    body: `${rayonsNav(rayon.key)}${crumbs}${card ? offerBanner(catalogue, items, { linkToBrand: false }) : ""}<section class="rayon-listing" aria-label="${escapeHtml(title)}">${listing}</section>${rubrique.key === "croquettes" && items.length ? toolsHtml(true) : ""}`,
     scripts
   });
 }
@@ -569,7 +599,7 @@ function renderRayon(catalogue, slug) {
   const rayon = rayonBySlug(slug);
   if (!rayon) return null;
   if (rayon.key === "ALIMENTATION") return renderAlimentationRayon(catalogue, rayon);
-  const fiches = catalogue.available ? buildFiches(catalogue.products).filter((fiche) => fiche.shelf === rayon.key && !fiche.showcase) : [];
+  const fiches = catalogueFiches(catalogue).filter((fiche) => fiche.shelf === rayon.key && !fiche.showcase);
   const parcours = PARCOURS[rayon.key] || [];
   let listing;
   let anchors = null;
@@ -597,7 +627,7 @@ function renderRayon(catalogue, slug) {
 }
 
 function renderSurDemande(catalogue) {
-  const fiches = catalogue.available ? buildFiches(catalogue.products).filter((fiche) => fiche.onRequest) : [];
+  const fiches = catalogueFiches(catalogue).filter((fiche) => fiche.onRequest);
   return page({
     title: "Produits sur commande | Boutique Dynastie d'Orkhan",
     description: "Produits sur commande de l'Élevage de la Dynastie d'Orkhan : commandés auprès de notre fournisseur après votre achat, retrait à l'élevage.",
@@ -610,16 +640,18 @@ function renderSurDemande(catalogue) {
 // C5 / CAT-02 : chaque variante garde sa référence, son prix, son stock et sa galerie résolue par le Manager.
 function renderFiche(catalogue, slug) {
   if (!catalogue.available || typeof slug !== "string" || !FICHE_SLUG.test(slug)) return null;
-  const fiche = findFiche(buildFiches(catalogue.products), slug);
+  const fiche = findFiche(catalogueFiches(catalogue), slug);
   if (!fiche) return null;
   const rayon = rayonByKey(fiche.shelf);
   const croquettes = fiche.subcategory === "croquettes";
+  const offers = runningOffers(catalogue);
   const selected = fiche.variants.find((variant) => variant.reference === slug) || fiche.variants.find((variant) => variant.state === "in_stock" || variant.state === "low_stock") || fiche.variants[0];
   const variants = fiche.variants.map((variant) => ({
     reference: variant.reference,
     label: variant.variantLabel || variant.name,
     price: money(variant.publicPriceCents),
-    familyPrice: Number.isInteger(variant.familyPriceCents) ? money(variant.familyPriceCents) : null,
+    // Étape 2 : offre en cours de ce format (encart affiché pour la variante choisie), jamais de prix Famille individuel.
+    offerId: (fiche.showcase ? null : offerForReference(offers, variant.reference))?.id || null,
     state: variant.state,
     availability: AVAILABILITY_LABELS[variant.state],
     maxQuantity: variant.purchasable && ["in_stock", "low_stock", "on_request"].includes(variant.state) ? variant.maxOrderQuantity : 0,
@@ -634,6 +666,8 @@ function renderFiche(catalogue, slug) {
     ? `<div class="fiche-gallery"><div class="fiche-plate">${photoHtml(photos[0], "fiche-photo", "eager").replace("<img", '<img data-fiche-photo')}</div><div class="fiche-thumbs" data-fiche-thumbs${photos.length > 1 ? "" : " hidden"}>${photos.map((photo, index) => `<button type="button" data-photo-index="${index}"${index === 0 ? ' aria-current="true"' : ""}>${photoHtml(photo, "")}</button>`).join("")}</div></div>`
     : `<div class="fiche-gallery"><span class="product-tile-placeholder fiche-photo">Photo à venir</span></div>`;
   const choice = variantChoices(variants, current);
+  const ficheOffers = [...new Set(variants.map((variant) => variant.offerId).filter(Boolean))]
+    .map((id) => ficheOfferHtml(offers.find((offer) => offer.id === id), id !== current.offerId)).join("");
   const purchase = fiche.showcase
     ? '<p class="fiche-on-request">Produit sur commande, non achetable directement en ligne. <a href="https://www.dynastiedorkhan.com/contact/">Contactez-nous</a> pour en parler.</p>'
     : `<div class="fiche-buy"><label>Quantité<input type="number" data-fiche-quantity min="1" max="${Math.max(current.maxQuantity, 1)}" value="1"${current.maxQuantity ? "" : " disabled"}></label><button type="button" class="btn-primary" data-fiche-add${current.maxQuantity ? "" : " disabled"}>Ajouter au panier</button></div>`
@@ -649,10 +683,11 @@ function renderFiche(catalogue, slug) {
   const kicker = kickerParts.length ? `<p class="fiche-kicker">${kickerParts.map(escapeHtml).join(" · ")}</p>` : "";
   const body = `<nav class="breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a>${rayon ? ` › <a href="/rayons/${rayon.slug}/">${rayon.label}</a>` : fiche.onRequest ? ' › <a href="/sur-demande/">Produits sur commande</a>' : ""} › <span>${escapeHtml(fiche.name)}</span></nav>`
     + `<article class="fiche" data-fiche><div class="fiche-media">${gallery}</div><div class="fiche-info">${kicker}<h1>${escapeHtml(fiche.name)}</h1>${choice}`
-    + (fiche.showcase ? "" : `<p class="product-price fiche-price" data-fiche-price>${current.price}</p><p class="family-price" data-fiche-family${current.familyPrice ? "" : " hidden"}>Prix Famille Dynastie : <span>${current.familyPrice || ""}</span></p>`)
+    + (fiche.showcase ? "" : `<p class="product-price fiche-price" data-fiche-price>${current.price}</p>`)
+    + ficheOffers
     + `<p class="availability availability-${current.state}" data-fiche-availability>${current.availability}</p>${purchase}`
     + (croquettes ? rationLinkHtml(current) : "")
-    + (fiche.familyPrice !== null && !fiche.showcase ? '<p class="fiche-family-note">Le prix Famille s’applique au panier après vérification de votre numéro de puce ou de votre code Famille.</p>' : "")
+    + (fiche.showcase ? "" : `<p class="fiche-family-note"><strong>Avantage Famille</strong> : ${familyRateOf(catalogue) ? `${familyRateOf(catalogue)} de remise` : "une remise"} sur tout le panier, cumulable avec les offres en cours, après vérification de votre numéro de puce ou de votre Code Famille dans le panier.</p>`)
     + `<p class="fiche-ref">Référence : <span data-fiche-ref>${escapeHtml(current.reference)}</span></p></div></article>`
     + (fiche.description ? `<section class="fiche-description"><h2>Description</h2>${descriptionHtml(fiche.description)}</section>` : "")
     + `<script type="application/json" id="fiche-variants">${JSON.stringify(variants).replace(/</g, "\\u003c")}</script>`

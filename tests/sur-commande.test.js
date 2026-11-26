@@ -56,7 +56,8 @@ test("rayon habituel et rubrique « Produits sur commande » ; un Sur commande f
 test("panier mixte : devis accepté, ligne Sur commande signalée ; rupture réelle et produit fermé refusés", async () => {
   const quote = (items) => quoteCartRequest({ items, shipping: { mode: "pickup", pickupTiming: "appointment" } }, {
     listCatalogue: async () => catalogue,
-    verifyFamilyChip: async () => ({ status: "ok", recognized: false })
+    verifyFamilyChip: async () => ({ status: "ok", recognized: false }),
+    manager: require("./helpers/manager-pricing").fakePricingManager()
   });
   const mixed = await quote([{ productId: "sechoir-test", quantity: 3 }, { productId: "brosse-test", quantity: 2 }]);
   assert.equal(mixed.error, undefined);

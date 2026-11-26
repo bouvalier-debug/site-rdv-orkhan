@@ -69,7 +69,8 @@ test("devis : Sur commande fermé à l'achat refusé côté serveur ; chaque var
   ];
   const quote = (items) => quoteCartRequest({ items, shipping: { mode: "pickup", pickupTiming: "appointment" } }, {
     listCatalogue: async () => ({ available: true, products: catalogue }),
-    verifyFamilyChip: async () => ({ status: "ok", recognized: false })
+    verifyFamilyChip: async () => ({ status: "ok", recognized: false }),
+    manager: require("./helpers/manager-pricing").fakePricingManager()
   });
   assert.equal((await quote([{ productId: "vitrine-test", quantity: 1 }])).error, "product_not_purchasable");
   const both = await quote([{ productId: "croquettes-1-5kg", quantity: 2 }, { productId: "croquettes-10kg", quantity: 1 }]);

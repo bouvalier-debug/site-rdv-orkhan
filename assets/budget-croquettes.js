@@ -25,26 +25,34 @@
     return Number.isInteger(priceCents) ? priceCents * grams / bagGrams : null;
   }
 
-  // R = ration (g/jour), P = poids du sac (g), V = prix du sac (centimes, public et Famille tels qu'enregistrés).
-  function bagBudget({ rationGrams, bagGrams, publicPriceCents, familyPriceCents }) {
+  // R = ration (g/jour), P = poids du sac (g), V = prix public du sac (centimes). Étape 2 : estimation « avec l'Avantage
+  // Famille » au taux global du Manager (points de base), remise arrondie une seule fois sur l'achat comme au panier ;
+  // le panier reste seul juge du montant réel (offres et autres articles compris).
+  function bagBudget({ rationGrams, bagGrams, publicPriceCents, familyBasisPoints = null }) {
     if (!validRation(rationGrams)) return { status: "invalid-ration" };
     if (!Number.isInteger(bagGrams) || bagGrams <= 0) return { status: "missing-bag-weight" };
     if (!Number.isInteger(publicPriceCents)) return { status: "missing-price" };
     const periodGrams = rationGrams * PERIOD_DAYS;
     // Petite tolérance : 30 jours à 250 g/jour remplissent exactement un sac de 7,5 kg, sans en exiger un second.
     const bags = Math.max(1, Math.ceil(periodGrams / bagGrams - 1e-9));
-    const costs = (priceCents) => Number.isInteger(priceCents) ? {
-      dailyCents: prorata(priceCents, rationGrams, bagGrams),
-      periodCents: prorata(priceCents, periodGrams, bagGrams),
-      purchaseCents: priceCents * bags
+    const costs = {
+      dailyCents: prorata(publicPriceCents, rationGrams, bagGrams),
+      periodCents: prorata(publicPriceCents, periodGrams, bagGrams),
+      purchaseCents: publicPriceCents * bags
+    };
+    const rate = Number.isInteger(familyBasisPoints) && familyBasisPoints > 0 && familyBasisPoints <= 2000 ? familyBasisPoints : null;
+    const family = rate ? {
+      dailyCents: costs.dailyCents * (10000 - rate) / 10000,
+      periodCents: costs.periodCents * (10000 - rate) / 10000,
+      purchaseCents: costs.purchaseCents - Math.floor((costs.purchaseCents * rate + 5000) / 10000)
     } : null;
     return {
       status: "ok",
       days: bagGrams / rationGrams,
       periodGrams,
       bags,
-      public: costs(publicPriceCents),
-      family: costs(familyPriceCents)
+      public: costs,
+      family
     };
   }
 
@@ -198,7 +206,7 @@
       out("availability").className = `availability availability-${format.state}`;
       out("ration-link").href = format.rationHref;
       return {
-        budget: bagBudget({ rationGrams: ration, bagGrams: format.weightGrams, publicPriceCents: format.publicPriceCents, familyPriceCents: format.familyPriceCents }),
+        budget: bagBudget({ rationGrams: ration, bagGrams: format.weightGrams, publicPriceCents: format.publicPriceCents, familyBasisPoints: Number(form.dataset.familyBasisPoints) || null }),
         bagLabel: format.label
       };
     }
@@ -207,7 +215,7 @@
     if (manual.status !== "ok") return { budget: { status: manual.status } };
     const name = form.elements.nom.value.trim();
     return {
-      budget: bagBudget({ rationGrams: ration, bagGrams: manual.bagGrams, publicPriceCents: manual.publicPriceCents, familyPriceCents: null }),
+      budget: bagBudget({ rationGrams: ration, bagGrams: manual.bagGrams, publicPriceCents: manual.publicPriceCents }),
       bagLabel: `${kilograms(manual.bagGrams)}${name ? ` (${name})` : ""}`
     };
   }
@@ -234,7 +242,7 @@
       showFamily("daily-family", budget.family && budget.family.dailyCents);
       showFamily("period-family", budget.family && budget.family.periodCents);
       setText("purchase", `${budget.bags} sac${budget.bags > 1 ? "s" : ""} de ${bag.bagLabel} : ${euros(budget.public.purchaseCents)}`
-        + (budget.family ? ` (prix Famille : ${euros(budget.family.purchaseCents)})` : ""));
+        + (budget.family ? ` (avec l’Avantage Famille : ${euros(budget.family.purchaseCents)})` : ""));
     }
 
     const remaining = parseAmount(form.elements.reste.value) * (form.elements.resteUnite.value === "kg" ? 1000 : 1);

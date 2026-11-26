@@ -26,23 +26,23 @@ function recorder() {
   return { statusCode: 200, headers: {}, body: "", setHeader(key, value) { this.headers[key] = value; }, status(code) { this.statusCode = code; return this; }, send(body) { this.body = body; return this; } };
 }
 
-test("une fiche par groupe de variantes, avec « À partir de », prix Famille et meilleure disponibilité", () => {
+test("une fiche par groupe de variantes, avec « À partir de », prix public unique et meilleure disponibilité", () => {
   const fiches = vitrine.buildFiches(CATALOGUE.products);
   assert.deepEqual(fiches.map((fiche) => fiche.slug), ["croquettes-test", "laisse-test", "panier-osier"], "le produit masqué n'est jamais présenté");
   const croquettes = fiches[0];
   assert.deepEqual(croquettes.variants.map((variant) => [variant.reference, variant.state]), [["croquettes-test-2kg", "in_stock"], ["croquettes-test-10kg", "out_of_stock"]]);
   assert.equal(croquettes.price, 1490); assert.equal(croquettes.priceFrom, true);
-  assert.equal(croquettes.familyPrice, 1290); assert.equal(croquettes.familyPriceFrom, true);
+  assert.equal("familyPrice" in croquettes, false, "étape 2 : plus de prix Famille individuel");
   assert.equal(croquettes.state, "in_stock");
   assert.equal(fiches[2].state, "on_request");
   assert.equal(vitrine.findFiche(fiches, "croquettes-test-10kg"), croquettes, "l'URL d'une variante ouvre la fiche du groupe");
 });
 
-test("carte compacte : photo, nom, prix, prix Famille, disponibilité et seul bouton « Voir le produit »", () => {
+test("carte compacte : photo, nom, prix public unique, disponibilité et seul bouton « Voir le produit »", () => {
   const [croquettes, laisse, panier] = vitrine.buildFiches(CATALOGUE.products);
   const card = vitrine.ficheCard(croquettes);
   assert.match(card, /À partir de 14,90/);
-  assert.match(card, /Prix Famille Dynastie : À partir de 12,90/);
+  assert.doesNotMatch(card, /Prix Famille|Tarif Famille|12,90/);
   assert.match(card, /En stock/);
   assert.equal((card.match(/class="btn-voir"/g) || []).length, 1);
   assert.match(card, /href="\/produits\/croquettes-test\/">Voir le produit<\/a>/);
@@ -91,8 +91,13 @@ test("accueil : engagements, sept rayons et au plus douze nouveautés triées, p
   const catalogue = { available: true, products };
   const home = vitrine.renderAccueil(catalogue);
   assert.ok(home.indexOf("home-scene") < home.indexOf("home-promises"));
-  assert.match(home, /Un tarif réduit pour nos familles adoptantes/);
-  assert.match(home, /Activez votre Tarif Famille Dynastie avec le numéro de puce de votre chien ou votre code Famille\./);
+  // Étape 2 : avantage Famille global, taux lu dans le catalogue (sans taux publié : texte exact sans pourcentage).
+  assert.match(home, /Une remise toute l’année pour nos familles adoptantes/);
+  assert.match(home, /Activez votre avantage dans le panier avec le numéro de puce de votre chien ou votre Code Famille, avant le paiement./);
+  assert.doesNotMatch(home, /Tarif Famille|tarif réduit/);
+  const withRate = vitrine.renderAccueil({ ...catalogue, commercial: { familyDiscountBasisPoints: 500, offers: [] } });
+  assert.match(withRate, /5 % de remise toute l’année pour nos familles adoptantes/);
+  assert.match(withRate, /Bénéficiez de 5 % de remise sur vos achats, cumulable avec les offres promotionnelles en cours./);
   assert.match(home, /class="home-promise-badge" aria-hidden="true"/);
   assert.match(home, /Retrait gratuit à l’élevage<\/strong> pour les articles de la boutique/);
   assert.match(home, /Paiement sécurisé<\/strong> en ligne/);
@@ -100,8 +105,8 @@ test("accueil : engagements, sept rayons et au plus douze nouveautés triées, p
   assert.ok(home.indexOf('id="rayons-title"') < home.indexOf('id="nouveautes-title"'));
   assert.equal((home.match(/class="rayon-tile"/g) || []).length, 7);
   const rayonGrid = home.match(/<div class="rayon-grid">([\s\S]*?)<\/div>/)[1].replace(/<i class="rayon-shots[\s\S]*?<\/i>/g, "");
-  assert.ok(home.indexOf('class="famille"') > home.indexOf('class="stage"') && home.indexOf('class="famille"') < home.indexOf('id="rayons-title"'), "le Tarif Famille suit la scène d'ouverture, avant les rayons");
-  assert.equal((home.match(/Un tarif réduit pour nos familles adoptantes/g) || []).length, 1, "un seul bloc Tarif Famille");
+  assert.ok(home.indexOf('class="famille"') > home.indexOf('class="stage"') && home.indexOf('class="famille"') < home.indexOf('id="rayons-title"'), "l'Avantage Famille suit la scène d'ouverture, avant les rayons");
+  assert.equal((home.match(/class="famille"/g) || []).length, 1, "un seul bloc Avantage Famille");
   assert.doesNotMatch(home.match(/<section class="famille"[\s\S]*?<\/section>/)[0], /<a |<button/, "cartouche sans bouton : l'activation reste celle du panier");
   assert.doesNotMatch(rayonGrid, /\d+ articles?|Prochainement|Découvrir/i);
   assert.equal((rayonGrid.match(/<em aria-hidden="true"><b>→<\/b><\/em>/g) || []).length, 7);
