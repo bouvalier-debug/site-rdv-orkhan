@@ -429,6 +429,44 @@
     return node;
   }
 
+  // Miniature et lien vers la fiche, fournis par le devis du serveur (affichage seulement). Seuls les chemins internes à la
+  // Boutique sont acceptés ; sans photo, un cadre de secours avec l'initiale du produit.
+  function internalPath(value) {
+    return typeof value === "string" && /^\/(?!\/)[^\s"'<>\\]*$/.test(value) ? value : null;
+  }
+
+  function lineDisplayOf(serverLine) {
+    if (!serverLine) return null;
+    const url = internalPath(serverLine.photo && serverLine.photo.url);
+    return {
+      photo: url ? { url, altText: typeof serverLine.photo.altText === "string" ? serverLine.photo.altText : "" } : null,
+      href: internalPath(serverLine.href)
+    };
+  }
+
+  function lineThumbnail(document, display, name) {
+    const frame = element(document, display && display.href ? "a" : "span", "cart-line__thumb");
+    if (display && display.href) {
+      frame.href = display.href;
+      frame.tabIndex = -1;
+      frame.setAttribute("aria-hidden", "true");
+    }
+    if (display && display.photo) {
+      const image = element(document, "img");
+      image.src = display.photo.url;
+      image.alt = "";
+      image.width = 80;
+      image.height = 80;
+      image.loading = "lazy";
+      image.decoding = "async";
+      frame.append(image);
+    } else {
+      frame.classList.add("cart-line__thumb--empty");
+      frame.append(element(document, "span", "", (String(name || "").trim().charAt(0) || "·").toUpperCase()));
+    }
+    return frame;
+  }
+
   // Nom de repli tant que le devis n'a pas donné le nom du produit (devis en cours ou refusé).
   function fallbackLineName(productId) {
     if (/^red-dingo:/i.test(productId)) return "Médaille Red Dingo gravée";
@@ -487,6 +525,7 @@
     const onRequestNotice = container.querySelector("[data-on-request-notice]");
     const countryField = customerForm.querySelector('[name="country"]');
     const knownNames = new Map();
+    const knownDisplays = new Map();
     let selectedShipping = null;
     let pickupTiming = "";
     let lastResult = null;
@@ -543,7 +582,16 @@
         const info = element(document, "div", "cart-line__info");
         if (serverLine?.name) knownNames.set(item.productId, serverLine.displayName || serverLine.name);
         const lineName = serverLine?.displayName || serverLine?.name || knownNames.get(item.productId) || fallbackLineName(item.productId);
-        info.append(element(document, "h2", "cart-line__title", lineName));
+        const fresh = lineDisplayOf(serverLine);
+        if (fresh) knownDisplays.set(item.productId, fresh);
+        const display = fresh || knownDisplays.get(item.productId) || null;
+        const title = element(document, "h2", "cart-line__title");
+        if (display && display.href) {
+          const link = element(document, "a", "cart-line__link", lineName);
+          link.href = display.href;
+          title.append(link);
+        } else title.textContent = lineName;
+        info.append(title);
         const optionsList = element(document, "dl", "cart-line__options");
         displayOptionRows(item).forEach(([label, value]) => {
           optionsList.append(element(document, "dt", "", label), element(document, "dd", "", value));
@@ -569,7 +617,9 @@
         const price = element(document, "div", "cart-line__price");
         price.append(element(document, "span", "cart-line__unit", serverLine ? `${money(serverLine.unitPriceCents)} l’unité` : (state === "failed" ? "Prix non calculé" : "Prix en cours de calcul")));
         price.append(element(document, "strong", "", serverLine ? money(serverLine.subtotalCents) : "—"));
-        card.append(info, controls, price);
+        const product = element(document, "div", "cart-line__product");
+        product.append(lineThumbnail(document, display, lineName), info);
+        card.append(product, controls, price);
         linesNode.append(card);
       });
     }
@@ -959,6 +1009,7 @@
     deliveryDelayLines,
     discountRows,
     displayOptionRows,
+    lineDisplayOf,
     familyRateText,
     offerProgressMessages,
     checkoutCancelMessage,

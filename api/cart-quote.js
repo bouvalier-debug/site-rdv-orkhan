@@ -1,4 +1,5 @@
 const { quoteCart } = require("./_cart");
+const { CATALOG_CONFIG, buildCatalog, getProduct } = require("./_catalog");
 const { cartCatalog } = require("./_cart-catalogue");
 const { applyCommercialPricing } = require("./_cart-pricing");
 const { chipNumbers, familyCodeInput, resolveFamilyEligibility } = require("./_family-benefit");
@@ -22,6 +23,25 @@ function displayVariantName(product) {
   return missing.length ? `${product.name} – ${missing.join(" · ")}` : product.name;
 }
 
+// Affichage du panier : miniature (photo réelle de la référence choisie) et lien vers sa fiche. Données d'affichage
+// seulement : ni la commande, ni Stripe, ni le Manager ne les reçoivent (le paiement recalcule son propre devis).
+const ANIMOCO_DISPLAY = { photo: { url: "/medailles-connectees/assets/medaille-animoco-recto-verso.webp", altText: CATALOG_CONFIG.animoco.name }, href: "/medailles-connectees/" };
+
+function lineDisplay(line, catalog) {
+  if (line.productId === "animoco") return ANIMOCO_DISPLAY;
+  const product = getProduct(line.productId, catalog || buildCatalog());
+  if (!product) return {};
+  if (product.catalogue) {
+    return { ...(product.photo ? { photo: product.photo } : {}), href: `/produits/${encodeURIComponent(product.id)}/` };
+  }
+  if (product.family === "red-dingo") {
+    const colour = line.options && line.options.colour;
+    const model = product.models.find((candidate) => candidate.image && candidate.color === colour) || product.models.find((candidate) => candidate.image);
+    return { ...(model ? { photo: { url: `/medailles-gravees/${model.image}`, altText: product.name } } : {}), href: "/medailles-gravees/" };
+  }
+  return {};
+}
+
 async function quoteCartRequest(input, options = {}) {
   const eligibility = await resolveFamilyEligibility(input?.items, { ...options, familyChipNumber: input?.familyChipNumber, familyCode: input?.familyCode });
   if (eligibility.error) return eligibility;
@@ -36,12 +56,11 @@ async function quoteCartRequest(input, options = {}) {
   // Étape 2 : offres en cours et avantage Famille global, calculés par le Manager.
   const priced = await (options.applyCommercialPricing || applyCommercialPricing)(result.quote, eligibility.familyEligible, options);
   if (priced.error) return priced;
-  if (!catalogue.catalog) return { ...result, quote: priced.quote };
   return { ...result, quote: { ...priced.quote, lines: priced.quote.lines.map((line) => {
-    const product = catalogue.catalog.get(line.productId);
-    if (!product?.variantGroup) return line;
-    const displayName = displayVariantName(product);
-    return displayName === line.name ? line : { ...line, displayName };
+    const display = lineDisplay(line, catalogue.catalog);
+    const product = catalogue.catalog && catalogue.catalog.get(line.productId);
+    const displayName = product?.variantGroup ? displayVariantName(product) : line.name;
+    return { ...line, ...(displayName !== line.name ? { displayName } : {}), ...display };
   }) } };
 }
 
