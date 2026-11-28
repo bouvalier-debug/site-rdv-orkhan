@@ -142,6 +142,14 @@
       "destination": "/api/vitrine?vue=accueil"
     },
     {
+      "source": "/promotions",
+      "destination": "/api/vitrine?vue=promotions"
+    },
+    {
+      "source": "/promotions/",
+      "destination": "/api/vitrine?vue=promotions"
+    },
+    {
       "source": "/nouveautes",
       "destination": "/api/vitrine?vue=nouveautes"
     },

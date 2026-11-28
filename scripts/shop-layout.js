@@ -29,7 +29,7 @@ const RAYONS = Object.freeze([
 const SHOP_HEADER = '<a class="shop-return-link" href="https://www.dynastiedorkhan.com/">← Retour au site de l’élevage</a><header class="shop-header"><a class="shop-brand" href="/"><img src="/medailles-gravees/assets/logo-dynastie-orkhan.png" alt="" width="76" height="76"><span><strong>Dynastie d’Orkhan</strong><small>La boutique</small></span></a>'
   + '<nav class="shop-menu" aria-label="Navigation de la boutique"><a href="/">Accueil</a>'
   + `<details class="shop-rayons"><summary>Rayons</summary><ul>${RAYONS.map((rayon) => `<li><a href="/rayons/${rayon.slug}/">${rayon.label}</a></li>`).join("")}<li class="shop-rayons-extra"><a href="/sur-demande/">Produits sur commande</a></li></ul></details>`
-  + '<a class="cart-nav-link" href="/panier/">Panier <span class="cart-badge" data-cart-count hidden>0</span></a></nav>'
+  + '<a href="/promotions/">Promotions</a><a class="cart-nav-link" href="/panier/">Panier <span class="cart-badge" data-cart-count hidden>0</span></a></nav>'
   + '<script src="/assets/shop-menu.js" defer></script></header>';
 
 module.exports = { SHOP_FOOTER, FACEBOOK_FAB, BACK_TO_TOP, RAYONS, SHOP_HEADER };

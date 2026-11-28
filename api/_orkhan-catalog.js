@@ -90,9 +90,19 @@ function publicProduct(raw) {
       altText: text(photo.altText, 300) || name
     };
   }).filter(Boolean);
+  // Remise ciblée en cours (Manager) : publicPriceCents est déjà le prix remisé. Le prix barré et le badge ne
+  // s'affichent que si le Manager fournit un prix de référence (prix le plus bas des 30 jours précédents).
+  const rawPromo = raw.promotion && typeof raw.promotion === "object" ? raw.promotion : null;
+  const rawReduction = rawPromo && rawPromo.reduction && typeof rawPromo.reduction === "object" ? rawPromo.reduction : null;
+  const referencePriceCents = rawReduction ? cents(rawReduction.referencePriceCents) : null;
+  const reductionPercent = rawReduction && Number.isSafeInteger(rawReduction.percent) ? rawReduction.percent : null;
+  const promotion = rawPromo && referencePriceCents !== null && referencePriceCents > publicPriceCents && reductionPercent >= 1 && reductionPercent <= 90
+    ? { referencePriceCents, percent: reductionPercent, endsAt: catalogueDate(rawPromo.endsAt) }
+    : null;
   return {
     reference,
     name,
+    ...(promotion ? { promotion } : {}),
     family: FAMILIES.has(raw.family) ? raw.family : null,
     description: text(raw.description, 5000),
     publicPriceCents,

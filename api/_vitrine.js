@@ -133,6 +133,34 @@ function variantAvailability(product) {
 // CAT-02 / C5 : une fiche par groupe de variantes (chaque format garde sa référence, son prix et son stock), sinon une
 // fiche par produit. Seuls les produits visibles sont présentés.
 // Étape 2 : prix public unique ; offers (catalogue.commercial) sert seulement à la pastille « X + Y offert » des cartes.
+// Remise ciblée : la carte annonce la remise de la variante la moins chère qui en porte une (état vendable).
+function tilePromo(fiche) {
+  if (fiche.showcase) return null;
+  const promoted = fiche.variants.filter((variant) => variant.promotion && variant.state !== "out_of_stock" && variant.state !== "soon");
+  if (!promoted.length) return null;
+  const best = promoted.sort((a, b) => a.publicPriceCents - b.publicPriceCents)[0];
+  return { ...best.promotion, priceCents: best.publicPriceCents };
+}
+
+// « Offre jusqu'au… » : la fin de promotion est exclusive côté Manager (minuit de Paris du lendemain), on affiche donc la veille.
+function promoUntilText(endsAt) {
+  const last = new Date(Date.parse(endsAt) - 60000);
+  return `Offre jusqu’au ${new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Paris" }).format(last)}`;
+}
+
+function promoNoteText(promo) {
+  return `Prix de référence : prix le plus bas des 30 derniers jours.${promo.until ? ` ${promo.until}.` : ""}`;
+}
+
+function promoBadgeHtml(promo) {
+  return promo ? `<span class="tile-promo">−${promo.percent} %</span>` : "";
+}
+
+function promoPriceHtml(promo, priceCents, from) {
+  if (!promo) return priceText(priceCents, from);
+  return `<s class="price-ref"><span class="sr-only">Prix de référence : </span>${money(promo.referencePriceCents)}</s> <span class="price-now">${from ? "À partir de " : ""}${money(priceCents)}</span>`;
+}
+
 function buildFiches(products, offers = []) {
   const groups = new Map();
   for (const product of products) {
@@ -174,7 +202,7 @@ function buildFiches(products, offers = []) {
       priceFrom: new Set(prices).size > 1,
       state: AVAILABILITY_RANK.find((state) => variants.some((variant) => variant.state === state))
     };
-    return { ...fiche, offer: tileOffer(fiche, offers) };
+    return { ...fiche, offer: tileOffer(fiche, offers), promo: tilePromo(fiche) };
   });
 }
 
@@ -326,9 +354,10 @@ function ficheTile(fiche, order) {
   const profileData = recipe && profileTokens(recipe).length ? ` data-profile="${profileTokens(recipe).join(" ")}"` : "";
   const sortData = order === null ? "" : ` data-order="${order}" data-name="${escapeHtml(fiche.name)}" data-price="${fiche.price}"${fiche.publishedAt ? ` data-published="${escapeHtml(fiche.publishedAt)}"` : ""}`;
   const brand = recipe && recipe.brand && !fiche.name.toLocaleLowerCase("fr").startsWith(recipe.brand.toLocaleLowerCase("fr")) ? `<p class="tile-brand">${escapeHtml(recipe.brand)}</p>` : "";
-  return `<article class="product-tile"${filterData}${profileData}${sortData}><a class="product-tile-photo" href="${href}" tabindex="-1" aria-hidden="true">${photo ? photoHtml(photo, "") : `<span class="product-tile-placeholder">Photo à venir</span>`}${fiche.isNew ? '<span class="tile-badge">Nouveauté</span>' : ""}${tileBadgeHtml(fiche.offer)}</a>`
+  return `<article class="product-tile"${filterData}${profileData}${sortData}><a class="product-tile-photo" href="${href}" tabindex="-1" aria-hidden="true">${photo ? photoHtml(photo, "") : `<span class="product-tile-placeholder">Photo à venir</span>`}${fiche.isNew ? '<span class="tile-badge">Nouveauté</span>' : ""}${tileBadgeHtml(fiche.offer)}${promoBadgeHtml(fiche.promo)}</a>`
     + `<div class="product-tile-body">${brand}<h3><a href="${href}">${escapeHtml(fiche.name)}</a></h3>`
-    + (fiche.showcase ? "" : `<p class="product-price">${priceText(fiche.price, fiche.priceFrom)}</p>`)
+    + (fiche.showcase ? "" : `<p class="product-price">${promoPriceHtml(fiche.promo, fiche.promo ? fiche.promo.priceCents : fiche.price, fiche.priceFrom)}</p>`)
+    + (fiche.promo && fiche.promo.endsAt ? `<p class="tile-promo-until">${promoUntilText(fiche.promo.endsAt)}</p>` : "")
     + tileNoteHtml(fiche.offer)
     + `<p class="availability availability-${fiche.state}">${AVAILABILITY_LABELS[fiche.state]}</p>`
     + `<div class="tile-actions">${quickAddHtml(fiche)}<a class="btn-voir" href="${href}">Voir le produit</a></div><p class="tile-added" data-quick-status role="status" aria-live="polite"></p></div></article>`;
@@ -517,6 +546,19 @@ function renderAccueil(catalogue) {
   });
 }
 
+// Onglet Promotions : mêmes cartes, articles avec remise ciblée ou offre X + Y en cours ; message si aucune.
+function renderPromotions(catalogue) {
+  if (!catalogue.available) return null;
+  const items = catalogueFiches(catalogue).filter((fiche) => !fiche.showcase && (fiche.promo || fiche.offer));
+  return page({
+    title: "Promotions | Boutique Dynastie d'Orkhan",
+    description: "Les remises et offres en cours à la boutique de l'Élevage de la Dynastie d'Orkhan.",
+    canonical: "/promotions/",
+    hero: heroHtml("Promotions", "Les remises et les offres en cours.", true),
+    body: `<section class="rayon-listing"><h2>Promotions en cours</h2>${items.length ? `<div class="product-grid">${items.map(ficheCard).join("")}</div>` : '<p class="rayon-empty">Aucune promotion en cours actuellement.</p>'}</section>`
+  });
+}
+
 function renderNouveautes(catalogue, requestedPage = 1) {
   const items = latestFiches(catalogueFiches(catalogue));
   const pageNumber = Number(requestedPage);
@@ -668,6 +710,8 @@ function renderFiche(catalogue, slug) {
     reference: variant.reference,
     label: variant.variantLabel || variant.name,
     price: money(variant.publicPriceCents),
+    rawPriceCents: variant.publicPriceCents,
+    promo: variant.promotion ? { referencePriceCents: variant.promotion.referencePriceCents, referencePrice: money(variant.promotion.referencePriceCents), percent: variant.promotion.percent, until: variant.promotion.endsAt ? promoUntilText(variant.promotion.endsAt) : null } : null,
     // Étape 2 : offre en cours de ce format (encart affiché pour la variante choisie), jamais de prix Famille individuel.
     offerId: (fiche.showcase ? null : offerForReference(offers, variant.reference))?.id || null,
     state: variant.state,
@@ -680,8 +724,9 @@ function renderFiche(catalogue, slug) {
   }));
   const current = variants.find((variant) => variant.reference === selected.reference);
   const photos = current.photos;
+  const promoBadgePlaceholder = `<span class="tile-promo" data-fiche-promo-badge${current.promo ? "" : " hidden"}>${current.promo ? `−${current.promo.percent} %` : ""}</span>`;
   const gallery = photos.length
-    ? `<div class="fiche-gallery"><div class="fiche-plate">${photoHtml(photos[0], "fiche-photo", "eager").replace("<img", '<img data-fiche-photo')}</div><div class="fiche-thumbs" data-fiche-thumbs${photos.length > 1 ? "" : " hidden"}>${photos.map((photo, index) => `<button type="button" data-photo-index="${index}"${index === 0 ? ' aria-current="true"' : ""}>${photoHtml(photo, "")}</button>`).join("")}</div></div>`
+    ? `<div class="fiche-gallery"><div class="fiche-plate">${photoHtml(photos[0], "fiche-photo", "eager").replace("<img", '<img data-fiche-photo')}${promoBadgePlaceholder}</div><div class="fiche-thumbs" data-fiche-thumbs${photos.length > 1 ? "" : " hidden"}>${photos.map((photo, index) => `<button type="button" data-photo-index="${index}"${index === 0 ? ' aria-current="true"' : ""}>${photoHtml(photo, "")}</button>`).join("")}</div></div>`
     : `<div class="fiche-gallery"><span class="product-tile-placeholder fiche-photo">Photo à venir</span></div>`;
   const choice = variantChoices(variants, current);
   const ficheOffers = [...new Set(variants.map((variant) => variant.offerId).filter(Boolean))]
@@ -701,7 +746,7 @@ function renderFiche(catalogue, slug) {
   const kicker = kickerParts.length ? `<p class="fiche-kicker">${kickerParts.map(escapeHtml).join(" · ")}</p>` : "";
   const body = `<nav class="breadcrumb" aria-label="Fil d’Ariane"><a href="/">Accueil</a>${rayon ? ` › <a href="/rayons/${rayon.slug}/">${rayon.label}</a>` : fiche.onRequest ? ' › <a href="/sur-demande/">Produits sur commande</a>' : ""} › <span>${escapeHtml(fiche.name)}</span></nav>`
     + `<article class="fiche" data-fiche><div class="fiche-media">${gallery}</div><div class="fiche-info">${kicker}<h1>${escapeHtml(fiche.name)}</h1>${choice}`
-    + (fiche.showcase ? "" : `<p class="product-price fiche-price" data-fiche-price>${current.price}</p>`)
+    + (fiche.showcase ? "" : `<p class="product-price fiche-price" data-fiche-price>${current.promo ? promoPriceHtml(current.promo, current.rawPriceCents) : current.price}</p><p class="fiche-promo-note" data-fiche-promo-note${current.promo ? "" : " hidden"}>${current.promo ? promoNoteText(current.promo) : ""}</p>`)
     + ficheOffers
     + `<p class="availability availability-${current.state}" data-fiche-availability>${current.availability}</p>${purchase}`
     + (croquettes ? rationLinkHtml(current) : "")
@@ -730,5 +775,5 @@ function renderNotFound() {
 
 module.exports = {
   ARTERO_PHOTOS, AVAILABILITY_LABELS, BUDGET_PATH, ON_REQUEST_NOTICE, PARCOURS, RATION_CALCULATOR_URL, SCENE, budgetHref, buildFiches, descriptionHtml, escapeHtml, findFiche, ficheCard, heroHtml, money,
-  page, rationCalculatorHref, rayonBySlug, renderAccueil, renderAlimentation, renderFiche, renderNotFound, renderNouveautes, renderRayon, renderSurDemande, sceneHtml, variantAvailability
+  page, rationCalculatorHref, rayonBySlug, renderAccueil, renderAlimentation, renderFiche, renderNotFound, renderNouveautes, renderPromotions, renderRayon, renderSurDemande, sceneHtml, variantAvailability
 };

@@ -94,6 +94,8 @@ function validateCart(input, options = {}) {
       quantity: item.quantity,
       unitPriceCents,
       subtotalCents: unitPriceCents * item.quantity,
+      // Affichage seulement : prix de référence barré d'une remise ciblée, pour le montant économisé du panier.
+      ...(product.catalogue && product.promotion ? { referencePriceCents: product.promotion.referencePriceCents } : {}),
       weightGrams: product.weightGrams,
       // Affichage seulement (rappel « Produit sur commande » au panier) : non transmis au Manager.
       ...(product.catalogue && product.onRequest ? { onRequest: true } : {}),
