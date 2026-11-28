@@ -28,6 +28,7 @@ function catalogueCartProduct(product) {
     purchasable: product.purchasable === true,
     onRequest: product.onRequest === true,
     publicPriceCents: product.publicPriceCents,
+    promotion: product.promotion || null,
     familyPriceCents: product.familyPriceCents,
     // Affichage du panier seulement (miniature) : première photo de la référence, déjà publique sur sa fiche.
     photo: Array.isArray(product.photos) && product.photos[0] ? { url: product.photos[0].url, altText: product.photos[0].altText || product.name } : null,

@@ -550,6 +550,14 @@
 
 /* ───────── Étape 2 : offres « X achetés + Y offerts » (bordeaux vineux, doré, crème), sans changer le prix public ───────── */
 .tile-offer{position:absolute;top:10px;right:10px;z-index:1;padding:4px 10px;border:1px solid var(--gold);border-radius:999px;background:var(--cream);color:var(--wine);font-size:.7rem;font-weight:900;letter-spacing:.02em;line-height:1.4;white-space:nowrap;box-shadow:0 4px 10px rgba(115,29,50,.12)}
+.tile-promo{position:absolute;top:10px;right:10px;z-index:2;padding:4px 10px;border-radius:999px;background:var(--wine);color:#fff;font-size:.74rem;font-weight:900;letter-spacing:.02em;line-height:1.4;white-space:nowrap;box-shadow:0 4px 10px rgba(115,29,50,.2)}
+.tile-promo[hidden]{display:none}
+.tile-offer + .tile-promo{top:38px}
+.price-ref{margin-right:2px;color:#7a6a64;font-size:.82em;font-weight:600;text-decoration:line-through}
+.price-now{color:var(--wine)}
+.tile-promo-until,.fiche-promo-note{margin:2px 0 0;color:#8a6628;font-size:.8rem;font-weight:700}
+.fiche-promo-note[hidden]{display:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .tile-offer-note{margin:2px 0 0;color:#8a6628;font-size:.8rem;font-weight:700}
 .fiche-info>.fiche-offer{order:4;align-self:stretch}
 .fiche-offer{margin:14px 0 0;padding:14px 18px;border:1px solid var(--hair);border-left:3px solid var(--wine);border-radius:0 12px 12px 0;background:var(--cream);color:var(--ink);font-size:.9rem}
@@ -575,6 +583,8 @@
   .offer-banner{grid-template-columns:minmax(0,1fr)}
   .offer-banner-link{justify-self:start}
   .tile-offer{top:7px;right:7px;font-size:.64rem;padding:3px 8px}
+  .tile-promo{top:7px;right:7px;font-size:.66rem;padding:3px 8px}
+  .tile-offer + .tile-promo{top:32px}
 }
 
 /* ───────── Ajout rapide au panier depuis les cartes (produits sans choix préalable) ───────── */

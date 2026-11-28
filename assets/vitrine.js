@@ -9,6 +9,8 @@
   const byReference = new Map(variants.map((variant) => [variant.reference, variant]));
   const axisFields = [...fiche.querySelectorAll("[data-variant-axis]")];
   const priceNode = fiche.querySelector("[data-fiche-price]");
+  const promoNote = fiche.querySelector("[data-fiche-promo-note]");
+  const promoBadge = fiche.querySelector("[data-fiche-promo-badge]");
   const offerNodes = [...fiche.querySelectorAll("[data-fiche-offer]")];
   const availabilityNode = fiche.querySelector("[data-fiche-availability]");
   const referenceNode = fiche.querySelector("[data-fiche-ref]");
@@ -65,7 +67,27 @@
 
   function select(variant) {
     current = variant;
-    if (priceNode) priceNode.textContent = variant.price;
+    if (priceNode) {
+      const promo = variant.promo;
+      priceNode.replaceChildren();
+      if (promo) {
+        const old = document.createElement("s");
+        old.className = "price-ref";
+        old.textContent = promo.referencePrice;
+        const now = document.createElement("span");
+        now.className = "price-now";
+        now.textContent = variant.price;
+        priceNode.append(old, " ", now);
+      } else priceNode.textContent = variant.price;
+    }
+    if (promoNote) {
+      promoNote.hidden = !variant.promo;
+      promoNote.textContent = variant.promo ? `Prix de référence : prix le plus bas des 30 derniers jours.${variant.promo.until ? ` ${variant.promo.until}.` : ""}` : "";
+    }
+    if (promoBadge) {
+      promoBadge.hidden = !variant.promo;
+      promoBadge.textContent = variant.promo ? `−${variant.promo.percent} %` : "";
+    }
     // Encart de l'offre du format choisi (aucun si ce format n'en relève pas).
     offerNodes.forEach((node) => { node.hidden = node.dataset.ficheOffer !== variant.offerId; });
     if (availabilityNode) { availabilityNode.textContent = variant.availability; availabilityNode.className = `availability availability-${variant.state}`; }

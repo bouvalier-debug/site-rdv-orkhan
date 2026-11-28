@@ -761,7 +761,9 @@
         }));
       }
       if (savingsNode) {
-        const saved = Number.isInteger(quote?.discountCents) ? quote.discountCents : 0;
+        // Remises ciblées : écart entre le prix de référence (barré en boutique) et le prix payé, en plus des remises du devis.
+        const targeted = (quote?.lines || []).reduce((sum, line) => (Number.isInteger(line.referencePriceCents) && line.referencePriceCents > line.unitPriceCents ? sum + (line.referencePriceCents - line.unitPriceCents) * line.quantity : sum), 0);
+        const saved = (Number.isInteger(quote?.discountCents) ? quote.discountCents : 0) + targeted;
         savingsNode.hidden = saved <= 0;
         const amount = savingsNode.querySelector("strong");
         if (amount) amount.textContent = money(saved);
