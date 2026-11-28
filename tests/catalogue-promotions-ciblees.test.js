@@ -23,3 +23,15 @@ test("sans prix de référence ou sans remise : aucun badge ni prix barré", () 
     assert.doesNotMatch(html, /tile-promo|price-ref/);
   }
 });
+
+test("page Promotions : cartes des articles remisés ou en offre, message sinon", () => {
+  const { renderPromotions } = require("../api/_vitrine");
+  const promo = publicProduct({ ...base, promotion: { percent: 20, endsAt: null, reduction: { referencePriceCents: 2000, percent: 20 } } });
+  const plain = publicProduct({ ...base, reference: "croq-2", name: "Sans remise" });
+  const withPromo = renderPromotions({ available: true, products: [promo, plain], commercial: { offers: [] } });
+  assert.match(withPromo, /Croquettes test/);
+  assert.doesNotMatch(withPromo, /Sans remise/);
+  assert.match(withPromo, /−20 %/);
+  assert.match(renderPromotions({ available: true, products: [plain], commercial: { offers: [] } }), /Aucune promotion en cours actuellement/);
+  assert.equal(renderPromotions({ available: false, products: [] }), null);
+});

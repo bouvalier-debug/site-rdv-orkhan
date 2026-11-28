@@ -546,6 +546,19 @@ function renderAccueil(catalogue) {
   });
 }
 
+// Onglet Promotions : mêmes cartes, articles avec remise ciblée ou offre X + Y en cours ; message si aucune.
+function renderPromotions(catalogue) {
+  if (!catalogue.available) return null;
+  const items = catalogueFiches(catalogue).filter((fiche) => !fiche.showcase && (fiche.promo || fiche.offer));
+  return page({
+    title: "Promotions | Boutique Dynastie d'Orkhan",
+    description: "Les remises et offres en cours à la boutique de l'Élevage de la Dynastie d'Orkhan.",
+    canonical: "/promotions/",
+    hero: heroHtml("Promotions", "Les remises et les offres en cours.", true),
+    body: `<section class="rayon-listing"><h2>Promotions en cours</h2>${items.length ? `<div class="product-grid">${items.map(ficheCard).join("")}</div>` : '<p class="rayon-empty">Aucune promotion en cours actuellement.</p>'}</section>`
+  });
+}
+
 function renderNouveautes(catalogue, requestedPage = 1) {
   const items = latestFiches(catalogueFiches(catalogue));
   const pageNumber = Number(requestedPage);
@@ -762,5 +775,5 @@ function renderNotFound() {
 
 module.exports = {
   ARTERO_PHOTOS, AVAILABILITY_LABELS, BUDGET_PATH, ON_REQUEST_NOTICE, PARCOURS, RATION_CALCULATOR_URL, SCENE, budgetHref, buildFiches, descriptionHtml, escapeHtml, findFiche, ficheCard, heroHtml, money,
-  page, rationCalculatorHref, rayonBySlug, renderAccueil, renderAlimentation, renderFiche, renderNotFound, renderNouveautes, renderRayon, renderSurDemande, sceneHtml, variantAvailability
+  page, rationCalculatorHref, rayonBySlug, renderAccueil, renderAlimentation, renderFiche, renderNotFound, renderNouveautes, renderPromotions, renderRayon, renderSurDemande, sceneHtml, variantAvailability
 };
