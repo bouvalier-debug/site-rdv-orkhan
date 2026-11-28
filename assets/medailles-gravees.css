@@ -1,0 +1,58 @@
+/* Médailles gravées Red Dingo : habillage Boutique 2.0.
+   Chargé uniquement par /medailles-gravees/, après orkhan-design.css et vitrine.css.
+   Apparence seule : aucun sélecteur n'agit sur le configurateur, le panier ou le paiement au-delà de leur rendu.
+   Le bandeau du haut est le composant .page-head de vitrine.css, sans aucune règle supplémentaire. */
+
+/* Repères : mêmes cartes crème, filets et arrondis que les rayons et fiches */
+.steps,.prices{gap:16px;margin:34px 0 26px}
+.step,.price-card,.benefits,form{border:1px solid var(--line);border-radius:8px;background:var(--paper);box-shadow:none}
+.step{padding:18px 18px 20px;color:var(--muted);font-size:.95rem;line-height:1.55}
+.step strong{margin-bottom:6px;color:var(--wine);font-family:"Lora",Georgia,serif;font-size:1.12rem;font-weight:600;line-height:1.3}
+.price-card{background:var(--plate)}
+.price-card h2{margin:0;color:var(--wine);font-size:1.3rem}
+.amount{margin:.35rem 0;color:var(--ink);font-size:1.7rem;font-weight:800;font-variant-numeric:tabular-nums}
+.price-card p:last-child{margin-bottom:0;color:var(--muted)}
+
+/* Volets d'information */
+.benefits{padding:6px 22px 18px}
+.warranty summary{color:var(--wine);font-weight:800}
+.benefit-list li,.benefit-list>div{background:var(--plate)}
+
+/* Titres de section et barre de recherche (même rendu que le tri des rayons) */
+main>h2{margin-top:46px;font-size:clamp(1.6rem,2.6vw,2.1rem)}
+.toolbar input,.toolbar select{min-height:44px;padding:8px 16px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);font-weight:700}
+.toolbar input:focus-visible,.toolbar select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.count{color:var(--muted)}
+.category-section>h3{padding-bottom:9px;border-bottom:1px solid var(--hair);font-size:1.35rem}
+
+/* Galerie des modèles : tuiles produit des rayons (photo sur écrin, nom en Lora, prix, bouton) */
+.grid{gap:34px 22px;grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.card{padding:0;border:0;border-radius:0;background:transparent}
+.card img{height:auto;aspect-ratio:1;padding:12px;border:1px solid var(--line);border-radius:8px;background:#fff;transition:border-color .3s}
+.card:hover img{border-color:var(--gold)}
+.card h3{margin:12px 0 4px;color:var(--ink);font-family:"Lora",Georgia,serif;font-size:1.06rem;font-weight:600;line-height:1.3}
+.meta{color:var(--muted)}
+.tag{margin-top:10px;background:var(--plate);color:var(--wine);font-weight:800}
+
+/* Boutons : pilule bordeaux des boutons d'ajout au panier (.btn-add) */
+.card button,#add-red-dingo{min-height:42px;padding:9px 18px;border:0;border-radius:999px;background:var(--wine);color:#fff;font-size:.9rem;font-weight:800;box-shadow:0 8px 18px rgba(115,29,50,.18);transition:background .15s,transform .15s}
+.card button:hover,#add-red-dingo:hover{background:var(--wine-dark)}
+.card button:focus-visible,#add-red-dingo:focus-visible{outline:3px solid var(--gold-soft);outline-offset:3px}
+.card button:active,#add-red-dingo:active{transform:scale(.98)}
+#add-red-dingo{min-height:48px;padding:12px 26px;font-size:1rem}
+
+/* Formulaire de gravure */
+form{padding:clamp(18px,3vw,30px)}
+input,select,textarea{border-color:var(--line)}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.hint{color:var(--muted)}
+.engraving-guide,.cart-confirmation{border-left-color:var(--gold);background:var(--plate)}
+.size-card{border-radius:8px;background:var(--plate)}
+.colour-showcase{border-radius:8px;background:var(--paper)}
+.notice{border-left:3px solid var(--gold);border-radius:8px;background:var(--plate)}
+
+/* Mobile : deux tuiles par ligne, comme les rayons */
+@media(max-width:560px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:26px 14px}
+  .card button{padding:9px 10px;font-size:.84rem}
+}
