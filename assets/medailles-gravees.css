@@ -108,3 +108,6 @@ form input:focus-visible,form select:focus-visible,form textarea:focus-visible{o
 .amount{color:var(--gold-soft)!important}
 form{border-color:var(--hair)!important;border-radius:18px!important;box-shadow:var(--shadow)!important}
 @media(max-width:560px){form{border-radius:14px!important}}
+
+/* Le script masque « Gravure verso » (attribut hidden) pour les modèles sans recto-verso ; label{display:block} l'annulait. */
+#verso-field[hidden]{display:none}
