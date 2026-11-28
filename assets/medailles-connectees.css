@@ -1,0 +1,71 @@
+/* Médaille connectée Animoco : habillage Boutique 2.0, même principe que assets/medailles-gravees.css.
+   Chargé uniquement par /medailles-connectees/, après orkhan-design.css, styles.css et vitrine.css.
+   Apparence seule : aucun sélecteur n'agit sur la commande, le panier ou le paiement au-delà de leur rendu.
+   Le bandeau du haut est le composant .page-head de vitrine.css, sans aucune règle supplémentaire. */
+
+/* styles.css redéfinit les anciennes teintes : retour aux valeurs de la Boutique 2.0 (orkhan-design.css). */
+:root{--wine:#731d32;--wine-dark:#4e1222;--gold:#bd9452;--cream:#f8f2e8;--paper:#fffdf9;--ink:#261d1f;--muted:#6b5e60;--line:#e6d9c8;--shadow:0 18px 50px rgba(78,18,34,.10)}
+
+/* Sections */
+.section{padding:clamp(40px,6vw,68px) 0}
+.section.tint{padding-inline:clamp(18px,3vw,36px);border-radius:18px;background:var(--plate)}
+.section.tint>.shell{width:100%}
+.section.tint+.section.tint{margin-top:24px}
+.eyebrow{color:#8a6628;font-size:.74rem;font-weight:800;letter-spacing:.18em}
+h2{color:var(--wine);font-size:clamp(1.7rem,3vw,2.4rem);font-weight:600;letter-spacing:-.02em}
+.section-intro,.lead{color:var(--muted)}
+
+/* Tarif et Avantage Famille : hiérarchie de la fiche produit (prix en Lora, pastille Famille) */
+.hero-details{padding-top:34px}
+.price-public{margin:0;color:var(--wine);font-family:"Lora",Georgia,serif;font-size:clamp(1.9rem,3vw,2.4rem);font-weight:600;line-height:1.1}
+.price-family{display:inline-flex;margin:12px 0 0;padding:7px 14px;border:1px solid var(--hair);border-radius:999px;background:#fff8ea;color:#6d4f17;font-size:.9rem;font-weight:700;line-height:1.4}
+.availability{margin:12px 0 0}
+.pills li{border-color:var(--hair);background:var(--plate);color:var(--ink);font-weight:700}
+
+/* Photo principale sur écrin (cadre de la fiche produit) */
+.hero-image{position:relative;padding:18px;border:0;border-radius:12px;background:var(--plate);box-shadow:none}
+.hero-image::after{content:"";position:absolute;inset:12px;border:1px solid rgba(189,148,82,.4);border-radius:6px;pointer-events:none}
+.hero-image img{mix-blend-mode:multiply}
+.hero-image .caption{text-align:center}
+.media{border-color:var(--line);border-radius:12px;background:#fff}
+.media img{border-radius:6px}
+
+/* Boutons : pilules des boutons Boutique 2.0 */
+.button{border-color:var(--wine);background:var(--wine);font-weight:800;box-shadow:0 10px 24px rgba(115,29,50,.22);transition:background .2s,color .2s}
+.button:hover,.button:focus-visible{background:var(--wine-dark);outline:3px solid var(--gold-soft);outline-offset:3px}
+.button.secondary{border-color:var(--hair);background:transparent;color:var(--wine);box-shadow:none}
+.button.secondary:hover,.button.secondary:focus-visible{border-color:var(--wine);background:var(--wine);color:#fff}
+
+/* Cartes, étapes, avantages, caractéristiques */
+.card{border:1px solid var(--line);border-radius:12px!important;background:var(--paper);box-shadow:none!important}
+.section.tint .card{background:#fff}
+.card h3{color:var(--wine);font-weight:600}
+.step-number{display:block;width:auto;height:auto;border-radius:0;background:none;color:var(--gold);font-size:.74rem;font-weight:800;letter-spacing:.18em}
+.step-number::before{content:"0"}
+.card .step-number+h3{margin-top:8px}
+.specs div{background:transparent;border-bottom-color:var(--line)}
+.specs dt{color:var(--ink);font-weight:800}
+
+/* Encadrés */
+.notice{padding:16px 20px;border-left:3px solid var(--gold);border-radius:10px;background:#fff;font-size:.93rem;line-height:1.55}
+.notice p{margin:0 0 10px}.notice p:last-child{margin:0}
+
+/* Espace de commande : panneau du configurateur Red Dingo */
+.order-form,.summary{border:1px solid var(--hair);border-radius:18px;background:#fff;box-shadow:var(--shadow)}
+.field span{color:var(--ink);font-size:.86rem;font-weight:800;letter-spacing:.02em}
+.field input,.field select,.field textarea{border:1px solid var(--line);border-radius:10px;background:var(--paper);font-weight:600;transition:border-color .2s,box-shadow .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 3px rgba(189,148,82,.22)}
+.submit{min-height:52px;font-size:1.02rem}
+.summary h3{margin-top:0;font-weight:600}
+.success{border-left:3px solid var(--gold);border-radius:8px;background:var(--plate)}
+
+/* FAQ : volets aux filets dorés */
+.faq details{border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+.faq details[open]{border-color:var(--hair)}
+.faq summary{color:var(--wine);font-weight:800}
+
+@media(max-width:560px){
+  .section.tint{padding-inline:16px;border-radius:14px}
+  .hero-details{padding-top:24px}
+  .price-family{display:block}
+}
